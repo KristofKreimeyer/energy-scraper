@@ -1,0 +1,123 @@
+/* ---- Design-Tokens (WCAG 2.2 AA) ---------------------------------------- */
+:root {
+  --ground: #edf0f3;
+  --surface: #ffffff;
+  --surface-2: #f4f6f8;
+  --ink: #10151b;
+  --muted: #5b6772;
+  --border: #dbe1e7;
+  --border-strong: #c3ccd5;
+  --accent: #e24a08; /* Signal-Orange: nur groß oder als Fläche mit weißem Text */
+  --accent-strong: #b23c07; /* Text/Links auf hellem Grund */
+  --accent-tint: #fbeae1;
+  --good: #0a7a42; /* semantisch: bester Grundpreis */
+  --good-tint: #e1f1e8;
+  --warn-ink: #7a4b00;
+  --warn-tint: #f6ecd6;
+  --focus: #1155dd;
+
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', Menlo, Consolas, monospace;
+
+  --radius: 14px;
+  --radius-sm: 9px;
+  --shadow: 0 1px 2px rgba(16, 21, 27, 0.06), 0 6px 20px rgba(16, 21, 27, 0.06);
+  --maxw: 1160px;
+
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ground: #0d1116;
+    --surface: #151b22;
+    --surface-2: #1b222b;
+    --ink: #e8edf2;
+    --muted: #9aa6b1;
+    --border: #29323c;
+    --border-strong: #3a4653;
+    --accent: #ff6a33;
+    --accent-strong: #ff7a45;
+    --accent-tint: #2a1810;
+    --good: #35c978;
+    --good-tint: #10281c;
+    --warn-ink: #e6b65c;
+    --warn-tint: #2a2213;
+    --focus: #6fa8ff;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
+  }
+}
+
+/* Explizite Theme-Umschaltung überschreibt die Systemvorgabe in beide Richtungen */
+:root[data-theme='light'] {
+  --ground: #edf0f3; --surface: #ffffff; --surface-2: #f4f6f8;
+  --ink: #10151b; --muted: #5b6772; --border: #dbe1e7; --border-strong: #c3ccd5;
+  --accent: #e24a08; --accent-strong: #b23c07; --accent-tint: #fbeae1;
+  --good: #0a7a42; --good-tint: #e1f1e8; --warn-ink: #7a4b00; --warn-tint: #f6ecd6;
+  --focus: #1155dd; --shadow: 0 1px 2px rgba(16, 21, 27, 0.06), 0 6px 20px rgba(16, 21, 27, 0.06);
+}
+:root[data-theme='dark'] {
+  --ground: #0d1116; --surface: #151b22; --surface-2: #1b222b;
+  --ink: #e8edf2; --muted: #9aa6b1; --border: #29323c; --border-strong: #3a4653;
+  --accent: #ff6a33; --accent-strong: #ff7a45; --accent-tint: #2a1810;
+  --good: #35c978; --good-tint: #10281c; --warn-ink: #e6b65c; --warn-tint: #2a2213;
+  --focus: #6fa8ff; --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+/* ---- Reset / Basis ------------------------------------------------------ */
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+h1, h2, h3 {
+  margin: 0;
+  color: var(--ink);
+}
+p {
+  margin: 0;
+}
+a {
+  color: var(--accent-strong);
+}
+code {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+}
+
+/* Sichtbarer Fokus überall – Grundpfeiler der Tastaturbedienung */
+:where(a, button, select, input, [tabindex]):focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

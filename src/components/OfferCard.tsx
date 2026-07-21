@@ -7,6 +7,7 @@ import {
   type GroupedOffer,
   type PriceInsight,
 } from '../lib/offers'
+import { AlarmButton } from './AlarmButton'
 
 /** Textbausteine je Preisniveau (relativ zur eigenen Historie des Produkts). */
 const INSIGHT_COPY: Record<PriceInsight['level'], { label: string; icon: 'bolt' | 'trend' }> = {
@@ -256,6 +257,8 @@ export function OfferCard({ offer, isBest }: Props) {
             <ClockIcon />
             {validLabel}
           </span>
+
+          <AlarmButton offer={offer} />
 
           {offer.url && (
             <a

@@ -1,0 +1,5 @@
+# Nur die normalisierbaren *offers*.json werden versioniert – die rohen
+# Explorations-Artefakte (response-*.json, *.html, *-elements.json) nicht.
+*
+!.gitignore
+!*offers*.json

@@ -1,0 +1,20 @@
+[
+  {
+    "brand": "Monster",
+    "supermarket": "Penny",
+    "title": "Energy Drink",
+    "productBrand": "Monster Energy",
+    "description": "Versch. Sorten, koffein- und taurinhaltig, zzgl. 0.25 Pfand, je 0,5 l",
+    "price": "0,89 €",
+    "priceNumber": 0.89,
+    "referencePrice": 1.78,
+    "unit": "Liter",
+    "quantity": 1,
+    "validFrom": "2026-07-22T22:00:00Z",
+    "validTo": "2026-07-25T21:59:00Z",
+    "imageUrl": "https://cdn.marktguru.de/api/v1/offers/24092822/images/default/0/medium.webp",
+    "offerId": 24092822,
+    "sourceUrl": "https://www.marktguru.de/offers/24092822",
+    "scrapedAt": "2026-07-21T13:22:12.184Z"
+  }
+]

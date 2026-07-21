@@ -1,0 +1,12 @@
+{
+  "name": "energy-scraper-scrapers",
+  "version": "1.0.0",
+  "description": "Produktive Energy-Drink-Scraper. Schreiben captured/*offers*.json, die scripts/prepare-data.mjs normalisiert.",
+  "private": true,
+  "scripts": {
+    "all": "node run-all.js"
+  },
+  "dependencies": {
+    "playwright": "^1.61.1"
+  }
+}

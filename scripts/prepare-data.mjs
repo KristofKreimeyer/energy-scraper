@@ -1,4 +1,4 @@
-// Normalisiert die heterogenen Scraper-Outputs aus ../captured/*offers*.json
+// Normalisiert die heterogenen Scraper-Outputs aus ../scrapers/captured/*offers*.json
 // in ein einheitliches Offer-Schema und schreibt src/data/offers.json.
 //
 // Die Quellen liefern den Grundpreis (€/L) in fünf verschiedenen Formen –
@@ -11,7 +11,7 @@ import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const scriptDir = dirname(fileURLToPath(import.meta.url))
-const capturedDir = resolve(scriptDir, '../../captured')
+const capturedDir = resolve(scriptDir, '../scrapers/captured')
 const outDir = resolve(scriptDir, '../src/data')
 const outFile = join(outDir, 'offers.json')
 const historyFile = join(outDir, 'price-history.json')

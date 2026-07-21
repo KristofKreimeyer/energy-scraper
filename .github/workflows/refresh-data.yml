@@ -1,0 +1,62 @@
+name: Preisdaten aktualisieren
+
+# Fährt alle produktiven Scraper, normalisiert und schreibt die Preishistorie
+# fort, dann committet die Action die aktualisierten Datendateien zurück.
+#
+# Voraussetzung: Repo liegt auf GitHub. Unter Settings → Actions → General muss
+# "Workflow permissions" auf "Read and write" stehen (oder das permissions-Feld
+# unten genügt), damit der Push zurück ins Repo funktioniert.
+
+on:
+  schedule:
+    - cron: '0 5 * * 1' # jeden Montag 05:00 UTC (neue Wochenprospekte)
+  workflow_dispatch:
+    inputs:
+      aldi_sued_slug:
+        description: 'Aldi-Süd-Prospekt-Slug (z. B. kw30-26-op-mp) – leer lassen, um Aldi Süd zu überspringen'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+# Verhindert überlappende Läufe (Push-Konflikte); wartet lieber, statt abzubrechen.
+concurrency:
+  group: refresh-data
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Scraper-Abhängigkeiten installieren
+        working-directory: scrapers
+        run: npm ci
+
+      - name: Chromium für Playwright installieren
+        working-directory: scrapers
+        run: npx playwright install --with-deps chromium
+
+      - name: Scraper + Normalisierung ausführen
+        working-directory: scrapers
+        env:
+          ALDI_SUED_SLUG: ${{ github.event.inputs.aldi_sued_slug }}
+        run: node run-all.js
+
+      - name: Aktualisierte Daten committen
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add src/data/offers.json src/data/price-history.json scrapers/captured
+          if git diff --cached --quiet; then
+            echo 'Keine Datenänderungen – nichts zu committen.'
+          else
+            git commit -m 'chore(data): Preisdaten & -historie aktualisiert [skip ci]'
+            git push
+          fi

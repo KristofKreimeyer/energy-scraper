@@ -1,0 +1,38 @@
+[
+  {
+    "brand": "Red Bull",
+    "supermarket": "Kaufland",
+    "title": "Energy Drink",
+    "productBrand": "Red Bull",
+    "description": "Festival-Tray taurin- und koffeinhaltig (+ 6.00 Pfand) je Karton = 24 x 0,25-l-Dose",
+    "price": "19,99 €",
+    "priceNumber": 19.99,
+    "referencePrice": 3.33,
+    "unit": "Liter",
+    "quantity": 24,
+    "validFrom": "2026-07-15T22:00:00Z",
+    "validTo": "2026-07-22T18:00:00Z",
+    "imageUrl": "https://cdn.marktguru.de/api/v1/offers/24067400/images/default/0/medium.webp",
+    "offerId": 24067400,
+    "sourceUrl": "https://www.marktguru.de/offers/24067400",
+    "scrapedAt": "2026-07-21T13:21:47.388Z"
+  },
+  {
+    "brand": "Gönnergy",
+    "supermarket": "Kaufland",
+    "title": "Energy Drink by MontanaBlack",
+    "productBrand": "Gönrgy",
+    "description": "versch. Sorten, mit und ohne Zucker, taurin- und koffeinhaltig, (+ 0.25 Pfand) je 0,5-l-Dose",
+    "price": "1,29 €",
+    "priceNumber": 1.29,
+    "referencePrice": 2.58,
+    "unit": "Liter",
+    "quantity": 1,
+    "validFrom": "2026-07-15T22:00:00Z",
+    "validTo": "2026-07-22T18:00:00Z",
+    "imageUrl": "https://cdn.marktguru.de/api/v1/offers/24068285/images/default/0/medium.webp",
+    "offerId": 24068285,
+    "sourceUrl": "https://www.marktguru.de/offers/24068285",
+    "scrapedAt": "2026-07-21T13:21:47.389Z"
+  }
+]

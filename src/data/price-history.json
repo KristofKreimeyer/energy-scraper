@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-21T12:42:36.242Z",
+  "updatedAt": "2026-07-21T13:22:43.884Z",
   "products": {
     "aldi nord|rockstar|energydrink original|0,5-l-dose": {
       "market": "Aldi Nord",
@@ -68,6 +68,12 @@
           "price": 19.99,
           "perUnit": 0.83,
           "perLiter": 3.33
+        },
+        {
+          "date": "2026-07-21",
+          "price": 19.99,
+          "perUnit": 0.83,
+          "perLiter": 3.33
         }
       ]
     },
@@ -79,6 +85,12 @@
       "points": [
         {
           "date": "2026-07-18",
+          "price": 1.29,
+          "perUnit": 1.29,
+          "perLiter": 2.58
+        },
+        {
+          "date": "2026-07-21",
           "price": 1.29,
           "perUnit": 1.29,
           "perLiter": 2.58
@@ -110,6 +122,12 @@
           "price": 5.29,
           "perUnit": 0.88,
           "perLiter": 3.53
+        },
+        {
+          "date": "2026-07-21",
+          "price": 5.29,
+          "perUnit": 0.88,
+          "perLiter": 3.53
         }
       ]
     },
@@ -138,6 +156,12 @@
           "price": 0.77,
           "perUnit": 0.77,
           "perLiter": 1.54
+        },
+        {
+          "date": "2026-07-21",
+          "price": 0.77,
+          "perUnit": 0.77,
+          "perLiter": 1.54
         }
       ]
     },
@@ -152,6 +176,76 @@
           "price": 0.99,
           "perUnit": 0.99,
           "perLiter": 3.96
+        }
+      ]
+    },
+    "aldi nord|monster|energydrink original|0,5-l-dose": {
+      "market": "Aldi Nord",
+      "brand": "Monster",
+      "title": "Energydrink Original",
+      "unitLabel": "0,5-L-Dose",
+      "points": [
+        {
+          "date": "2026-07-21",
+          "price": 0.79,
+          "perUnit": 0.79,
+          "perLiter": 1.58
+        }
+      ]
+    },
+    "aldi nord|monster|energydrink|0,5-l-dose": {
+      "market": "Aldi Nord",
+      "brand": "Monster",
+      "title": "Energydrink",
+      "unitLabel": "0,5-L-Dose",
+      "points": [
+        {
+          "date": "2026-07-21",
+          "price": 0.79,
+          "perUnit": 0.79,
+          "perLiter": 1.58
+        }
+      ]
+    },
+    "aldi nord|red bull|energydrink|6x0,25-l-dose": {
+      "market": "Aldi Nord",
+      "brand": "Red Bull",
+      "title": "Energydrink",
+      "unitLabel": "6x0,25-L-Dose",
+      "points": [
+        {
+          "date": "2026-07-21",
+          "price": 4.99,
+          "perUnit": 0.83,
+          "perLiter": 3.33
+        }
+      ]
+    },
+    "lidl|monster|energy drink|0,5 l": {
+      "market": "Lidl",
+      "brand": "Monster",
+      "title": "Energy Drink",
+      "unitLabel": "0,5 l",
+      "points": [
+        {
+          "date": "2026-07-21",
+          "price": 0.89,
+          "perUnit": 0.89,
+          "perLiter": 1.78
+        }
+      ]
+    },
+    "penny|monster|energy drink|0,5 l": {
+      "market": "Penny",
+      "brand": "Monster",
+      "title": "Energy Drink",
+      "unitLabel": "0,5 l",
+      "points": [
+        {
+          "date": "2026-07-21",
+          "price": 0.89,
+          "perUnit": 0.89,
+          "perLiter": 1.78
         }
       ]
     }

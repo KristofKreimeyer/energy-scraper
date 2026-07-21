@@ -60,3 +60,28 @@ jobs:
             git commit -m 'chore(data): Preisdaten & -historie aktualisiert [skip ci]'
             git push
           fi
+
+      # Bestpreis-Alarm: erkennt neue Preistiefs (aus der frisch geschriebenen
+      # price-history.json) und mailt die bestätigten Abos an. Ohne die Secrets
+      # läuft ein Trockenlauf; fehlende Alarme dürfen den Datenlauf nicht kippen,
+      # daher continue-on-error (die wichtigen Daten sind oben schon committet).
+      # web-push (für den Push-Kanal) als Laufzeit-Dependency installieren.
+      - name: Alarm-Abhängigkeiten installieren
+        run: npm ci --omit=dev
+
+      - name: Bestpreis-Alarme versenden
+        continue-on-error: true
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_D1_DATABASE_ID: ${{ secrets.CLOUDFLARE_D1_DATABASE_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          VAPID_SUBJECT: ${{ vars.VAPID_SUBJECT }}
+          EMAIL_FROM: ${{ vars.EMAIL_FROM }}
+          EMAIL_FROM_NAME: ${{ vars.EMAIL_FROM_NAME }}
+          PUBLIC_SITE_URL: ${{ vars.PUBLIC_SITE_URL }}
+          API_BASE: ${{ vars.API_BASE }}
+        run: node scripts/send-alarms.mjs

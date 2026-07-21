@@ -1,4 +1,11 @@
-/* ---- Design-Tokens (WCAG 2.2 AA) ---------------------------------------- */
+@import 'tailwindcss';
+
+/* ---- Design-Tokens (WCAG 2.2 AA) ----------------------------------------
+   Die Farbwerte leben als CSS-Variablen, damit ein einziger Satz Utilities
+   (bg-surface, text-muted …) sowohl der System-Vorgabe (prefers-color-scheme)
+   ALS AUCH dem expliziten data-theme-Umschalter folgt – ohne Tailwinds
+   dark:-Variante, die den „System-Default, bis manuell umgeschaltet“-Fall
+   nicht sauber abbildet. */
 :root {
   --ground: #edf0f3;
   --surface: #ffffff;
@@ -15,9 +22,6 @@
   --warn-ink: #7a4b00;
   --warn-tint: #f6ecd6;
   --focus: #1155dd;
-
-  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', Menlo, Consolas, monospace;
 
   --radius: 14px;
   --radius-sm: 9px;
@@ -64,60 +68,115 @@
   --focus: #6fa8ff; --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
 }
 
-/* ---- Reset / Basis ------------------------------------------------------ */
-* {
-  box-sizing: border-box;
-}
-body {
-  margin: 0;
-  background: var(--ground);
-  color: var(--ink);
-  font-family: var(--font-sans);
-  font-size: 16px;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-}
-h1, h2, h3 {
-  margin: 0;
-  color: var(--ink);
-}
-p {
-  margin: 0;
-}
-a {
-  color: var(--accent-strong);
-}
-code {
-  font-family: var(--font-mono);
-  font-size: 0.86em;
+/* ---- Tokens für Tailwind-Utilities verfügbar machen --------------------- */
+@theme {
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', Menlo, Consolas, monospace;
 }
 
-/* Sichtbarer Fokus überall – Grundpfeiler der Tastaturbedienung */
-:where(a, button, select, input, [tabindex]):focus-visible {
-  outline: 3px solid var(--focus);
-  outline-offset: 2px;
-  border-radius: 6px;
+/* inline = Utilities referenzieren die Runtime-Variablen direkt und schalten
+   so automatisch mit Light/Dark um. */
+@theme inline {
+  --color-ground: var(--ground);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-tint: var(--accent-tint);
+  --color-good: var(--good);
+  --color-good-tint: var(--good-tint);
+  --color-warn-ink: var(--warn-ink);
+  --color-warn-tint: var(--warn-tint);
+  --color-focus: var(--focus);
+
+  --radius-card: var(--radius);
+  --radius-card-sm: var(--radius-sm);
+  --shadow-card: var(--shadow);
 }
 
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  margin: -1px;
-  padding: 0;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  border: 0;
+/* ---- Basis / a11y ------------------------------------------------------- */
+@layer base {
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  a {
+    color: var(--accent-strong);
+  }
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+  }
+
+  /* Sichtbarer Fokus überall – Grundpfeiler der Tastaturbedienung */
+  :where(a, button, select, input, [tabindex]):focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    border: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+/* ---- Widgets, die als reine Utilities unleserlich/unmöglich wären ------- */
+@layer components {
+  /* Platzhalter-Dose (Pseudo-Element, wenn kein Produktbild vorliegt) */
+  .can {
+    width: 46px;
+    height: 84px;
+    border-radius: 10px / 8px;
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.35);
+    position: relative;
+  }
+  .can::before {
+    content: '';
+    position: absolute;
+    inset: 14px 0;
+    background: rgba(255, 255, 255, 0.16);
+  }
+
+  /* Eigener Dropdown-Pfeil (appearance:none) für die Sortier-Auswahl */
+  .select-chevron {
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235B6772' stroke-width='2.4' stroke-linecap='round'><path d='M6 9l6 6 6-6'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 11px center;
+  }
+
+  /* Stretched-Link: der Fokus des unsichtbar über die Karte gelegten CTA soll
+     die GANZE Karte umranden, nicht nur den Text. */
+  .offer-card:has([data-cta]:focus-visible) {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
   }
 }

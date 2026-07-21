@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import './App.css'
 import type { SortKey } from './types'
 import {
   offers as allOffers,
@@ -20,6 +19,9 @@ import {
   type Timeframe,
 } from './lib/offers'
 import { OfferCard } from './components/OfferCard'
+
+const WRAP = 'mx-auto w-full max-w-[var(--maxw)] px-5'
+const EYEBROW = 'font-mono text-[0.72rem] tracking-[0.14em] uppercase text-muted'
 
 const TIMEFRAMES: { value: Timeframe; label: string }[] = [
   { value: 'current', label: 'Diese Woche' },
@@ -126,23 +128,43 @@ function App() {
     year: 'numeric',
   })
 
+  // Chip-Grundstil (Markt- & Marken-Filter) – Zustände via aria-pressed/disabled
+  const chip =
+    'group inline-flex items-center gap-[7px] min-h-[38px] px-3.5 bg-surface text-ink border border-border-strong ' +
+    'rounded-full text-[0.85rem] font-semibold cursor-pointer enabled:aria-[pressed=false]:hover:bg-surface-2 ' +
+    'aria-pressed:bg-accent aria-pressed:text-white aria-pressed:border-accent ' +
+    'aria-pressed:hover:bg-accent-strong aria-pressed:hover:border-accent-strong ' +
+    'disabled:opacity-40 disabled:cursor-not-allowed'
+  const chipCount = 'font-mono text-[0.74rem] opacity-75 tabular-nums group-aria-pressed:opacity-90'
+
   return (
     <>
-      <a className="skip" href="#main">
+      <a
+        className="absolute left-3 -top-[60px] z-50 bg-surface text-ink border-2 border-focus px-4 py-2.5 rounded-lg font-semibold transition-[top] duration-150 focus:top-3"
+        href="#main"
+      >
         Zum Inhalt springen
       </a>
 
-      <header className="site-header">
-        <div className="wrap">
-          <div className="brand">
-            <span className="bolt" aria-hidden="true">
+      <header className="sticky top-0 z-20 bg-[color-mix(in_srgb,var(--surface)_88%,transparent)] backdrop-blur-[8px] backdrop-saturate-150 border-b border-border">
+        <div className={`${WRAP} flex items-center gap-4 h-[62px]`}>
+          <div className="flex items-center gap-2.5 font-[750] tracking-[-0.02em] text-[1.12rem]">
+            <span
+              className="w-[30px] h-[30px] flex-none grid place-items-center bg-accent text-white rounded-lg text-[1.1rem]"
+              aria-hidden="true"
+            >
               ⚡
             </span>
             <span>
-              FindMy<em>Energy</em>
+              FindMy<em className="not-italic text-accent-strong">Energy</em>
             </span>
           </div>
-          <button className="theme-btn" type="button" aria-pressed={isDark} onClick={toggle}>
+          <button
+            className="flex-none ml-auto h-10 min-w-[44px] px-3 bg-surface text-ink border border-border-strong rounded-[10px] text-[0.85rem] font-semibold cursor-pointer inline-flex items-center gap-[7px] hover:bg-surface-2"
+            type="button"
+            aria-pressed={isDark}
+            onClick={toggle}
+          >
             <span aria-hidden="true">{isDark ? '◑' : '◐'}</span>
             {isDark ? 'Hell' : 'Dunkel'}
           </button>
@@ -150,45 +172,53 @@ function App() {
       </header>
 
       <main id="main">
-        <section className="hero wrap" aria-labelledby="page-title">
-          <p className="eyebrow">
+        <section className={`${WRAP} pt-[34px] pb-2`} aria-labelledby="page-title">
+          <p className={`${EYEBROW} mb-2.5`}>
             Energy-Drink-Angebote · {timeframe === 'current' ? 'Diese Woche' : 'Nächste Woche · Vorschau'}
           </p>
-          <h1 id="page-title">
+          <h1
+            id="page-title"
+            className="text-[clamp(1.7rem,3.4vw,2.5rem)] leading-[1.08] tracking-[-0.025em] mb-2.5 text-balance max-w-[20ch]"
+          >
             {timeframe === 'current'
               ? 'Alle Energy-Deals der Woche, nach Preis pro Liter sortiert.'
               : 'Ein Blick voraus: die Energy-Deals der nächsten Woche.'}
           </h1>
-          <p className="lede">
+          <p className="text-muted text-[1.02rem] max-w-[56ch]">
             Automatisch gesammelt aus den Prospekten von Aldi, Kaufland, Lidl, Netto, Penny und Rewe.
             Vergleiche Dosenpreis <em>und</em> Grundpreis auf einen Blick.
           </p>
 
           {deal && dealSaving && (
-            <section className="spotlight" aria-labelledby="deal-title">
-              <p className="deal-pct" aria-hidden="true">
+            <section
+              className="mt-6 flex items-center gap-5 px-[22px] py-[18px] bg-good-tint border border-[color-mix(in_srgb,var(--good)_40%,transparent)] rounded-card shadow-card max-[560px]:flex-wrap max-[560px]:gap-x-4 max-[560px]:gap-y-3"
+              aria-labelledby="deal-title"
+            >
+              <p className="flex-none font-mono text-[clamp(2.1rem,5vw,3rem)] font-[750] tracking-[-0.03em] tabular-nums text-good leading-none">
                 −{dealSaving.percent}&nbsp;%
               </p>
-              <div className="deal-info">
-                <p className="eyebrow deal-eyebrow">
+              <div className="flex-1 min-w-0">
+                <p className={`${EYEBROW} !text-good mb-1.5`}>
                   {timeframe === 'current' ? 'Größter Preissturz' : 'Größter Preissturz · nächste Woche'}
                 </p>
-                <h2 id="deal-title" className="deal-title">
+                <h2 id="deal-title" className="text-[1.3rem] tracking-[-0.02em] leading-[1.15] text-balance">
                   {deal.brand} {deal.title}
                 </h2>
-                <p className="deal-meta">
+                <p className="mt-[3px] text-muted text-[0.9rem]">
                   {deal.market} · {deal.unitLabel}
                 </p>
               </div>
-              <div className="deal-price">
-                <span className="deal-now">{formatEuro(deal.price)}</span>
-                <span className="deal-was">
+              <div className="flex-none text-right flex flex-col gap-0.5 max-[560px]:text-left max-[560px]:w-full max-[560px]:flex-row max-[560px]:items-baseline max-[560px]:gap-2.5 max-[560px]:pt-3 max-[560px]:border-t max-[560px]:border-[color-mix(in_srgb,var(--good)_25%,transparent)]">
+                <span className="font-mono text-[1.7rem] font-bold tracking-[-0.03em] tabular-nums text-ink">
+                  {formatEuro(deal.price)}
+                </span>
+                <span className="font-mono text-[0.82rem] tabular-nums text-muted">
                   <span className="visually-hidden">
                     {dealSaving.percent} Prozent günstiger, Sie sparen {formatEuro(dealSaving.amount)} gegenüber vorher{' '}
                     {formatEuro(deal.oldPrice!)}
                   </span>
                   <span aria-hidden="true">
-                    <s>{formatEuro(deal.oldPrice!)}</s> · {formatEuro(dealSaving.amount)} gespart
+                    <s className="text-muted">{formatEuro(deal.oldPrice!)}</s> · {formatEuro(dealSaving.amount)} gespart
                   </span>
                 </span>
               </div>
@@ -196,111 +226,119 @@ function App() {
           )}
 
           {stats ? (
-            <ul className="kpis">
-              <li className="kpi lead">
-                <span className="k-label">Günstigste Dose</span>
-                <span className="k-val">{formatEuro(stats.cheapest.perUnit)}</span>
-                <span className="k-sub">
+            <ul className="list-none mt-[26px] p-0 grid gap-[14px] grid-cols-4 max-[780px]:grid-cols-2 max-[430px]:grid-cols-1">
+              <li className="bg-surface border border-[color-mix(in_srgb,var(--accent)_55%,var(--border))] rounded-card px-4 pt-4 pb-[15px] shadow-card flex flex-col gap-0.5">
+                <span className={`${EYEBROW} !text-[0.68rem] !tracking-[0.1em]`}>Günstigste Dose</span>
+                <span className="font-mono text-[1.85rem] font-bold tracking-[-0.02em] tabular-nums text-accent">
+                  {formatEuro(stats.cheapest.perUnit)}
+                </span>
+                <span className="text-[0.82rem] text-muted">
                   {stats.cheapest.brand} · {stats.cheapest.market} ·{' '}
                   {stats.cheapest.unitCount > 1 ? 'je Dose' : stats.cheapest.unitLabel}
                 </span>
               </li>
-              <li className="kpi">
-                <span className="k-label">Bester Grundpreis</span>
+              <li className="bg-surface border border-border rounded-card px-4 pt-4 pb-[15px] shadow-card flex flex-col gap-0.5">
+                <span className={`${EYEBROW} !text-[0.68rem] !tracking-[0.1em]`}>Bester Grundpreis</span>
                 {stats.bestLiter ? (
                   <>
-                    <span className="k-val">
+                    <span className="font-mono text-[1.85rem] font-bold tracking-[-0.02em] tabular-nums">
                       {formatEuro(stats.bestLiter.perLiter!)}
-                      <span className="u">/L</span>
+                      <span className="text-[0.9rem] text-muted">/L</span>
                     </span>
-                    <span className="k-sub">
+                    <span className="text-[0.82rem] text-muted">
                       {stats.bestLiter.brand} · {stats.bestLiter.market}
                     </span>
                   </>
                 ) : (
                   <>
-                    <span className="k-val">—</span>
-                    <span className="k-sub">Kein Grundpreis verfügbar</span>
+                    <span className="font-mono text-[1.85rem] font-bold tabular-nums">—</span>
+                    <span className="text-[0.82rem] text-muted">Kein Grundpreis verfügbar</span>
                   </>
                 )}
               </li>
-              <li className="kpi">
-                <span className="k-label">Preisspanne pro Liter</span>
+              <li className="bg-surface border border-border rounded-card px-4 pt-4 pb-[15px] shadow-card flex flex-col gap-0.5">
+                <span className={`${EYEBROW} !text-[0.68rem] !tracking-[0.1em]`}>Preisspanne pro Liter</span>
                 {stats.literStats ? (
                   <>
-                    <span className="k-val k-val--range">
+                    <span className="font-mono text-[1.4rem] font-bold tracking-[-0.02em] tabular-nums">
                       {formatNumber(stats.literStats.min)}–{formatNumber(stats.literStats.max)}
-                      <span className="u"> €/L</span>
+                      <span className="text-[0.9rem] text-muted"> €/L</span>
                     </span>
-                    <span className="k-sub">Vergleichen lohnt sich</span>
+                    <span className="text-[0.82rem] text-muted">Vergleichen lohnt sich</span>
                   </>
                 ) : (
                   <>
-                    <span className="k-val">—</span>
-                    <span className="k-sub">Kein Grundpreis verfügbar</span>
+                    <span className="font-mono text-[1.85rem] font-bold tabular-nums">—</span>
+                    <span className="text-[0.82rem] text-muted">Kein Grundpreis verfügbar</span>
                   </>
                 )}
               </li>
-              <li className="kpi">
-                <span className="k-label">Typischer Grundpreis</span>
+              <li className="bg-surface border border-border rounded-card px-4 pt-4 pb-[15px] shadow-card flex flex-col gap-0.5">
+                <span className={`${EYEBROW} !text-[0.68rem] !tracking-[0.1em]`}>Typischer Grundpreis</span>
                 {stats.literStats ? (
                   <>
-                    <span className="k-val">
+                    <span className="font-mono text-[1.85rem] font-bold tracking-[-0.02em] tabular-nums">
                       {formatNumber(stats.literStats.median)}
-                      <span className="u"> €/L</span>
+                      <span className="text-[0.9rem] text-muted"> €/L</span>
                     </span>
-                    <span className="k-sub">Median über {stats.literCount} Angebote</span>
+                    <span className="text-[0.82rem] text-muted">Median über {stats.literCount} Angebote</span>
                   </>
                 ) : (
                   <>
-                    <span className="k-val">—</span>
-                    <span className="k-sub">Kein Grundpreis verfügbar</span>
+                    <span className="font-mono text-[1.85rem] font-bold tabular-nums">—</span>
+                    <span className="text-[0.82rem] text-muted">Kein Grundpreis verfügbar</span>
                   </>
                 )}
               </li>
             </ul>
           ) : (
-            <p className="empty" style={{ marginTop: 24 }}>
+            <p className="mt-6 px-5 py-12 text-center text-muted border border-dashed border-border-strong rounded-card">
               Für nächste Woche liegen noch keine Angebote vor. Sobald neue Prospekte erscheinen, tauchen sie hier auf.
             </p>
           )}
         </section>
 
-        <div className="controls">
-          <div className="wrap">
-            <div className="segmented" role="group" aria-label="Zeitraum wählen">
+        <div className="sticky top-[62px] z-[15] bg-[color-mix(in_srgb,var(--ground)_92%,transparent)] backdrop-blur-[6px] py-4 mt-[30px] border-b border-border">
+          <div className={WRAP}>
+            <div className="inline-flex gap-1 p-1 mb-3.5 bg-surface-2 border border-border rounded-xl" role="group" aria-label="Zeitraum wählen">
               {TIMEFRAMES.map((t) => (
                 <button
                   key={t.value}
                   type="button"
-                  className="seg"
+                  className="group inline-flex items-center gap-2 min-h-10 px-4 bg-transparent text-muted border-0 rounded-[9px] text-[0.9rem] font-[650] cursor-pointer hover:text-ink aria-pressed:bg-surface aria-pressed:text-ink aria-pressed:shadow-card"
                   aria-pressed={timeframe === t.value}
                   onClick={() => setTimeframe(t.value)}
                 >
                   {t.label}
-                  <span className="count">{timeframeCounts[t.value]}</span>
+                  <span className="font-mono text-[0.74rem] tabular-nums text-muted bg-ground rounded-full px-[7px] py-px group-aria-pressed:text-accent-strong group-aria-pressed:bg-accent-tint">
+                    {timeframeCounts[t.value]}
+                  </span>
                 </button>
               ))}
             </div>
-            <div className="controls-row">
-              <div className="search">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2 flex-1 basis-[220px] min-w-[180px] bg-surface border border-border-strong rounded-[10px] px-3 h-11">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true" className="flex-none text-muted">
                   <circle cx="11" cy="11" r="7" />
                   <path d="M20 20l-3.5-3.5" strokeLinecap="round" />
                 </svg>
                 <input
                   id="q"
                   type="search"
+                  className="border-0 bg-transparent text-ink w-full outline-none"
                   placeholder="Marke oder Produkt suchen …"
                   aria-label="Angebote durchsuchen"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                 />
               </div>
-              <div className="sort-group">
-                <label htmlFor="sort">Sortieren</label>
+              <div className="flex items-center gap-2">
+                <label htmlFor="sort" className="text-[0.82rem] text-muted font-semibold">
+                  Sortieren
+                </label>
                 <select
                   id="sort"
+                  className="select-chevron h-11 pl-3 pr-[34px] text-[0.9rem] text-ink bg-surface border border-border-strong rounded-[10px] cursor-pointer"
                   aria-label="Angebote sortieren nach"
                   value={sort}
                   onChange={(e) => setSort(e.target.value as SortKey)}
@@ -314,17 +352,12 @@ function App() {
               </div>
             </div>
 
-            <div className="filters" role="group" aria-label="Nach Supermarkt filtern">
-              <span className="filters-label" aria-hidden="true">
+            <div className="flex flex-wrap gap-2 mt-3 items-center" role="group" aria-label="Nach Supermarkt filtern">
+              <span className={`${EYEBROW} !text-[0.68rem] !tracking-[0.1em] mr-0.5`} aria-hidden="true">
                 Markt
               </span>
-              <button
-                className="chip"
-                type="button"
-                aria-pressed={market === 'all'}
-                onClick={() => setMarket('all')}
-              >
-                Alle <span className="count">{offers.length}</span>
+              <button className={chip} type="button" aria-pressed={market === 'all'} onClick={() => setMarket('all')}>
+                Alle <span className={chipCount}>{offers.length}</span>
               </button>
               {markets.map((m) => {
                 const count = marketTally.get(m) ?? 0
@@ -332,29 +365,24 @@ function App() {
                 return (
                   <button
                     key={m}
-                    className="chip"
+                    className={chip}
                     type="button"
                     aria-pressed={selected}
                     disabled={count === 0 && !selected}
                     onClick={() => setMarket(m)}
                   >
-                    {m} <span className="count">{count}</span>
+                    {m} <span className={chipCount}>{count}</span>
                   </button>
                 )
               })}
             </div>
 
-            <div className="filters" role="group" aria-label="Nach Marke filtern">
-              <span className="filters-label" aria-hidden="true">
+            <div className="flex flex-wrap gap-2 mt-3 items-center" role="group" aria-label="Nach Marke filtern">
+              <span className={`${EYEBROW} !text-[0.68rem] !tracking-[0.1em] mr-0.5`} aria-hidden="true">
                 Marke
               </span>
-              <button
-                className="chip"
-                type="button"
-                aria-pressed={brand === 'all'}
-                onClick={() => setBrand('all')}
-              >
-                Alle <span className="count">{offers.length}</span>
+              <button className={chip} type="button" aria-pressed={brand === 'all'} onClick={() => setBrand('all')}>
+                Alle <span className={chipCount}>{offers.length}</span>
               </button>
               {brands.map((b) => {
                 const count = brandTally.get(b) ?? 0
@@ -362,13 +390,13 @@ function App() {
                 return (
                   <button
                     key={b}
-                    className="chip"
+                    className={chip}
                     type="button"
                     aria-pressed={selected}
                     disabled={count === 0 && !selected}
                     onClick={() => setBrand(b)}
                   >
-                    {b} <span className="count">{count}</span>
+                    {b} <span className={chipCount}>{count}</span>
                   </button>
                 )
               })}
@@ -376,14 +404,18 @@ function App() {
           </div>
         </div>
 
-        <div className="wrap">
-          <p className="status-line" role="status" aria-live="polite">
-            <b>{visible.length}</b> {visible.length === 1 ? 'Angebot' : 'Angebote'} · sortiert nach{' '}
+        <div className={WRAP}>
+          <p className="mt-4 mb-1 text-[0.88rem] text-muted font-mono" role="status" aria-live="polite">
+            <b className="text-ink">{visible.length}</b> {visible.length === 1 ? 'Angebot' : 'Angebote'} · sortiert nach{' '}
             {SORT_LABELS[sort]}
             {filtersActive && (
               <>
                 {' · '}
-                <button type="button" className="reset-link" onClick={resetFilters}>
+                <button
+                  type="button"
+                  className="font-[inherit] text-accent-strong border-0 px-1 py-0.5 -mx-1 cursor-pointer underline underline-offset-2 hover:text-accent"
+                  onClick={resetFilters}
+                >
                   Filter zurücksetzen
                 </button>
               </>
@@ -391,21 +423,23 @@ function App() {
           </p>
 
           {visible.length > 0 ? (
-            <ul className="grid" aria-label="Energy-Drink-Angebote">
+            <ul className="list-none mt-1.5 p-0 grid gap-4 grid-cols-[repeat(auto-fill,minmax(248px,1fr))]" aria-label="Energy-Drink-Angebote">
               {visible.map((offer) => (
                 <OfferCard key={offer.id} offer={offer} isBest={offer.id === bestId} />
               ))}
             </ul>
           ) : (
-            <p className="empty">Keine Angebote gefunden. Filter oder Suche anpassen.</p>
+            <p className="mt-1.5 px-5 py-12 text-center text-muted border border-dashed border-border-strong rounded-card">
+              Keine Angebote gefunden. Filter oder Suche anpassen.
+            </p>
           )}
         </div>
       </main>
 
-      <footer className="site-footer">
-        <div className="wrap">
+      <footer className="border-t border-border mt-10 pt-[22px] pb-10 text-muted text-[0.84rem]">
+        <div className={`${WRAP} flex flex-wrap gap-x-[18px] gap-y-2 items-center`}>
           <span>FindMyEnergy — Angebotsübersicht</span>
-          <span className="prov">Datenquelle: energy-scraper · captured/*.json · Stand {generatedLabel}</span>
+          <span className="font-mono text-[0.76rem]">Datenquelle: energy-scraper · captured/*.json · Stand {generatedLabel}</span>
         </div>
       </footer>
     </>

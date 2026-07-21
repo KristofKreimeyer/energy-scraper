@@ -1,0 +1,8 @@
+# Lokale Secrets für `wrangler dev` – kopieren nach `.dev.vars` (gitignored).
+# Alle optional: ohne BREVO_API_KEY / TELEGRAM_BOT_TOKEN läuft der Dev-Fallback
+# (Mail bzw. Telegram-Nachricht landet in der Wrangler-Konsole) – so lassen sich
+# Double-Opt-In und der /start-Bindungs-Flow lokal komplett testen.
+BREVO_API_KEY=
+TELEGRAM_BOT_TOKEN=
+# Ohne Secret akzeptiert der Webhook lokal jeden Request (bequem zum Testen).
+TELEGRAM_WEBHOOK_SECRET=

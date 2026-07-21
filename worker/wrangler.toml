@@ -1,0 +1,33 @@
+# Cloudflare Worker: FindMyEnergy Bestpreis-Alarm-API
+#
+# Vor dem ersten Deploy:
+#   1) D1-DB anlegen:  npx wrangler d1 create findmyenergy
+#      -> die ausgegebene database_id unten eintragen.
+#   2) Migrationen:    npm run db:migrate         (remote) bzw. db:migrate:local
+#   3) Secrets setzen: npx wrangler secret put BREVO_API_KEY
+#                      npx wrangler secret put TELEGRAM_BOT_TOKEN     (von @BotFather)
+#                      npx wrangler secret put TELEGRAM_WEBHOOK_SECRET (selbst gewählt)
+#      und TELEGRAM_BOT_USERNAME unten unter [vars] eintragen.
+#   4) Deploy:         npm run deploy
+#   5) Telegram-Webhook registrieren (einmalig, <TOKEN>/<SECRET>/<WORKER_URL> einsetzen):
+#      curl "https://api.telegram.org/bot<TOKEN>/setWebhook?url=<WORKER_URL>/api/telegram/webhook&secret_token=<SECRET>"
+name = "findmyenergy-api"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "findmyenergy"
+database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
+
+# Öffentliche, nicht-geheime Konfiguration. Geheimnisse (BREVO_API_KEY) via
+# `wrangler secret put` bzw. lokal in .dev.vars (siehe .dev.vars.example).
+[vars]
+PUBLIC_SITE_URL = "http://localhost:5173"
+ALLOWED_ORIGIN = "http://localhost:5173"
+EMAIL_FROM = "alarm@findmyenergy.de"
+EMAIL_FROM_NAME = "FindMyEnergy"
+FREE_MAX_SUBSCRIPTIONS = "1"
+# Für lokales Testen ein Platzhalter; in Produktion den echten Bot-Namen (ohne @).
+TELEGRAM_BOT_USERNAME = "FindMyEnergyBot"

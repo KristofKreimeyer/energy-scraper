@@ -6,7 +6,9 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  // worker/ ist ein eigenes Sub-Package (eigenes tsconfig/Tooling); nicht vom
+  // Frontend-ESLint mitscannen – v. a. nicht die generierten .wrangler-Artefakte.
+  globalIgnores(['dist', 'worker', 'scrapers']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [

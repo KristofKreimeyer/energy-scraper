@@ -14,6 +14,7 @@ const scriptDir = dirname(fileURLToPath(import.meta.url))
 const capturedDir = resolve(scriptDir, '../../captured')
 const outDir = resolve(scriptDir, '../src/data')
 const outFile = join(outDir, 'offers.json')
+const historyFile = join(outDir, 'price-history.json')
 
 /** Kurzlabel + Markenfarbe je Supermarkt (für Badge & Platzhalter-Dose). */
 const MARKET_META = {
@@ -109,6 +110,24 @@ function slug(...parts) {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
     .slice(0, 60)
+}
+
+/**
+ * Preisunabhängiger Produktschlüssel für die Historie (Markt|Marke|Titel|Gebinde).
+ * Bewusst OHNE Preis – so lässt sich derselbe Artikel über die Wochen hinweg
+ * verfolgen, auch wenn sich sein Preis ändert. Muss identisch in
+ * src/lib/offers.ts (productKey) berechnet werden.
+ */
+function productKey(o) {
+  return [o.market, o.brand, o.title, o.unitLabel]
+    .map((s) => String(s ?? '').trim().toLowerCase())
+    .join('|')
+}
+
+/** UTC-Kalendertag (YYYY-MM-DD) eines ISO-Zeitstempels; Fallback: heute. */
+function dayStr(iso) {
+  const d = iso ? new Date(iso) : new Date()
+  return (Number.isNaN(d.getTime()) ? new Date() : d).toISOString().slice(0, 10)
 }
 
 function normalize(o) {
@@ -231,4 +250,50 @@ console.log(
   `[prepare-data] ${list.length} Angebote aus ${files.length} Dateien` +
     (rejected ? ` (${rejected} Fehltreffer verworfen)` : '') +
     ` -> src/data/offers.json`,
+)
+
+// --- Preishistorie fortschreiben (append-only, ein Punkt je Produkt & Tag) ---
+// Jeder Lauf ergänzt die Historie um den heute erfassten Grundpreis/Stückpreis,
+// damit die App später "Bestpreis"/"günstiger als üblich" ableiten kann. Der
+// Datenpunkt wird am *Scan-Tag* (scrapedAt) verbucht, nicht am Ausführungstag –
+// so erzeugt ein erneuter Lauf über alte captured-Daten keine falschen Punkte.
+let history = { updatedAt: null, products: {} }
+if (existsSync(historyFile)) {
+  try {
+    const parsed = JSON.parse(readFileSync(historyFile, 'utf8'))
+    if (parsed && typeof parsed === 'object' && parsed.products) history = parsed
+  } catch (err) {
+    console.warn(`[prepare-data] price-history.json unlesbar, starte neu: ${err.message}`)
+  }
+}
+
+let newPoints = 0
+for (const o of list) {
+  if (o.perLiter == null && o.perUnit == null) continue // nichts Vergleichbares
+  const key = productKey(o)
+  const entry = (history.products[key] ??= {
+    market: o.market,
+    brand: o.brand,
+    title: o.title,
+    unitLabel: o.unitLabel,
+    points: [],
+  })
+  const date = dayStr(o.scrapedAt)
+  const point = { date, price: o.price, perUnit: o.perUnit, perLiter: o.perLiter }
+  const existing = entry.points.find((p) => p.date === date)
+  if (existing) {
+    Object.assign(existing, point) // jüngster Scan des Tages gewinnt
+  } else {
+    entry.points.push(point)
+    newPoints++
+  }
+  entry.points.sort((a, b) => a.date.localeCompare(b.date))
+}
+
+history.updatedAt = new Date().toISOString()
+writeFileSync(historyFile, JSON.stringify(history, null, 2))
+console.log(
+  `[prepare-data] Historie: ${Object.keys(history.products).length} Produkte` +
+    (newPoints ? `, +${newPoints} neue Tagespunkte` : ', keine neuen Tagespunkte') +
+    ` -> src/data/price-history.json`,
 )

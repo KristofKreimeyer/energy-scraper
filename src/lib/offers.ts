@@ -1,10 +1,88 @@
-import type { Offer, OffersData, SortKey } from '../types'
+import type { Offer, OffersData, PriceHistory, SortKey } from '../types'
 import data from '../data/offers.json'
+import historyData from '../data/price-history.json'
 
 const dataset = data as OffersData
 
 export const offers: Offer[] = dataset.offers
 export const generatedAt: string = dataset.generatedAt
+
+const history = historyData as PriceHistory
+
+/**
+ * Preisunabhängiger Produktschlüssel – muss identisch zu productKey in
+ * scripts/prepare-data.mjs sein, damit ein Angebot seinen Historieneintrag
+ * findet (Markt|Marke|Titel|Gebinde, getrimmt & kleingeschrieben).
+ */
+export function productKey(o: {
+  market: string
+  brand: string
+  title: string
+  unitLabel: string
+}): string {
+  return [o.market, o.brand, o.title, o.unitLabel]
+    .map((s) => String(s ?? '').trim().toLowerCase())
+    .join('|')
+}
+
+/** Preisniveau des aktuellen Angebots gemessen an seiner eigenen Historie. */
+export type PriceLevel = 'best' | 'good' | 'normal' | 'high'
+
+export interface PriceInsight {
+  level: PriceLevel
+  /** Anzahl unterschiedlicher Tage mit €/L-Datenpunkt. */
+  dayCount: number
+  /** Günstigster je erfasster Grundpreis (€/L). */
+  min: number
+  /** Typischer (Median-)Grundpreis (€/L). */
+  median: number
+  /** €/L-Verlauf, chronologisch – für die Sparkline. */
+  trend: { date: string; perLiter: number }[]
+}
+
+/** Ab so vielen Tagen gilt die Historie als aussagekräftig genug für ein Signal. */
+const MIN_DAYS_FOR_INSIGHT = 2
+
+/**
+ * Leitet aus dem eigenen Preisverlauf eines Angebots ein Kaufsignal ab:
+ * „Bestpreis“, „günstiger als üblich“, „normal“ oder „über üblich“.
+ * Gibt null zurück, wenn kein Grundpreis vorliegt, die Historie zu kurz ist
+ * (< {@link MIN_DAYS_FOR_INSIGHT} Tage) oder der Preis praktisch konstant war
+ * (dann fehlt jede Vergleichsbasis – ein Signal wäre irreführend).
+ */
+export function priceInsight(offer: Offer): PriceInsight | null {
+  if (offer.perLiter == null) return null
+  const entry = history.products[productKey(offer)]
+  if (!entry) return null
+
+  // je Tag genau ein €/L-Wert (defensiv – prepare-data dedupliziert bereits)
+  const byDay = new Map<string, number>()
+  for (const p of entry.points) {
+    if (p.perLiter != null) byDay.set(p.date, p.perLiter)
+  }
+  const trend = [...byDay.entries()]
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([date, perLiter]) => ({ date, perLiter }))
+  if (trend.length < MIN_DAYS_FOR_INSIGHT) return null
+
+  const values = trend.map((t) => t.perLiter).sort((a, b) => a - b)
+  const min = values[0]
+  const max = values[values.length - 1]
+  // Praktisch konstanter Preis (≤ 0,5 % Spanne): keine Vergleichsbasis.
+  if (max - min <= min * 0.005) return null
+
+  const mid = Math.floor(values.length / 2)
+  const median = values.length % 2 ? values[mid] : (values[mid - 1] + values[mid]) / 2
+
+  const p = offer.perLiter
+  let level: PriceLevel
+  if (p <= min * 1.001) level = 'best'
+  else if (p <= median * 0.99) level = 'good'
+  else if (p >= median * 1.05) level = 'high'
+  else level = 'normal'
+
+  return { level, dayCount: trend.length, min, median, trend }
+}
 
 /** Ein Angebot, das stellvertretend für mehrere Geschmackssorten steht. */
 export interface GroupedOffer extends Offer {

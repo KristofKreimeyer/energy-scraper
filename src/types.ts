@@ -37,3 +37,27 @@ export interface OffersData {
 }
 
 export type SortKey = 'liter' | 'price' | 'brand' | 'ending' | 'savings'
+
+/** Ein datierter Preispunkt eines Produkts (ein Eintrag je Kalendertag). */
+export interface PricePoint {
+  /** UTC-Kalendertag, YYYY-MM-DD. */
+  date: string
+  price: number
+  perUnit: number | null
+  perLiter: number | null
+}
+
+/** Preisverlauf eines Produkts über die Zeit – gekeyt in PriceHistory.products. */
+export interface PriceHistoryEntry {
+  market: string
+  brand: string
+  title: string
+  unitLabel: string
+  points: PricePoint[]
+}
+
+/** Append-only Preishistorie – erzeugt von scripts/prepare-data.mjs. */
+export interface PriceHistory {
+  updatedAt: string | null
+  products: Record<string, PriceHistoryEntry>
+}

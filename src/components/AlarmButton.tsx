@@ -7,6 +7,7 @@ import { subscribeToPush, PushError } from '../lib/push'
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8787'
 
 type Channel = 'email' | 'telegram' | 'push'
+type Metric = 'unit' | 'liter'
 
 type State =
   | { kind: 'idle' }
@@ -15,6 +16,13 @@ type State =
   | { kind: 'pending'; message: string }
   | { kind: 'done'; message: string }
   | { kind: 'error'; channel: Channel; message: string }
+
+interface SubscribeResponse {
+  status?: string
+  message?: string
+  telegramLink?: string
+  error?: string
+}
 
 const BellIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
@@ -26,6 +34,14 @@ const BellIcon = () => (
 export function AlarmButton({ offer }: { offer: GroupedOffer }) {
   const [state, setState] = useState<State>({ kind: 'idle' })
   const [email, setEmail] = useState('')
+  // Preiswecker (Pro)
+  const [weckerOn, setWeckerOn] = useState(false)
+  const [targetPrice, setTargetPrice] = useState('')
+  const [targetMetric, setTargetMetric] = useState<Metric>('unit')
+  // Pro-Code einlösen
+  const [showRedeem, setShowRedeem] = useState(false)
+  const [redeemCode, setRedeemCode] = useState('')
+  const [redeemMsg, setRedeemMsg] = useState<string | null>(null)
 
   const label = `${offer.brand} ${offer.title} (${offer.market})`
   const channel: Channel = state.kind === 'open' || state.kind === 'submitting' || state.kind === 'error' ? state.channel : 'email'
@@ -34,7 +50,10 @@ export function AlarmButton({ offer }: { offer: GroupedOffer }) {
     setState({ kind: 'submitting', channel: ch })
     try {
       let extra: Record<string, unknown> = {}
-      if (ch === 'email') extra = { email }
+      if (ch === 'email') {
+        extra = { email }
+        if (weckerOn && targetPrice) extra = { ...extra, targetPrice, targetMetric }
+      }
       if (ch === 'push') {
         try {
           extra = { subscription: await subscribeToPush() }
@@ -46,15 +65,11 @@ export function AlarmButton({ offer }: { offer: GroupedOffer }) {
       const res = await fetch(`${API_BASE}/api/subscribe`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          channel: ch,
-          ...extra,
-          productKey: productKey(offer),
-          productLabel: label,
-        }),
+        body: JSON.stringify({ channel: ch, ...extra, productKey: productKey(offer), productLabel: label }),
       })
-      const data = (await res.json()) as { status?: string; message?: string; telegramLink?: string }
+      const data = (await res.json()) as SubscribeResponse
       if (!res.ok) {
+        if (data.error === 'pro_required') setShowRedeem(true) // Code-Einlösen anbieten
         setState({ kind: 'error', channel: ch, message: data.message ?? 'Das hat nicht geklappt. Bitte später erneut versuchen.' })
         return
       }
@@ -68,6 +83,30 @@ export function AlarmButton({ offer }: { offer: GroupedOffer }) {
       }
     } catch {
       setState({ kind: 'error', channel: ch, message: 'Keine Verbindung zum Alarm-Dienst.' })
+    }
+  }
+
+  async function redeem() {
+    if (!email) {
+      setRedeemMsg('Bitte trage oben zuerst deine E-Mail ein.')
+      return
+    }
+    setRedeemMsg('…')
+    try {
+      const res = await fetch(`${API_BASE}/api/redeem`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ code: redeemCode, email }),
+      })
+      const data = (await res.json()) as { message?: string }
+      if (res.ok) {
+        setRedeemMsg('✅ ' + (data.message ?? 'Pro freigeschaltet.'))
+        setShowRedeem(false)
+      } else {
+        setRedeemMsg(data.message ?? 'Code ungültig.')
+      }
+    } catch {
+      setRedeemMsg('Keine Verbindung zum Alarm-Dienst.')
     }
   }
 
@@ -104,10 +143,11 @@ export function AlarmButton({ offer }: { offer: GroupedOffer }) {
   }
 
   const submitting = state.kind === 'submitting'
-  const seg = (ch: Channel) =>
+  const seg = (active: boolean) =>
     `flex-1 h-8 text-[0.78rem] font-semibold rounded-md cursor-pointer border ${
-      channel === ch ? 'bg-accent text-white border-accent' : 'bg-surface text-muted border-border-strong hover:text-ink'
+      active ? 'bg-accent text-white border-accent' : 'bg-surface text-muted border-border-strong hover:text-ink'
     }`
+  const unit = targetMetric === 'liter' ? '€/L' : '€/Dose'
 
   return (
     <div className="relative z-10 mt-3 flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>
@@ -117,42 +157,85 @@ export function AlarmButton({ offer }: { offer: GroupedOffer }) {
       </span>
 
       <div className="flex gap-1.5" role="group" aria-label="Benachrichtigungskanal">
-        <button type="button" className={seg('email')} aria-pressed={channel === 'email'} disabled={submitting} onClick={() => setState({ kind: 'open', channel: 'email' })}>
+        <button type="button" className={seg(channel === 'email')} aria-pressed={channel === 'email'} disabled={submitting} onClick={() => setState({ kind: 'open', channel: 'email' })}>
           E-Mail
         </button>
-        <button type="button" className={seg('telegram')} aria-pressed={channel === 'telegram'} disabled={submitting} onClick={() => setState({ kind: 'open', channel: 'telegram' })}>
+        <button type="button" className={seg(channel === 'telegram')} aria-pressed={channel === 'telegram'} disabled={submitting} onClick={() => setState({ kind: 'open', channel: 'telegram' })}>
           Telegram
         </button>
-        <button type="button" className={seg('push')} aria-pressed={channel === 'push'} disabled={submitting} onClick={() => setState({ kind: 'open', channel: 'push' })}>
+        <button type="button" className={seg(channel === 'push')} aria-pressed={channel === 'push'} disabled={submitting} onClick={() => setState({ kind: 'open', channel: 'push' })}>
           Push
         </button>
       </div>
 
       {channel === 'email' && (
         <form
-          className="flex gap-1.5"
+          className="flex flex-col gap-2"
           onSubmit={(e) => {
             e.preventDefault()
             subscribe('email')
           }}
         >
-          <input
-            id={`alarm-${offer.id}`}
-            type="email"
-            required
-            autoFocus
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="deine@email.de"
-            className="flex-1 min-w-0 h-9 px-2.5 text-[0.82rem] bg-surface text-ink border border-border-strong rounded-lg outline-none"
-          />
+          <div className="flex gap-1.5">
+            <input
+              id={`alarm-${offer.id}`}
+              type="email"
+              required
+              autoFocus
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="deine@email.de"
+              className="flex-1 min-w-0 h-9 px-2.5 text-[0.82rem] bg-surface text-ink border border-border-strong rounded-lg outline-none"
+            />
+            <button
+              type="submit"
+              disabled={submitting}
+              className="flex-none h-9 px-3 text-[0.82rem] font-semibold text-white bg-accent border border-accent rounded-lg cursor-pointer hover:bg-accent-strong disabled:opacity-60"
+            >
+              {submitting ? '…' : 'Aktivieren'}
+            </button>
+          </div>
+
           <button
-            type="submit"
-            disabled={submitting}
-            className="flex-none h-9 px-3 text-[0.82rem] font-semibold text-white bg-accent border border-accent rounded-lg cursor-pointer hover:bg-accent-strong disabled:opacity-60"
+            type="button"
+            className="self-start text-[0.74rem] font-semibold text-muted hover:text-accent-strong cursor-pointer"
+            aria-expanded={weckerOn}
+            onClick={() => setWeckerOn((v) => !v)}
           >
-            {submitting ? '…' : 'Aktivieren'}
+            {weckerOn ? '− Preiswecker' : '＋ Preiswecker (Pro)'}
           </button>
+
+          {weckerOn && (
+            <div className="flex flex-col gap-1.5 rounded-lg border border-border p-2">
+              <label htmlFor={`target-${offer.id}`} className="text-[0.72rem] text-muted">
+                Benachrichtige mich, sobald der Preis ≤ Zielwert ist:
+              </label>
+              <div className="flex gap-1.5">
+                <div className="flex items-center gap-1 flex-1 min-w-0 h-8 px-2 bg-surface border border-border-strong rounded-md">
+                  <input
+                    id={`target-${offer.id}`}
+                    type="number"
+                    inputMode="decimal"
+                    min="0"
+                    step="0.01"
+                    value={targetPrice}
+                    onChange={(e) => setTargetPrice(e.target.value)}
+                    placeholder="z. B. 0.79"
+                    className="w-full min-w-0 bg-transparent text-ink text-[0.82rem] outline-none"
+                  />
+                  <span className="flex-none text-[0.72rem] text-muted">{unit}</span>
+                </div>
+                <div className="flex gap-1" role="group" aria-label="Zielgröße">
+                  <button type="button" className={seg(targetMetric === 'unit') + ' !flex-none px-2.5'} aria-pressed={targetMetric === 'unit'} onClick={() => setTargetMetric('unit')}>
+                    Dose
+                  </button>
+                  <button type="button" className={seg(targetMetric === 'liter') + ' !flex-none px-2.5'} aria-pressed={targetMetric === 'liter'} onClick={() => setTargetMetric('liter')}>
+                    €/L
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </form>
       )}
       {channel === 'telegram' && (
@@ -181,7 +264,39 @@ export function AlarmButton({ offer }: { offer: GroupedOffer }) {
           {state.message}
         </p>
       )}
-      <p className="text-[0.7rem] text-muted">Kostenlos · ein Produkt · jederzeit abbestellbar.</p>
+
+      {channel === 'email' && showRedeem && (
+        <div className="flex gap-1.5">
+          <input
+            type="text"
+            value={redeemCode}
+            onChange={(e) => setRedeemCode(e.target.value)}
+            placeholder="Pro-Code"
+            className="flex-1 min-w-0 h-9 px-2.5 text-[0.82rem] bg-surface text-ink border border-border-strong rounded-lg outline-none"
+          />
+          <button
+            type="button"
+            onClick={redeem}
+            className="flex-none h-9 px-3 text-[0.82rem] font-semibold text-good border border-[color-mix(in_srgb,var(--good)_40%,transparent)] rounded-lg cursor-pointer hover:bg-good-tint"
+          >
+            Einlösen
+          </button>
+        </div>
+      )}
+      {redeemMsg && (
+        <p className="text-[0.74rem] text-muted" role="status">
+          {redeemMsg}
+        </p>
+      )}
+
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-[0.7rem] text-muted">Kostenlos · ein Produkt · jederzeit abbestellbar.</span>
+        {channel === 'email' && !showRedeem && (
+          <button type="button" className="flex-none text-[0.7rem] text-muted underline underline-offset-2 hover:text-accent-strong cursor-pointer" onClick={() => setShowRedeem(true)}>
+            Pro-Code einlösen
+          </button>
+        )}
+      </div>
     </div>
   )
 }

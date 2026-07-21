@@ -59,6 +59,17 @@ export function detectNewBestPrices(history) {
   return events
 }
 
+/**
+ * Preiswecker-Entscheidung (Pro): 'fire', sobald der aktuelle Preis <= Ziel und
+ * noch nicht benachrichtigt; 'reset', wenn der Preis wieder über dem Ziel liegt
+ * (damit die nächste Unterschreitung erneut alarmiert); sonst 'none'.
+ */
+export function weckerDecision(price, target, notifiedAt) {
+  if (price == null) return 'none'
+  if (price <= target) return notifiedAt ? 'none' : 'fire'
+  return notifiedAt ? 'reset' : 'none'
+}
+
 // --- ab hier: I/O & Versand (in der Action) --------------------------------
 
 const ACCOUNT = process.env.CLOUDFLARE_ACCOUNT_ID
@@ -105,6 +116,28 @@ export function alarmEmail(event, offer, unsubToken) {
       <p style="color:#5b6772;font-size:0.78rem;margin-top:18px">Du bekommst diese Mail, weil du einen Bestpreis-Alarm aktiviert hast. <a href="${unsubLink}" style="color:#5b6772">Abmelden</a></p>
     </div></body></html>`
   return { subject: `⚡ Bestpreis: ${event.label} – ${perLiter} €/L`, html, text }
+}
+
+/** Preiswecker-Mail: aktueller Preis hat den Zielwert erreicht. */
+export function weckerEmail(sub, offer, price) {
+  const unit = sub.target_metric === 'liter' ? '/L' : ''
+  const cur = price.toFixed(2).replace('.', ',')
+  const target = sub.target_price.toFixed(2).replace('.', ',')
+  const url = offer?.url || SITE_URL
+  const text =
+    `Dein Preiswecker: ${sub.product_label} liegt jetzt bei ${cur} €${unit} ` +
+    `(dein Ziel: ${target} €${unit}).\n\nZum Angebot: ${url}`
+  const html = `<!doctype html><html lang="de"><body style="margin:0;background:#edf0f3;font-family:system-ui,sans-serif;color:#10151b">
+    <div style="max-width:520px;margin:0 auto;padding:32px 20px">
+      <div style="font-weight:750;font-size:1.1rem;margin-bottom:20px">⚡ FindMy<span style="color:#b23c07">Energy</span></div>
+      <div style="background:#fff;border:1px solid #dbe1e7;border-radius:14px;padding:24px">
+        <div style="display:inline-block;background:#0a7a42;color:#fff;font-weight:700;font-size:0.8rem;padding:4px 10px;border-radius:7px;margin-bottom:12px">🔔 Preiswecker</div>
+        <h1 style="font-size:1.25rem;margin:0 0 8px">${sub.product_label}</h1>
+        <p style="margin:0 0 16px;color:#5b6772">Jetzt <strong style="color:#10151b">${cur} €${unit}</strong> – dein Zielpreis von ${target} €${unit} ist erreicht.</p>
+        <a href="${url}" style="display:inline-block;background:#e24a08;color:#fff;text-decoration:none;font-weight:650;padding:11px 20px;border-radius:10px">Zum Angebot</a>
+      </div>
+    </div></body></html>`
+  return { subject: `🔔 Preiswecker erreicht: ${sub.product_label} – ${cur} €${unit}`, html, text }
 }
 
 /** Telegram-Alarmtext (HTML). */
@@ -193,14 +226,15 @@ async function main() {
   for (const o of offersData.offers) if (!offerByKey.has(productKey(o))) offerByKey.set(productKey(o), o)
 
   const events = detectNewBestPrices(history)
-  if (events.length === 0) {
-    console.log('[send-alarms] Keine neuen Preistiefs – nichts zu versenden.')
-    return
-  }
-  console.log(`[send-alarms] ${events.length} neue(s) Preistief(er): ${events.map((e) => e.label).join(', ')}`)
+  console.log(
+    events.length
+      ? `[send-alarms] ${events.length} neue(s) Preistief(er): ${events.map((e) => e.label).join(', ')}`
+      : '[send-alarms] Keine neuen Preistiefs.',
+  )
 
+  // Ohne D1-Zugang können weder Bestpreis-Alarme noch Preiswecker abgefragt werden.
   if (!ACCOUNT || !DB_ID || !CF_TOKEN) {
-    console.log('[send-alarms] Cloudflare-Secrets fehlen – Trockenlauf, keine Abfrage/Versand.')
+    console.log('[send-alarms] Cloudflare-Secrets fehlen – Trockenlauf, kein Versand.')
     return
   }
 
@@ -229,7 +263,26 @@ async function main() {
       sent++
     }
   }
-  console.log(`[send-alarms] ${sent} Alarm(e) versendet.`)
+
+  // --- Preiswecker (Pro): aktueller Preis vs. Zielwert je Abo ---------------
+  const targetSubs = await d1Query(
+    "SELECT id, channel, destination, token, product_key, product_label, target_price, target_metric, notified_at FROM subscriptions WHERE status='confirmed' AND target_price IS NOT NULL",
+  )
+  let weckerSent = 0
+  for (const sub of targetSubs) {
+    const offer = offerByKey.get(sub.product_key)
+    const price = offer ? (sub.target_metric === 'liter' ? offer.perLiter : offer.perUnit) : null
+    const decision = weckerDecision(price, sub.target_price, sub.notified_at)
+    if (decision === 'fire') {
+      if (sub.channel === 'telegram') await sendTelegram(sub.destination, weckerEmail(sub, offer, price).text.replace(/\n/g, '\n'))
+      else await sendEmail(sub.destination, weckerEmail(sub, offer, price))
+      await d1Query('UPDATE subscriptions SET notified_at=? WHERE id=?', [new Date().toISOString(), sub.id])
+      weckerSent++
+    } else if (decision === 'reset') {
+      await d1Query('UPDATE subscriptions SET notified_at=NULL WHERE id=?', [sub.id])
+    }
+  }
+  console.log(`[send-alarms] ${sent} Bestpreis-Alarm(e), ${weckerSent} Preiswecker versendet.`)
 }
 
 // --- Selbsttest der Erkennungslogik (ohne Cloud) ---------------------------
@@ -251,8 +304,23 @@ function selftest() {
   }
   const events = detectNewBestPrices(history)
   const keys = events.map((e) => e.productKey).sort()
-  const ok = keys.length === 1 && keys[0] === 'a'
-  console.log(ok ? '✓ selftest bestanden (nur "a" feuert)' : `✗ selftest FEHLGESCHLAGEN: ${JSON.stringify(keys)}`)
+  const detectOk = keys.length === 1 && keys[0] === 'a'
+
+  // Preiswecker: fire (unter Ziel, ungemeldet), none (unter Ziel, gemeldet),
+  // reset (wieder über Ziel, war gemeldet), none (über Ziel, ungemeldet).
+  const weckerOk =
+    weckerDecision(0.7, 0.79, null) === 'fire' &&
+    weckerDecision(0.7, 0.79, '2026-07-01') === 'none' &&
+    weckerDecision(0.9, 0.79, '2026-07-01') === 'reset' &&
+    weckerDecision(0.9, 0.79, null) === 'none' &&
+    weckerDecision(null, 0.79, null) === 'none'
+
+  const ok = detectOk && weckerOk
+  console.log(
+    ok
+      ? '✓ selftest bestanden (Erkennung "a" + Preiswecker-Logik)'
+      : `✗ selftest FEHLGESCHLAGEN: detect=${detectOk} keys=${JSON.stringify(keys)} wecker=${weckerOk}`,
+  )
   process.exit(ok ? 0 : 1)
 }
 

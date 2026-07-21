@@ -25,6 +25,17 @@ app.use('/api/*', (c, next) => cors({ origin: c.env.ALLOWED_ORIGIN || '*', allow
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const now = () => new Date().toISOString()
 
+/** Hat diese E-Mail ein gültiges Pro-Entitlement? */
+async function isPro(db: D1Database, email: string): Promise<boolean> {
+  const row = await db
+    .prepare(
+      "SELECT 1 AS x FROM entitlements WHERE channel='email' AND destination=? AND tier='pro' AND (valid_until IS NULL OR valid_until > ?) LIMIT 1",
+    )
+    .bind(email, now())
+    .first()
+  return !!row
+}
+
 app.get('/api/health', (c) => c.json({ ok: true }))
 
 app.post('/api/subscribe', async (c) => {
@@ -34,6 +45,8 @@ app.post('/api/subscribe', async (c) => {
     productKey?: string
     productLabel?: string
     subscription?: { endpoint?: string; keys?: { p256dh?: string; auth?: string } }
+    targetPrice?: number | string | null
+    targetMetric?: string // 'unit' | 'liter'
   }
   try {
     body = await c.req.json()
@@ -108,6 +121,20 @@ app.post('/api/subscribe', async (c) => {
   const email = (body.email ?? '').trim().toLowerCase()
   if (!EMAIL_RE.test(email)) return c.json({ error: 'invalid_email', message: 'Bitte gib eine gültige E-Mail-Adresse an.' }, 400)
 
+  const pro = await isPro(db, email)
+
+  // Preiswecker (Pro): Zielpreis + Metrik. Ohne Ziel => Free-Verhalten (neues Tief).
+  let targetPrice: number | null = null
+  let targetMetric: string | null = null
+  if (body.targetPrice != null && body.targetPrice !== '') {
+    const p = Number(body.targetPrice)
+    const m = body.targetMetric === 'liter' ? 'liter' : 'unit'
+    if (!Number.isFinite(p) || p <= 0) return c.json({ error: 'invalid_target', message: 'Bitte gib einen gültigen Zielpreis an.' }, 400)
+    if (!pro) return c.json({ error: 'pro_required', message: 'Der Preiswecker ist eine Pro-Funktion. Löse einen Pro-Code ein.' }, 402)
+    targetPrice = Math.round(p * 100) / 100
+    targetMetric = m
+  }
+
   const freeMax = Number(c.env.FREE_MAX_SUBSCRIPTIONS || '1')
   const apiOrigin = new URL(c.req.url).origin
   const confirmLink = (token: string) => `${apiOrigin}/api/confirm?token=${token}`
@@ -118,35 +145,86 @@ app.post('/api/subscribe', async (c) => {
     .first<{ id: string; status: string; token: string }>()
 
   if (existing) {
+    // Zielpreis eines bestehenden Abos aktualisieren (auch löschen via null).
+    await db
+      .prepare('UPDATE subscriptions SET target_price=?, target_metric=?, notified_at=NULL WHERE id=?')
+      .bind(targetPrice, targetMetric, existing.id)
+      .run()
     if (existing.status === 'confirmed') {
-      return c.json({ status: 'confirmed', message: 'Für dieses Produkt ist dein Alarm bereits aktiv.' })
+      return c.json({ status: 'confirmed', message: targetPrice != null ? 'Preiswecker aktualisiert.' : 'Für dieses Produkt ist dein Alarm bereits aktiv.' })
     }
     await db.prepare("UPDATE subscriptions SET status='pending', created_at=? WHERE id=?").bind(now(), existing.id).run()
     await sendEmail(c.env, { to: email, ...confirmEmail(productLabel, confirmLink(existing.token)) })
     return c.json({ status: 'pending', resent: true, message: 'Wir haben dir die Bestätigungsmail erneut geschickt.' })
   }
 
-  const active = await db
-    .prepare("SELECT COUNT(*) AS n FROM subscriptions WHERE channel='email' AND destination=? AND status IN ('pending','confirmed')")
-    .bind(email)
-    .first<{ n: number }>()
-  if ((active?.n ?? 0) >= freeMax) {
-    return c.json(
-      { error: 'free_limit', message: `Im kostenlosen Tarif kannst du ${freeMax === 1 ? 'ein Produkt' : `${freeMax} Produkte`} beobachten. Mehr gibt es bald mit Pro.` },
-      409,
-    )
+  // Free-Limit nur für Nicht-Pro (Pro darf beliebig viele Produkte).
+  if (!pro) {
+    const active = await db
+      .prepare("SELECT COUNT(*) AS n FROM subscriptions WHERE channel='email' AND destination=? AND status IN ('pending','confirmed')")
+      .bind(email)
+      .first<{ n: number }>()
+    if ((active?.n ?? 0) >= freeMax) {
+      return c.json(
+        { error: 'free_limit', message: `Im kostenlosen Tarif kannst du ${freeMax === 1 ? 'ein Produkt' : `${freeMax} Produkte`} beobachten. Mit Pro sind es beliebig viele.` },
+        409,
+      )
+    }
   }
 
   const id = crypto.randomUUID()
   const token = crypto.randomUUID()
   await db
     .prepare(
-      "INSERT INTO subscriptions (id, channel, destination, product_key, product_label, status, token, created_at) VALUES (?, 'email', ?, ?, ?, 'pending', ?, ?)",
+      "INSERT INTO subscriptions (id, channel, destination, product_key, product_label, status, token, created_at, target_price, target_metric) VALUES (?, 'email', ?, ?, ?, 'pending', ?, ?, ?, ?)",
     )
-    .bind(id, email, productKey, productLabel, token, now())
+    .bind(id, email, productKey, productLabel, token, now(), targetPrice, targetMetric)
     .run()
   await sendEmail(c.env, { to: email, ...confirmEmail(productLabel, confirmLink(token)) })
   return c.json({ status: 'pending', message: 'Fast geschafft! Bitte bestätige den Link in deiner E-Mail.' })
+})
+
+// --- Pro-Status abfragen (für die UI) -------------------------------------
+app.get('/api/entitlement', async (c) => {
+  const email = (c.req.query('email') ?? '').trim().toLowerCase()
+  if (!EMAIL_RE.test(email)) return c.json({ pro: false })
+  return c.json({ pro: await isPro(c.env.DB, email) })
+})
+
+// --- Pro-Code einlösen -----------------------------------------------------
+app.post('/api/redeem', async (c) => {
+  const body = (await c.req.json().catch(() => ({}))) as { code?: string; email?: string }
+  const code = (body.code ?? '').trim()
+  const email = (body.email ?? '').trim().toLowerCase()
+  if (!code) return c.json({ error: 'missing_code', message: 'Bitte gib einen Code ein.' }, 400)
+  if (!EMAIL_RE.test(email)) return c.json({ error: 'invalid_email', message: 'Bitte gib eine gültige E-Mail-Adresse an.' }, 400)
+
+  const db = c.env.DB
+  const rc = await db
+    .prepare('SELECT code, tier, valid_days, max_uses, uses FROM redeem_codes WHERE code=?')
+    .bind(code)
+    .first<{ code: string; tier: string; valid_days: number | null; max_uses: number; uses: number }>()
+  if (!rc) return c.json({ error: 'invalid_code', message: 'Dieser Code ist ungültig.' }, 404)
+  if (rc.uses >= rc.max_uses) return c.json({ error: 'code_used', message: 'Dieser Code wurde bereits aufgebraucht.' }, 409)
+
+  const validUntil = rc.valid_days ? new Date(Date.now() + rc.valid_days * 86_400_000).toISOString() : null
+
+  const existing = await db
+    .prepare("SELECT id, valid_until FROM entitlements WHERE channel='email' AND destination=? AND tier=?")
+    .bind(email, rc.tier)
+    .first<{ id: string; valid_until: string | null }>()
+  if (existing) {
+    // Verlängern: späteres Ende gewinnt (unbegrenzt schlägt alles).
+    const keep = existing.valid_until === null || validUntil === null ? null : existing.valid_until > validUntil ? existing.valid_until : validUntil
+    await db.prepare('UPDATE entitlements SET valid_until=?, source=? WHERE id=?').bind(keep, `redeem:${code}`, existing.id).run()
+  } else {
+    await db
+      .prepare('INSERT INTO entitlements (id, channel, destination, tier, source, valid_until, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
+      .bind(crypto.randomUUID(), 'email', email, rc.tier, `redeem:${code}`, validUntil, now())
+      .run()
+  }
+  await db.prepare('UPDATE redeem_codes SET uses=uses+1 WHERE code=?').bind(code).run()
+  return c.json({ tier: rc.tier, validUntil, message: 'Pro freigeschaltet – du kannst jetzt Preiswecker setzen.' })
 })
 
 app.get('/api/confirm', async (c) => {

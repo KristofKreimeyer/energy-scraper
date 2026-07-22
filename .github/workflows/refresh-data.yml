@@ -57,7 +57,7 @@ jobs:
           if git diff --cached --quiet; then
             echo 'Keine Datenänderungen – nichts zu committen.'
           else
-            git commit -m 'chore(data): Preisdaten & -historie aktualisiert [skip ci]'
+            git commit -m 'chore(data): Preisdaten & -historie aktualisiert'
             git push
           fi
 

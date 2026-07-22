@@ -1,0 +1,53 @@
+name: Seite deployen
+
+# Baut die Vite-App und deployt sie zu Cloudflare Pages. Läuft bei jedem
+# main-Push (außer reinen Worker-/Doku-Änderungen) und manuell – so geht auch
+# frisch gescrapte Datenaktualisierung (chore(data)) automatisch live.
+#
+# Voraussetzungen:
+#   Repo-Secrets: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID
+#   Repo-Variablen: VITE_API_BASE (Worker-URL), VITE_VAPID_PUBLIC_KEY
+#   Cloudflare-Pages-Projekt "findmyenergy" muss existieren. Siehe DEPLOY.md.
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'worker/**'
+      - '.github/**'
+      - 'DEPLOY.md'
+      - 'CLAUDE.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-site
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Abhängigkeiten
+        run: npm ci
+
+      - name: Bauen
+        env:
+          VITE_API_BASE: ${{ vars.VITE_API_BASE }}
+          VITE_VAPID_PUBLIC_KEY: ${{ vars.VITE_VAPID_PUBLIC_KEY }}
+        run: npm run build
+
+      - name: Zu Cloudflare Pages deployen
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=findmyenergy --branch=main

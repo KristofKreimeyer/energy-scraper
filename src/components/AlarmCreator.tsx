@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { offers as allOffers, allBrands, allMarkets } from "../lib/offers";
 import { subscribeToPush, PushError } from "../lib/push";
+import { Modal } from "./Modal";
 
 // Globaler Preiswecker-Dialog: markenbasiert, von überall aufrufbar.
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8787";
@@ -134,9 +135,8 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
   const unitLabel = metric === "liter" ? "€/L" : "€ / Dose";
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-start justify-center overflow-y-auto bg-black/50 p-4 sm:place-items-center" role="dialog" aria-modal="true" aria-label="Preis-Alarm einrichten" onClick={onClose}>
-      <div className="w-full max-w-md bg-surface border border-border rounded-2xl shadow-card p-5 flex flex-col gap-4" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-start justify-between gap-3">
+    <Modal onClose={onClose} label="Preis-Alarm einrichten">
+      <div className="flex items-start justify-between gap-3">
           <div>
             <h2 className="text-[1.15rem] font-bold text-ink leading-tight">Preis-Alarm einrichten</h2>
             <p className="text-[0.8rem] text-muted mt-0.5">Wähle Marken – wir melden uns, sobald ein Deal auftaucht.</p>
@@ -286,7 +286,6 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
             </button>
           )}
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }

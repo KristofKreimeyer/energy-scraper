@@ -11,6 +11,13 @@
 #   4) Deploy:         npm run deploy
 #   5) Telegram-Webhook registrieren (einmalig, <TOKEN>/<SECRET>/<WORKER_URL> einsetzen):
 #      curl "https://api.telegram.org/bot<TOKEN>/setWebhook?url=<WORKER_URL>/api/telegram/webhook&secret_token=<SECRET>"
+#   6) Stripe: 3 Preise anlegen (monatlich/jährlich Recurring, Lifetime One-time),
+#      die price_...-IDs unten unter [vars] eintragen; Secrets setzen:
+#        npx wrangler secret put STRIPE_SECRET_KEY
+#        npx wrangler secret put STRIPE_WEBHOOK_SECRET
+#      Webhook im Stripe-Dashboard auf <WORKER_URL>/api/stripe/webhook, Events:
+#        checkout.session.completed, invoice.paid, customer.subscription.deleted
+#      Lokal testen: `stripe listen --forward-to localhost:8787/api/stripe/webhook`
 name = "findmyenergy-api"
 main = "src/index.ts"
 compatibility_date = "2025-01-01"
@@ -31,3 +38,7 @@ EMAIL_FROM_NAME = "FindMyEnergy"
 FREE_MAX_SUBSCRIPTIONS = "1"
 # Für lokales Testen ein Platzhalter; in Produktion den echten Bot-Namen (ohne @).
 TELEGRAM_BOT_USERNAME = "FindMyEnergyBot"
+# Stripe-Preis-IDs (aus dem Stripe-Dashboard). Leer = Plan nicht buchbar.
+STRIPE_PRICE_MONTHLY = ""
+STRIPE_PRICE_YEARLY = ""
+STRIPE_PRICE_LIFETIME = ""

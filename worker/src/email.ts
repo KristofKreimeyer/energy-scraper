@@ -14,6 +14,12 @@ export interface Env {
   TELEGRAM_BOT_TOKEN?: string
   TELEGRAM_BOT_USERNAME?: string
   TELEGRAM_WEBHOOK_SECRET?: string
+  // Stripe (Pro-Zahlung)
+  STRIPE_SECRET_KEY?: string
+  STRIPE_WEBHOOK_SECRET?: string
+  STRIPE_PRICE_MONTHLY?: string
+  STRIPE_PRICE_YEARLY?: string
+  STRIPE_PRICE_LIFETIME?: string
 }
 
 export interface OutgoingEmail {

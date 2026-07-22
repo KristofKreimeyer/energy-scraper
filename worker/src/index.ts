@@ -13,6 +13,7 @@
 
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
+import Stripe from 'stripe'
 import { type Env, sendEmail, confirmEmail, statusPage } from './email'
 import { sendTelegram } from './telegram'
 
@@ -34,6 +35,31 @@ async function isPro(db: D1Database, email: string): Promise<boolean> {
     .bind(email, now())
     .first()
   return !!row
+}
+
+/**
+ * Legt ein Entitlement an oder verlängert es (späteres Ende gewinnt; NULL =
+ * unbegrenzt schlägt alles). Gemeinsame Stelle für Redeem-Codes UND Stripe.
+ */
+async function grantEntitlement(db: D1Database, email: string, tier: string, source: string, validUntil: string | null): Promise<void> {
+  const existing = await db
+    .prepare("SELECT id, valid_until FROM entitlements WHERE channel='email' AND destination=? AND tier=?")
+    .bind(email, tier)
+    .first<{ id: string; valid_until: string | null }>()
+  if (existing) {
+    const keep = existing.valid_until === null || validUntil === null ? null : existing.valid_until > validUntil ? existing.valid_until : validUntil
+    await db.prepare('UPDATE entitlements SET valid_until=?, source=? WHERE id=?').bind(keep, source, existing.id).run()
+  } else {
+    await db
+      .prepare('INSERT INTO entitlements (id, channel, destination, tier, source, valid_until, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
+      .bind(crypto.randomUUID(), 'email', email, tier, source, validUntil, now())
+      .run()
+  }
+}
+
+/** Entzieht ein Entitlement (läuft ab jetzt aus). */
+async function revokeEntitlement(db: D1Database, email: string, tier: string): Promise<void> {
+  await db.prepare("UPDATE entitlements SET valid_until=? WHERE channel='email' AND destination=? AND tier=?").bind(now(), email, tier).run()
 }
 
 app.get('/api/health', (c) => c.json({ ok: true }))
@@ -208,23 +234,97 @@ app.post('/api/redeem', async (c) => {
   if (rc.uses >= rc.max_uses) return c.json({ error: 'code_used', message: 'Dieser Code wurde bereits aufgebraucht.' }, 409)
 
   const validUntil = rc.valid_days ? new Date(Date.now() + rc.valid_days * 86_400_000).toISOString() : null
-
-  const existing = await db
-    .prepare("SELECT id, valid_until FROM entitlements WHERE channel='email' AND destination=? AND tier=?")
-    .bind(email, rc.tier)
-    .first<{ id: string; valid_until: string | null }>()
-  if (existing) {
-    // Verlängern: späteres Ende gewinnt (unbegrenzt schlägt alles).
-    const keep = existing.valid_until === null || validUntil === null ? null : existing.valid_until > validUntil ? existing.valid_until : validUntil
-    await db.prepare('UPDATE entitlements SET valid_until=?, source=? WHERE id=?').bind(keep, `redeem:${code}`, existing.id).run()
-  } else {
-    await db
-      .prepare('INSERT INTO entitlements (id, channel, destination, tier, source, valid_until, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
-      .bind(crypto.randomUUID(), 'email', email, rc.tier, `redeem:${code}`, validUntil, now())
-      .run()
-  }
+  await grantEntitlement(db, email, rc.tier, `redeem:${code}`, validUntil)
   await db.prepare('UPDATE redeem_codes SET uses=uses+1 WHERE code=?').bind(code).run()
   return c.json({ tier: rc.tier, validUntil, message: 'Pro freigeschaltet – du kannst jetzt Preiswecker setzen.' })
+})
+
+// --- Stripe: Checkout starten ---------------------------------------------
+function stripeClient(env: Env): Stripe {
+  return new Stripe(env.STRIPE_SECRET_KEY!, { httpClient: Stripe.createFetchHttpClient() })
+}
+
+app.post('/api/checkout', async (c) => {
+  const body = (await c.req.json().catch(() => ({}))) as { email?: string; plan?: string }
+  const email = (body.email ?? '').trim().toLowerCase()
+  const plan = body.plan ?? ''
+  if (!EMAIL_RE.test(email)) return c.json({ error: 'invalid_email', message: 'Bitte gib eine gültige E-Mail-Adresse an.' }, 400)
+
+  const priceByPlan: Record<string, string | undefined> = {
+    monthly: c.env.STRIPE_PRICE_MONTHLY,
+    yearly: c.env.STRIPE_PRICE_YEARLY,
+    lifetime: c.env.STRIPE_PRICE_LIFETIME,
+  }
+  const price = priceByPlan[plan]
+  if (!c.env.STRIPE_SECRET_KEY || !price) {
+    return c.json({ error: 'stripe_unconfigured', message: 'Die Zahlung ist noch nicht eingerichtet.' }, 503)
+  }
+
+  const mode = plan === 'lifetime' ? 'payment' : 'subscription'
+  const site = c.env.PUBLIC_SITE_URL
+  const meta = { email, tier: 'pro', plan }
+  const session = await stripeClient(c.env).checkout.sessions.create({
+    mode,
+    line_items: [{ price, quantity: 1 }],
+    customer_email: email,
+    client_reference_id: email,
+    metadata: meta,
+    // Abo-Events tragen die Metadaten mit, damit der Webhook die E-Mail kennt.
+    ...(mode === 'subscription' ? { subscription_data: { metadata: meta } } : {}),
+    success_url: `${site}/?pro=success`,
+    cancel_url: `${site}/?pro=cancel`,
+  })
+  return c.json({ url: session.url })
+})
+
+// --- Stripe: Webhook (schreibt/entzieht das Entitlement) -------------------
+app.post('/api/stripe/webhook', async (c) => {
+  const sig = c.req.header('stripe-signature')
+  if (!c.env.STRIPE_SECRET_KEY || !c.env.STRIPE_WEBHOOK_SECRET || !sig) return c.json({ error: 'unconfigured' }, 400)
+  const stripe = stripeClient(c.env)
+  const raw = await c.req.text()
+
+  let event: Stripe.Event
+  try {
+    // In Workers async + WebCrypto (SubtleCryptoProvider), nicht das sync constructEvent.
+    event = await stripe.webhooks.constructEventAsync(raw, sig, c.env.STRIPE_WEBHOOK_SECRET, undefined, Stripe.createSubtleCryptoProvider())
+  } catch {
+    return c.json({ error: 'bad_signature' }, 400)
+  }
+
+  const db = c.env.DB
+  const untilFromSub = (sub: Stripe.Subscription) => new Date(sub.current_period_end * 1000).toISOString()
+
+  switch (event.type) {
+    case 'checkout.session.completed': {
+      const s = event.data.object
+      const email = (s.metadata?.email || s.customer_details?.email || '').toLowerCase()
+      if (!email) break
+      if (s.mode === 'payment') {
+        await grantEntitlement(db, email, 'pro', `stripe:${s.id}`, null) // Lifetime
+      } else if (s.mode === 'subscription' && s.subscription) {
+        const sub = await stripe.subscriptions.retrieve(String(s.subscription))
+        await grantEntitlement(db, email, 'pro', `stripe:${sub.id}`, untilFromSub(sub))
+      }
+      break
+    }
+    case 'invoice.paid': {
+      const inv = event.data.object
+      const subId = inv.subscription ? String(inv.subscription) : null
+      if (!subId) break
+      const sub = await stripe.subscriptions.retrieve(subId)
+      const email = (sub.metadata?.email || inv.customer_email || '').toLowerCase()
+      if (email) await grantEntitlement(db, email, 'pro', `stripe:${subId}`, untilFromSub(sub))
+      break
+    }
+    case 'customer.subscription.deleted': {
+      const sub = event.data.object
+      const email = (sub.metadata?.email || '').toLowerCase()
+      if (email) await revokeEntitlement(db, email, 'pro')
+      break
+    }
+  }
+  return c.json({ received: true })
 })
 
 app.get('/api/confirm', async (c) => {

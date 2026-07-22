@@ -86,6 +86,26 @@ export function AlarmButton({ offer }: { offer: GroupedOffer }) {
     }
   }
 
+  async function checkout(plan: 'monthly' | 'yearly' | 'lifetime') {
+    if (!email) {
+      setRedeemMsg('Bitte trage oben zuerst deine E-Mail ein.')
+      return
+    }
+    setRedeemMsg('Weiterleitung zu Stripe …')
+    try {
+      const res = await fetch(`${API_BASE}/api/checkout`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ email, plan }),
+      })
+      const data = (await res.json()) as { url?: string; message?: string }
+      if (res.ok && data.url) window.location.assign(data.url)
+      else setRedeemMsg(data.message ?? 'Kauf konnte nicht gestartet werden.')
+    } catch {
+      setRedeemMsg('Keine Verbindung zum Alarm-Dienst.')
+    }
+  }
+
   async function redeem() {
     if (!email) {
       setRedeemMsg('Bitte trage oben zuerst deine E-Mail ein.')
@@ -266,21 +286,43 @@ export function AlarmButton({ offer }: { offer: GroupedOffer }) {
       )}
 
       {channel === 'email' && showRedeem && (
-        <div className="flex gap-1.5">
-          <input
-            type="text"
-            value={redeemCode}
-            onChange={(e) => setRedeemCode(e.target.value)}
-            placeholder="Pro-Code"
-            className="flex-1 min-w-0 h-9 px-2.5 text-[0.82rem] bg-surface text-ink border border-border-strong rounded-lg outline-none"
-          />
-          <button
-            type="button"
-            onClick={redeem}
-            className="flex-none h-9 px-3 text-[0.82rem] font-semibold text-good border border-[color-mix(in_srgb,var(--good)_40%,transparent)] rounded-lg cursor-pointer hover:bg-good-tint"
-          >
-            Einlösen
-          </button>
+        <div className="flex flex-col gap-1.5 rounded-lg border border-border p-2">
+          <span className="text-[0.72rem] font-semibold text-ink">Pro freischalten</span>
+          <div className="flex gap-1.5">
+            {(
+              [
+                ['monthly', 'Monatlich'],
+                ['yearly', 'Jährlich'],
+                ['lifetime', 'Lifetime'],
+              ] as const
+            ).map(([plan, text]) => (
+              <button
+                key={plan}
+                type="button"
+                onClick={() => checkout(plan)}
+                className="flex-1 h-8 text-[0.76rem] font-semibold text-white bg-accent border border-accent rounded-md cursor-pointer hover:bg-accent-strong"
+              >
+                {text}
+              </button>
+            ))}
+          </div>
+          <span className="text-[0.7rem] text-muted">oder Pro-Code einlösen:</span>
+          <div className="flex gap-1.5">
+            <input
+              type="text"
+              value={redeemCode}
+              onChange={(e) => setRedeemCode(e.target.value)}
+              placeholder="Code"
+              className="flex-1 min-w-0 h-9 px-2.5 text-[0.82rem] bg-surface text-ink border border-border-strong rounded-lg outline-none"
+            />
+            <button
+              type="button"
+              onClick={redeem}
+              className="flex-none h-9 px-3 text-[0.82rem] font-semibold text-good border border-[color-mix(in_srgb,var(--good)_40%,transparent)] rounded-lg cursor-pointer hover:bg-good-tint"
+            >
+              Einlösen
+            </button>
+          </div>
         </div>
       )}
       {redeemMsg && (

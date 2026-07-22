@@ -70,6 +70,18 @@ export function weckerDecision(price, target, notifiedAt) {
   return notifiedAt ? 'reset' : 'none'
 }
 
+/** Normalisierte Marke für den Match (identisch zur Speicherung im Worker). */
+export function brandKey(brand) {
+  return String(brand ?? '').trim().toLowerCase()
+}
+
+/** Passt ein Markt zum Store-Filter eines Marken-Weckers? */
+export function storeMatches(market, mode, stores) {
+  if (mode === 'only') return stores.includes(market)
+  if (mode === 'except') return !stores.includes(market)
+  return true // 'all'
+}
+
 // --- ab hier: I/O & Versand (in der Action) --------------------------------
 
 const ACCOUNT = process.env.CLOUDFLARE_ACCOUNT_ID
@@ -268,9 +280,9 @@ async function main() {
     }
   }
 
-  // --- Preiswecker (Pro): aktueller Preis vs. Zielwert je Abo ---------------
+  // --- Preiswecker (Pro): aktueller Preis vs. Zielwert je PRODUKT-Abo -------
   const targetSubs = await d1Query(
-    "SELECT id, channel, destination, token, product_key, product_label, target_price, target_metric, notified_at FROM subscriptions WHERE status='confirmed' AND target_price IS NOT NULL",
+    "SELECT id, channel, destination, token, product_key, product_label, target_price, target_metric, notified_at FROM subscriptions WHERE status='confirmed' AND scope='product' AND target_price IS NOT NULL",
   )
   let weckerSent = 0
   for (const sub of targetSubs) {
@@ -295,7 +307,78 @@ async function main() {
       await d1Query('UPDATE subscriptions SET notified_at=NULL WHERE id=?', [sub.id])
     }
   }
-  console.log(`[send-alarms] ${sent} Bestpreis-Alarm(e), ${weckerSent} Preiswecker versendet.`)
+  // --- Marken-Wecker: gegen ALLE Angebote der Marke (Store-gefiltert) -------
+  const brandSubs = await d1Query(
+    "SELECT id, channel, destination, token, brand, product_label, store_mode, stores, target_price, target_metric, notified_at FROM subscriptions WHERE status='confirmed' AND scope='brand'",
+  )
+  const newLowKeys = new Set(events.map((e) => e.productKey))
+  let brandSent = 0
+  for (const sub of brandSubs) {
+    const stores = sub.stores ? JSON.parse(sub.stores) : []
+    const matching = offersData.offers.filter((o) => brandKey(o.brand) === sub.brand && storeMatches(o.market, sub.store_mode, stores))
+    if (matching.length === 0) continue
+
+    if (sub.target_price != null) {
+      // Pro-Wecker: günstigstes passendes Angebot nach Metrik
+      const priced = matching
+        .map((o) => ({ o, p: sub.target_metric === 'liter' ? o.perLiter : o.perUnit }))
+        .filter((x) => x.p != null)
+        .sort((a, b) => a.p - b.p)
+      if (priced.length === 0) continue
+      const best = priced[0]
+      const decision = weckerDecision(best.p, sub.target_price, sub.notified_at)
+      if (decision === 'fire') {
+        const ok = await dispatchBrand(sub, best.o, weckerPush(sub, best.o, best.p))
+        if (ok === 'expired') {
+          await d1Query("UPDATE subscriptions SET status='unsubscribed' WHERE id=?", [sub.id])
+          continue
+        }
+        await d1Query('UPDATE subscriptions SET notified_at=? WHERE id=?', [new Date().toISOString(), sub.id])
+        brandSent++
+      } else if (decision === 'reset') {
+        await d1Query('UPDATE subscriptions SET notified_at=NULL WHERE id=?', [sub.id])
+      }
+    } else {
+      // Free: hat ein passendes Produkt heute ein neues Tief erreicht?
+      const dropped = matching.find((o) => newLowKeys.has(productKey(o)))
+      if (dropped && (!sub.notified_at || sub.notified_at < today)) {
+        const ok = await dispatchBrand(sub, dropped, bestPricePush({ label: `${sub.product_label} bei ${dropped.market}`, perLiter: dropped.perLiter, productKey: sub.brand }, dropped))
+        if (ok === 'expired') {
+          await d1Query("UPDATE subscriptions SET status='unsubscribed' WHERE id=?", [sub.id])
+          continue
+        }
+        await d1Query('UPDATE subscriptions SET notified_at=? WHERE id=?', [new Date().toISOString(), sub.id])
+        brandSent++
+      }
+    }
+  }
+
+  console.log(`[send-alarms] ${sent} Bestpreis-Alarm(e), ${weckerSent} Preiswecker, ${brandSent} Marken-Wecker versendet.`)
+}
+
+/**
+ * Versendet einen Marken-Wecker über den Kanal des Abos. `push` erwartet ein
+ * fertiges Payload-Objekt (title/body/url/tag); E-Mail/Telegram bauen daraus
+ * eine passende Nachricht. Rückgabe 'expired' bei toter Push-Subscription.
+ */
+async function dispatchBrand(sub, offer, pushPayload) {
+  if (sub.channel === 'push') return pushSend(sub.destination, pushPayload)
+  const url = offer?.url || SITE_URL
+  if (sub.channel === 'telegram') {
+    await sendTelegram(sub.destination, `⚡ <b>${pushPayload.title}</b>\n${pushPayload.body}\n${url}\n\n<i>/stop zum Abmelden</i>`)
+    return 'ok'
+  }
+  const html = `<!doctype html><html lang="de"><body style="margin:0;background:#edf0f3;font-family:system-ui,sans-serif;color:#10151b">
+    <div style="max-width:520px;margin:0 auto;padding:32px 20px">
+      <div style="font-weight:750;font-size:1.1rem;margin-bottom:20px">⚡ FindMy<span style="color:#b23c07">Energy</span></div>
+      <div style="background:#fff;border:1px solid #dbe1e7;border-radius:14px;padding:24px">
+        <h1 style="font-size:1.2rem;margin:0 0 8px">${pushPayload.title}</h1>
+        <p style="margin:0 0 16px;color:#5b6772">${pushPayload.body}</p>
+        <a href="${url}" style="display:inline-block;background:#e24a08;color:#fff;text-decoration:none;font-weight:650;padding:11px 20px;border-radius:10px">Zum Angebot</a>
+      </div>
+    </div></body></html>`
+  await sendEmail(sub.destination, { subject: pushPayload.title, html, text: `${pushPayload.title}\n${pushPayload.body}\n${url}` })
+  return 'ok'
 }
 
 // --- Selbsttest der Erkennungslogik (ohne Cloud) ---------------------------
@@ -328,11 +411,20 @@ function selftest() {
     weckerDecision(0.9, 0.79, null) === 'none' &&
     weckerDecision(null, 0.79, null) === 'none'
 
-  const ok = detectOk && weckerOk
+  // Store-Filter: all (immer), only (nur Liste), except (alles außer Liste).
+  const storeOk =
+    storeMatches('Kaufland', 'all', []) === true &&
+    storeMatches('Kaufland', 'only', ['Kaufland']) === true &&
+    storeMatches('Lidl', 'only', ['Kaufland']) === false &&
+    storeMatches('Kaufland', 'except', ['Kaufland']) === false &&
+    storeMatches('Lidl', 'except', ['Kaufland']) === true &&
+    brandKey('  Red Bull ') === 'red bull'
+
+  const ok = detectOk && weckerOk && storeOk
   console.log(
     ok
-      ? '✓ selftest bestanden (Erkennung "a" + Preiswecker-Logik)'
-      : `✗ selftest FEHLGESCHLAGEN: detect=${detectOk} keys=${JSON.stringify(keys)} wecker=${weckerOk}`,
+      ? '✓ selftest bestanden (Erkennung + Preiswecker + Store-Filter)'
+      : `✗ selftest FEHLGESCHLAGEN: detect=${detectOk} wecker=${weckerOk} store=${storeOk}`,
   )
   process.exit(ok ? 0 : 1)
 }

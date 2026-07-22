@@ -11,7 +11,7 @@
 // Free-Tarif: pro Ziel (E-Mail-Adresse bzw. Telegram-chat_id) genau EIN Produkt.
 // Der Preiswecker mit eigenem Zielpreis kommt in der Pro-Variante obendrauf.
 
-import { Hono } from 'hono'
+import { Hono, type Context } from 'hono'
 import { cors } from 'hono/cors'
 import Stripe from 'stripe'
 import { type Env, sendEmail, confirmEmail, statusPage } from './email'
@@ -94,6 +94,99 @@ async function consumeRedeemCode(
   return { ok: true, tier: rc.tier, validUntil }
 }
 
+/**
+ * Marken-basierter Wecker: pro gewählter Marke eine Subscription (scope='brand',
+ * product_key='brand:<norm>'), optional Store-Filter und Zielpreis je Marke.
+ * Alle Marken einer Anlage teilen sich EINEN Bestätigungs-Token (eine Opt-in-Mail
+ * bzw. ein Telegram-Deep-Link bindet alle). Free = 1 Marke ohne Zielpreis;
+ * mehrere Marken oder Zielpreise erfordern Pro (Telegram: Prüfung beim Binden).
+ */
+async function handleBrandSubscribe(
+  c: Context<{ Bindings: Env }>,
+  body: {
+    email?: string
+    subscription?: { endpoint?: string; keys?: { p256dh?: string; auth?: string } }
+    brands?: { brand?: string; targetPrice?: number | string | null; targetMetric?: string }[]
+    storeMode?: string
+    stores?: string[]
+  },
+  channel: string,
+  db: D1Database,
+): Promise<Response> {
+  const storeMode = body.storeMode === 'only' || body.storeMode === 'except' ? body.storeMode : 'all'
+  const storesJson = storeMode === 'all' ? null : JSON.stringify(Array.isArray(body.stores) ? body.stores.map(String) : [])
+
+  const brands = (Array.isArray(body.brands) ? body.brands : [])
+    .map((b) => {
+      const display = String(b.brand ?? '').trim()
+      return { display, norm: display.toLowerCase(), t: parseTarget(b) }
+    })
+    .filter((b) => b.display)
+  if (brands.length === 0) return c.json({ error: 'missing_brands', message: 'Bitte wähle mindestens eine Marke.' }, 400)
+  if (brands.some((b) => b.t.invalid)) return c.json({ error: 'invalid_target', message: 'Bitte gib gültige Zielpreise an.' }, 400)
+
+  const wantsTarget = brands.some((b) => b.t.price != null)
+  const multi = brands.length > 1
+  const isTelegram = channel === 'telegram'
+  const freeMax = Number(c.env.FREE_MAX_SUBSCRIPTIONS || '1')
+
+  // Ziel-Identität + Pro (Telegram erst beim Binden bekannt).
+  let destination = ''
+  let pro = false
+  if (channel === 'email') {
+    destination = String(body.email ?? '').trim().toLowerCase()
+    if (!EMAIL_RE.test(destination)) return c.json({ error: 'invalid_email', message: 'Bitte gib eine gültige E-Mail-Adresse an.' }, 400)
+    pro = await isPro(db, 'email', destination)
+  } else if (channel === 'push') {
+    const sub = body.subscription
+    if (!sub?.endpoint || !sub.keys?.p256dh || !sub.keys?.auth) return c.json({ error: 'invalid_subscription', message: 'Push-Anmeldung unvollständig.' }, 400)
+    destination = JSON.stringify(sub)
+    pro = await isPro(db, 'push', destination)
+  } else if (!isTelegram) {
+    return c.json({ error: 'bad_channel' }, 400)
+  }
+
+  if (!isTelegram && (wantsTarget || multi) && !pro) {
+    return c.json({ error: 'pro_required', message: 'Mehrere Marken oder Zielpreise sind eine Pro-Funktion. Schalte Pro frei.' }, 402)
+  }
+  if (!isTelegram && !pro) {
+    const active = await db
+      .prepare("SELECT COUNT(*) AS n FROM subscriptions WHERE channel=? AND destination=? AND status IN ('pending','confirmed')")
+      .bind(channel, destination)
+      .first<{ n: number }>()
+    if ((active?.n ?? 0) + brands.length > freeMax) {
+      return c.json({ error: 'free_limit', message: `Im kostenlosen Tarif kannst du ${freeMax === 1 ? 'eine Marke' : `${freeMax} Marken`} beobachten. Mit Pro sind es beliebig viele.` }, 409)
+    }
+  }
+
+  const token = crypto.randomUUID()
+  const status = channel === 'push' ? 'confirmed' : 'pending'
+  const dbDest = isTelegram ? `pending:${token}` : destination
+  for (const b of brands) {
+    await db
+      .prepare(
+        "INSERT INTO subscriptions (id, channel, destination, scope, brand, product_key, product_label, store_mode, stores, status, token, created_at, confirmed_at, target_price, target_metric) " +
+          "VALUES (?, ?, ?, 'brand', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+          'ON CONFLICT(channel, destination, product_key) DO UPDATE SET store_mode=excluded.store_mode, stores=excluded.stores, target_price=excluded.target_price, target_metric=excluded.target_metric, notified_at=NULL',
+      )
+      .bind(crypto.randomUUID(), channel, dbDest, b.norm, `brand:${b.norm}`, b.display, storeMode, storesJson, status, token, now(), status === 'confirmed' ? now() : null, b.t.price, b.t.metric)
+      .run()
+  }
+
+  if (channel === 'email') {
+    const apiOrigin = new URL(c.req.url).origin
+    const list = brands.map((b) => b.display).join(', ')
+    await sendEmail(c.env, { to: destination, ...confirmEmail(list, `${apiOrigin}/api/confirm?token=${token}`) })
+    return c.json({ status: 'pending', message: 'Fast geschafft! Bitte bestätige den Link in deiner E-Mail.' })
+  }
+  if (channel === 'push') {
+    return c.json({ status: 'confirmed', message: 'Marken-Wecker aktiv! Wir melden uns beim nächsten Tief.' })
+  }
+  const botUser = c.env.TELEGRAM_BOT_USERNAME
+  if (!botUser) return c.json({ error: 'telegram_unconfigured', message: 'Telegram ist noch nicht eingerichtet.' }, 503)
+  return c.json({ channel: 'telegram', telegramLink: `https://t.me/${botUser}?start=${token}`, message: 'Öffne Telegram und tippe auf „Start“, um die Wecker zu aktivieren.' })
+}
+
 app.get('/api/health', (c) => c.json({ ok: true }))
 
 app.post('/api/subscribe', async (c) => {
@@ -105,6 +198,11 @@ app.post('/api/subscribe', async (c) => {
     subscription?: { endpoint?: string; keys?: { p256dh?: string; auth?: string } }
     targetPrice?: number | string | null
     targetMetric?: string // 'unit' | 'liter'
+    // Marken-Wecker (scope='brand')
+    scope?: string
+    brands?: { brand?: string; targetPrice?: number | string | null; targetMetric?: string }[]
+    storeMode?: string
+    stores?: string[]
   }
   try {
     body = await c.req.json()
@@ -113,11 +211,14 @@ app.post('/api/subscribe', async (c) => {
   }
 
   const channel = (body.channel ?? 'email').trim()
+  const db = c.env.DB
+
+  // Marken-basierter Wecker (nicht produktgebunden) – eigener Pfad.
+  if ((body.scope ?? 'product') === 'brand') return handleBrandSubscribe(c, body, channel, db)
+
   const productKey = (body.productKey ?? '').trim()
   const productLabel = (body.productLabel ?? '').trim()
   if (!productKey || !productLabel) return c.json({ error: 'missing_product' }, 400)
-
-  const db = c.env.DB
 
   // --- Telegram: pending-Abo + Deep-Link (chat_id folgt über den Webhook) ---
   if (channel === 'telegram') {
@@ -444,52 +545,55 @@ app.post('/api/telegram/webhook', async (c) => {
       await sendTelegram(c.env, chatId, 'Willkommen bei FindMyEnergy ⚡ Aktiviere deinen Bestpreis-Alarm über den Button auf der Website.')
       return c.json({ ok: true })
     }
-    const sub = await db
-      .prepare("SELECT id, product_key, product_label, target_price FROM subscriptions WHERE channel='telegram' AND token=? AND destination LIKE 'pending:%'")
-      .bind(token)
-      .first<{ id: string; product_key: string; product_label: string; target_price: number | null }>()
-    if (!sub) {
+    // Ein Token kann mehrere pending-Abos umfassen (Marken-Batch).
+    const subs = (
+      await db
+        .prepare("SELECT id, product_key, product_label, target_price FROM subscriptions WHERE channel='telegram' AND token=? AND destination LIKE 'pending:%'")
+        .bind(token)
+        .all<{ id: string; product_key: string; product_label: string; target_price: number | null }>()
+    ).results
+    if (subs.length === 0) {
       await sendTelegram(c.env, chatId, 'Dieser Aktivierungslink ist ungültig oder wurde bereits verwendet.')
       return c.json({ ok: true })
     }
 
     const pro = await isPro(db, 'telegram', chatId)
+    const existing = await db
+      .prepare("SELECT COUNT(*) AS n FROM subscriptions WHERE channel='telegram' AND destination=? AND status='confirmed'")
+      .bind(chatId)
+      .first<{ n: number }>()
+    let capacity = pro ? Number.POSITIVE_INFINITY : Math.max(0, freeMax - (existing?.n ?? 0))
+    const strippedTarget = subs.some((s) => s.target_price != null) && !pro
 
-    // Free-Limit pro Chat (Pro umgeht es).
-    if (!pro) {
-      const active = await db
-        .prepare("SELECT COUNT(*) AS n FROM subscriptions WHERE channel='telegram' AND destination=? AND status='confirmed'")
-        .bind(chatId)
-        .first<{ n: number }>()
-      if ((active?.n ?? 0) >= freeMax) {
-        await db.prepare('DELETE FROM subscriptions WHERE id=?').bind(sub.id).run()
-        await sendTelegram(c.env, chatId, `Im kostenlosen Tarif kannst du ${freeMax === 1 ? 'ein Produkt' : `${freeMax} Produkte`} beobachten. Mit /redeem <code> schaltest du Pro frei.`)
-        return c.json({ ok: true })
+    const bound: string[] = []
+    for (const s of subs) {
+      // schon aktiv?
+      const dup = await db
+        .prepare("SELECT id FROM subscriptions WHERE channel='telegram' AND destination=? AND product_key=? AND status='confirmed'")
+        .bind(chatId, s.product_key)
+        .first<{ id: string }>()
+      if (dup || capacity <= 0) {
+        await db.prepare('DELETE FROM subscriptions WHERE id=?').bind(s.id).run()
+        continue
       }
+      await db
+        .prepare(
+          pro
+            ? "UPDATE subscriptions SET destination=?, status='confirmed', confirmed_at=? WHERE id=?"
+            : "UPDATE subscriptions SET destination=?, status='confirmed', confirmed_at=?, target_price=NULL, target_metric=NULL WHERE id=?",
+        )
+        .bind(chatId, now(), s.id)
+        .run()
+      bound.push(s.product_label)
+      capacity -= 1
     }
 
-    // Schon dasselbe Produkt aktiv? Dann pending verwerfen.
-    const dup = await db
-      .prepare("SELECT id FROM subscriptions WHERE channel='telegram' AND destination=? AND product_key=? AND status='confirmed'")
-      .bind(chatId, sub.product_key)
-      .first<{ id: string }>()
-    if (dup) {
-      await db.prepare('DELETE FROM subscriptions WHERE id=?').bind(sub.id).run()
-      await sendTelegram(c.env, chatId, `„${sub.product_label}“ ist bereits aktiv.`)
-      return c.json({ ok: true })
+    let msg = bound.length ? `✅ Alarm aktiv für: ${bound.join(', ')}.` : 'Diese Marken sind bei dir bereits aktiv.'
+    if (!pro && (strippedTarget || bound.length < subs.length)) {
+      msg += ' Mehr Marken und Zielpreise gibt es mit Pro – schalte es per /redeem <code> frei.'
     }
-
-    // Preiswecker nur für Pro; sonst verwerfen und normaler Bestpreis-Alarm.
-    let extra = ''
-    if (sub.target_price != null && !pro) {
-      await db.prepare('UPDATE subscriptions SET target_price=NULL, target_metric=NULL WHERE id=?').bind(sub.id).run()
-      extra = ' Der Preiswecker ist Pro – mit /redeem <code> schaltest du ihn frei; bis dahin bekommst du den normalen Bestpreis-Alarm.'
-    } else if (sub.target_price != null && pro) {
-      extra = ' Dein Preiswecker ist aktiv.'
-    }
-
-    await db.prepare("UPDATE subscriptions SET destination=?, status='confirmed', confirmed_at=? WHERE id=?").bind(chatId, now(), sub.id).run()
-    await sendTelegram(c.env, chatId, `✅ Bestpreis-Alarm aktiv für „${sub.product_label}“.${extra} Mit /stop meldest du dich wieder ab.`)
+    msg += ' Mit /stop meldest du dich wieder ab.'
+    await sendTelegram(c.env, chatId, msg)
     return c.json({ ok: true })
   }
 

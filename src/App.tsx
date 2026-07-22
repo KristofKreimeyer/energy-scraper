@@ -19,6 +19,7 @@ import {
   type Timeframe,
 } from './lib/offers'
 import { OfferCard } from './components/OfferCard'
+import { AlarmCreator } from './components/AlarmCreator'
 
 const WRAP = 'mx-auto w-full max-w-[var(--maxw)] px-5'
 const EYEBROW = 'font-mono text-[0.72rem] tracking-[0.14em] uppercase text-muted'
@@ -65,6 +66,7 @@ function App() {
   const [brand, setBrand] = useState('all')
   const [sort, setSort] = useState<SortKey>('liter')
   const [query, setQuery] = useState('')
+  const [showCreator, setShowCreator] = useState(false)
 
   // Angebote des gewählten Zeitraums – Sorten erst innerhalb des Zeitraums bündeln
   const offers = useMemo(() => groupOffers(inTimeframe(allOffers, timeframe)), [timeframe])
@@ -160,7 +162,15 @@ function App() {
             </span>
           </div>
           <button
-            className="flex-none ml-auto h-10 min-w-[44px] px-3 bg-surface text-ink border border-border-strong rounded-[10px] text-[0.85rem] font-semibold cursor-pointer inline-flex items-center gap-[7px] hover:bg-surface-2"
+            className="flex-none ml-auto h-10 px-3.5 bg-accent text-white border border-accent rounded-[10px] text-[0.85rem] font-semibold cursor-pointer inline-flex items-center gap-1.5 hover:bg-accent-strong"
+            type="button"
+            onClick={() => setShowCreator(true)}
+          >
+            <span aria-hidden="true">⏰</span>
+            Preis-Alarm
+          </button>
+          <button
+            className="flex-none h-10 min-w-[44px] px-3 bg-surface text-ink border border-border-strong rounded-[10px] text-[0.85rem] font-semibold cursor-pointer inline-flex items-center gap-[7px] hover:bg-surface-2"
             type="button"
             aria-pressed={isDark}
             onClick={toggle}
@@ -442,6 +452,8 @@ function App() {
           <span className="font-mono text-[0.76rem]">Datenquelle: energy-scraper · captured/*.json · Stand {generatedLabel}</span>
         </div>
       </footer>
+
+      {showCreator && <AlarmCreator onClose={() => setShowCreator(false)} />}
     </>
   )
 }

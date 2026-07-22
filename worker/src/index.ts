@@ -26,25 +26,38 @@ app.use('/api/*', (c, next) => cors({ origin: c.env.ALLOWED_ORIGIN || '*', allow
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const now = () => new Date().toISOString()
 
-/** Hat diese E-Mail ein gültiges Pro-Entitlement? */
-async function isPro(db: D1Database, email: string): Promise<boolean> {
+/** Zielpreis + Metrik aus dem Body lesen. `invalid`, wenn ein Wert vorliegt, der nicht > 0 ist. */
+function parseTarget(body: { targetPrice?: number | string | null; targetMetric?: string }): {
+  price: number | null
+  metric: string | null
+  invalid: boolean
+} {
+  if (body.targetPrice == null || body.targetPrice === '') return { price: null, metric: null, invalid: false }
+  const p = Number(body.targetPrice)
+  if (!Number.isFinite(p) || p <= 0) return { price: null, metric: null, invalid: true }
+  return { price: Math.round(p * 100) / 100, metric: body.targetMetric === 'liter' ? 'liter' : 'unit', invalid: false }
+}
+
+/** Hat dieses Ziel (channel, destination) ein gültiges Pro-Entitlement? */
+async function isPro(db: D1Database, channel: string, destination: string): Promise<boolean> {
   const row = await db
     .prepare(
-      "SELECT 1 AS x FROM entitlements WHERE channel='email' AND destination=? AND tier='pro' AND (valid_until IS NULL OR valid_until > ?) LIMIT 1",
+      "SELECT 1 AS x FROM entitlements WHERE channel=? AND destination=? AND tier='pro' AND (valid_until IS NULL OR valid_until > ?) LIMIT 1",
     )
-    .bind(email, now())
+    .bind(channel, destination, now())
     .first()
   return !!row
 }
 
 /**
  * Legt ein Entitlement an oder verlängert es (späteres Ende gewinnt; NULL =
- * unbegrenzt schlägt alles). Gemeinsame Stelle für Redeem-Codes UND Stripe.
+ * unbegrenzt schlägt alles). Gemeinsame Stelle für Redeem-Codes UND Stripe,
+ * je Kanal (E-Mail / Telegram-chat_id / Push-Subscription).
  */
-async function grantEntitlement(db: D1Database, email: string, tier: string, source: string, validUntil: string | null): Promise<void> {
+async function grantEntitlement(db: D1Database, channel: string, destination: string, tier: string, source: string, validUntil: string | null): Promise<void> {
   const existing = await db
-    .prepare("SELECT id, valid_until FROM entitlements WHERE channel='email' AND destination=? AND tier=?")
-    .bind(email, tier)
+    .prepare('SELECT id, valid_until FROM entitlements WHERE channel=? AND destination=? AND tier=?')
+    .bind(channel, destination, tier)
     .first<{ id: string; valid_until: string | null }>()
   if (existing) {
     const keep = existing.valid_until === null || validUntil === null ? null : existing.valid_until > validUntil ? existing.valid_until : validUntil
@@ -52,14 +65,33 @@ async function grantEntitlement(db: D1Database, email: string, tier: string, sou
   } else {
     await db
       .prepare('INSERT INTO entitlements (id, channel, destination, tier, source, valid_until, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
-      .bind(crypto.randomUUID(), 'email', email, tier, source, validUntil, now())
+      .bind(crypto.randomUUID(), channel, destination, tier, source, validUntil, now())
       .run()
   }
 }
 
 /** Entzieht ein Entitlement (läuft ab jetzt aus). */
-async function revokeEntitlement(db: D1Database, email: string, tier: string): Promise<void> {
-  await db.prepare("UPDATE entitlements SET valid_until=? WHERE channel='email' AND destination=? AND tier=?").bind(now(), email, tier).run()
+async function revokeEntitlement(db: D1Database, channel: string, destination: string, tier: string): Promise<void> {
+  await db.prepare('UPDATE entitlements SET valid_until=? WHERE channel=? AND destination=? AND tier=?').bind(now(), channel, destination, tier).run()
+}
+
+/** Löst einen Redeem-Code ein und schreibt das Entitlement (gemeinsam für Web & Bot). */
+async function consumeRedeemCode(
+  db: D1Database,
+  code: string,
+  channel: string,
+  destination: string,
+): Promise<{ ok: true; tier: string; validUntil: string | null } | { ok: false; error: string }> {
+  const rc = await db
+    .prepare('SELECT tier, valid_days, max_uses, uses FROM redeem_codes WHERE code=?')
+    .bind(code)
+    .first<{ tier: string; valid_days: number | null; max_uses: number; uses: number }>()
+  if (!rc) return { ok: false, error: 'invalid_code' }
+  if (rc.uses >= rc.max_uses) return { ok: false, error: 'code_used' }
+  const validUntil = rc.valid_days ? new Date(Date.now() + rc.valid_days * 86_400_000).toISOString() : null
+  await grantEntitlement(db, channel, destination, rc.tier, `redeem:${code}`, validUntil)
+  await db.prepare('UPDATE redeem_codes SET uses=uses+1 WHERE code=?').bind(code).run()
+  return { ok: true, tier: rc.tier, validUntil }
 }
 
 app.get('/api/health', (c) => c.json({ ok: true }))
@@ -91,13 +123,17 @@ app.post('/api/subscribe', async (c) => {
   if (channel === 'telegram') {
     const botUser = c.env.TELEGRAM_BOT_USERNAME
     if (!botUser) return c.json({ error: 'telegram_unconfigured', message: 'Telegram ist noch nicht eingerichtet.' }, 503)
+    const tgTarget = parseTarget(body)
+    if (tgTarget.invalid) return c.json({ error: 'invalid_target', message: 'Bitte gib einen gültigen Zielpreis an.' }, 400)
+    // Pro wird erst beim Binden (/start, chat_id bekannt) geprüft; ein Zielpreis
+    // ohne Pro wird dort verworfen.
     const id = crypto.randomUUID()
     const token = crypto.randomUUID()
     await db
       .prepare(
-        "INSERT INTO subscriptions (id, channel, destination, product_key, product_label, status, token, created_at) VALUES (?, 'telegram', ?, ?, ?, 'pending', ?, ?)",
+        "INSERT INTO subscriptions (id, channel, destination, product_key, product_label, status, token, created_at, target_price, target_metric) VALUES (?, 'telegram', ?, ?, ?, 'pending', ?, ?, ?, ?)",
       )
-      .bind(id, `pending:${token}`, productKey, productLabel, token, now())
+      .bind(id, `pending:${token}`, productKey, productLabel, token, now(), tgTarget.price, tgTarget.metric)
       .run()
     return c.json({
       channel: 'telegram',
@@ -114,31 +150,41 @@ app.post('/api/subscribe', async (c) => {
     }
     const dest = JSON.stringify(sub)
     const freeMax = Number(c.env.FREE_MAX_SUBSCRIPTIONS || '1')
+    const pushPro = await isPro(db, 'push', dest)
+
+    const t = parseTarget(body)
+    if (t.invalid) return c.json({ error: 'invalid_target', message: 'Bitte gib einen gültigen Zielpreis an.' }, 400)
+    if (t.price != null && !pushPro) return c.json({ error: 'pro_required', message: 'Der Preiswecker ist eine Pro-Funktion. Löse einen Pro-Code ein.' }, 402)
 
     const existing = await db
       .prepare("SELECT id FROM subscriptions WHERE channel='push' AND destination=? AND product_key=?")
       .bind(dest, productKey)
       .first<{ id: string }>()
-    if (existing) return c.json({ status: 'confirmed', message: 'Für dieses Produkt ist dein Push-Alarm bereits aktiv.' })
+    if (existing) {
+      await db.prepare('UPDATE subscriptions SET target_price=?, target_metric=?, notified_at=NULL WHERE id=?').bind(t.price, t.metric, existing.id).run()
+      return c.json({ status: 'confirmed', message: t.price != null ? 'Preiswecker aktualisiert.' : 'Für dieses Produkt ist dein Push-Alarm bereits aktiv.' })
+    }
 
-    const active = await db
-      .prepare("SELECT COUNT(*) AS n FROM subscriptions WHERE channel='push' AND destination=? AND status='confirmed'")
-      .bind(dest)
-      .first<{ n: number }>()
-    if ((active?.n ?? 0) >= freeMax) {
-      return c.json(
-        { error: 'free_limit', message: `Im kostenlosen Tarif kannst du ${freeMax === 1 ? 'ein Produkt' : `${freeMax} Produkte`} beobachten. Mehr gibt es bald mit Pro.` },
-        409,
-      )
+    if (!pushPro) {
+      const active = await db
+        .prepare("SELECT COUNT(*) AS n FROM subscriptions WHERE channel='push' AND destination=? AND status='confirmed'")
+        .bind(dest)
+        .first<{ n: number }>()
+      if ((active?.n ?? 0) >= freeMax) {
+        return c.json(
+          { error: 'free_limit', message: `Im kostenlosen Tarif kannst du ${freeMax === 1 ? 'ein Produkt' : `${freeMax} Produkte`} beobachten. Mit Pro sind es beliebig viele.` },
+          409,
+        )
+      }
     }
 
     const id = crypto.randomUUID()
     const token = crypto.randomUUID()
     await db
       .prepare(
-        "INSERT INTO subscriptions (id, channel, destination, product_key, product_label, status, token, created_at, confirmed_at) VALUES (?, 'push', ?, ?, ?, 'confirmed', ?, ?, ?)",
+        "INSERT INTO subscriptions (id, channel, destination, product_key, product_label, status, token, created_at, confirmed_at, target_price, target_metric) VALUES (?, 'push', ?, ?, ?, 'confirmed', ?, ?, ?, ?, ?)",
       )
-      .bind(id, dest, productKey, productLabel, token, now(), now())
+      .bind(id, dest, productKey, productLabel, token, now(), now(), t.price, t.metric)
       .run()
     return c.json({ status: 'confirmed', message: 'Push-Alarm aktiv! Wir melden uns beim nächsten Preistief.' })
   }
@@ -147,19 +193,14 @@ app.post('/api/subscribe', async (c) => {
   const email = (body.email ?? '').trim().toLowerCase()
   if (!EMAIL_RE.test(email)) return c.json({ error: 'invalid_email', message: 'Bitte gib eine gültige E-Mail-Adresse an.' }, 400)
 
-  const pro = await isPro(db, email)
+  const pro = await isPro(db, 'email', email)
 
   // Preiswecker (Pro): Zielpreis + Metrik. Ohne Ziel => Free-Verhalten (neues Tief).
-  let targetPrice: number | null = null
-  let targetMetric: string | null = null
-  if (body.targetPrice != null && body.targetPrice !== '') {
-    const p = Number(body.targetPrice)
-    const m = body.targetMetric === 'liter' ? 'liter' : 'unit'
-    if (!Number.isFinite(p) || p <= 0) return c.json({ error: 'invalid_target', message: 'Bitte gib einen gültigen Zielpreis an.' }, 400)
-    if (!pro) return c.json({ error: 'pro_required', message: 'Der Preiswecker ist eine Pro-Funktion. Löse einen Pro-Code ein.' }, 402)
-    targetPrice = Math.round(p * 100) / 100
-    targetMetric = m
-  }
+  const t = parseTarget(body)
+  if (t.invalid) return c.json({ error: 'invalid_target', message: 'Bitte gib einen gültigen Zielpreis an.' }, 400)
+  if (t.price != null && !pro) return c.json({ error: 'pro_required', message: 'Der Preiswecker ist eine Pro-Funktion. Löse einen Pro-Code ein.' }, 402)
+  const targetPrice = t.price
+  const targetMetric = t.metric
 
   const freeMax = Number(c.env.FREE_MAX_SUBSCRIPTIONS || '1')
   const apiOrigin = new URL(c.req.url).origin
@@ -210,33 +251,44 @@ app.post('/api/subscribe', async (c) => {
   return c.json({ status: 'pending', message: 'Fast geschafft! Bitte bestätige den Link in deiner E-Mail.' })
 })
 
-// --- Pro-Status abfragen (für die UI) -------------------------------------
+// --- Pro-Status abfragen (für die UI; E-Mail & Push) ----------------------
 app.get('/api/entitlement', async (c) => {
   const email = (c.req.query('email') ?? '').trim().toLowerCase()
   if (!EMAIL_RE.test(email)) return c.json({ pro: false })
-  return c.json({ pro: await isPro(c.env.DB, email) })
+  return c.json({ pro: await isPro(c.env.DB, 'email', email) })
 })
 
-// --- Pro-Code einlösen -----------------------------------------------------
+// --- Pro-Code einlösen (Web: E-Mail oder Push; Telegram via Bot) -----------
 app.post('/api/redeem', async (c) => {
-  const body = (await c.req.json().catch(() => ({}))) as { code?: string; email?: string }
+  const body = (await c.req.json().catch(() => ({}))) as {
+    code?: string
+    channel?: string
+    email?: string
+    subscription?: { endpoint?: string; keys?: { p256dh?: string; auth?: string } }
+  }
   const code = (body.code ?? '').trim()
-  const email = (body.email ?? '').trim().toLowerCase()
+  const channel = (body.channel ?? 'email').trim()
   if (!code) return c.json({ error: 'missing_code', message: 'Bitte gib einen Code ein.' }, 400)
-  if (!EMAIL_RE.test(email)) return c.json({ error: 'invalid_email', message: 'Bitte gib eine gültige E-Mail-Adresse an.' }, 400)
 
-  const db = c.env.DB
-  const rc = await db
-    .prepare('SELECT code, tier, valid_days, max_uses, uses FROM redeem_codes WHERE code=?')
-    .bind(code)
-    .first<{ code: string; tier: string; valid_days: number | null; max_uses: number; uses: number }>()
-  if (!rc) return c.json({ error: 'invalid_code', message: 'Dieser Code ist ungültig.' }, 404)
-  if (rc.uses >= rc.max_uses) return c.json({ error: 'code_used', message: 'Dieser Code wurde bereits aufgebraucht.' }, 409)
+  let destination: string
+  if (channel === 'push') {
+    const sub = body.subscription
+    if (!sub?.endpoint || !sub.keys?.p256dh || !sub.keys?.auth) return c.json({ error: 'invalid_subscription', message: 'Push-Anmeldung unvollständig.' }, 400)
+    destination = JSON.stringify(sub)
+  } else if (channel === 'email') {
+    const email = (body.email ?? '').trim().toLowerCase()
+    if (!EMAIL_RE.test(email)) return c.json({ error: 'invalid_email', message: 'Bitte gib eine gültige E-Mail-Adresse an.' }, 400)
+    destination = email
+  } else {
+    return c.json({ error: 'unsupported_channel', message: 'Für Telegram löse den Code im Bot ein: /redeem <code>.' }, 400)
+  }
 
-  const validUntil = rc.valid_days ? new Date(Date.now() + rc.valid_days * 86_400_000).toISOString() : null
-  await grantEntitlement(db, email, rc.tier, `redeem:${code}`, validUntil)
-  await db.prepare('UPDATE redeem_codes SET uses=uses+1 WHERE code=?').bind(code).run()
-  return c.json({ tier: rc.tier, validUntil, message: 'Pro freigeschaltet – du kannst jetzt Preiswecker setzen.' })
+  const result = await consumeRedeemCode(c.env.DB, code, channel, destination)
+  if (!result.ok) {
+    const msg = result.error === 'code_used' ? 'Dieser Code wurde bereits aufgebraucht.' : 'Dieser Code ist ungültig.'
+    return c.json({ error: result.error, message: msg }, result.error === 'code_used' ? 409 : 404)
+  }
+  return c.json({ tier: result.tier, validUntil: result.validUntil, message: 'Pro freigeschaltet – du kannst jetzt Preiswecker setzen.' })
 })
 
 // --- Stripe: Checkout starten ---------------------------------------------
@@ -301,10 +353,10 @@ app.post('/api/stripe/webhook', async (c) => {
       const email = (s.metadata?.email || s.customer_details?.email || '').toLowerCase()
       if (!email) break
       if (s.mode === 'payment') {
-        await grantEntitlement(db, email, 'pro', `stripe:${s.id}`, null) // Lifetime
+        await grantEntitlement(db, 'email', email, 'pro', `stripe:${s.id}`, null) // Lifetime
       } else if (s.mode === 'subscription' && s.subscription) {
         const sub = await stripe.subscriptions.retrieve(String(s.subscription))
-        await grantEntitlement(db, email, 'pro', `stripe:${sub.id}`, untilFromSub(sub))
+        await grantEntitlement(db, 'email', email, 'pro', `stripe:${sub.id}`, untilFromSub(sub))
       }
       break
     }
@@ -314,13 +366,13 @@ app.post('/api/stripe/webhook', async (c) => {
       if (!subId) break
       const sub = await stripe.subscriptions.retrieve(subId)
       const email = (sub.metadata?.email || inv.customer_email || '').toLowerCase()
-      if (email) await grantEntitlement(db, email, 'pro', `stripe:${subId}`, untilFromSub(sub))
+      if (email) await grantEntitlement(db, 'email', email, 'pro', `stripe:${subId}`, untilFromSub(sub))
       break
     }
     case 'customer.subscription.deleted': {
       const sub = event.data.object
       const email = (sub.metadata?.email || '').toLowerCase()
-      if (email) await revokeEntitlement(db, email, 'pro')
+      if (email) await revokeEntitlement(db, 'email', email, 'pro')
       break
     }
   }
@@ -366,6 +418,26 @@ app.post('/api/telegram/webhook', async (c) => {
   const db = c.env.DB
   const freeMax = Number(c.env.FREE_MAX_SUBSCRIPTIONS || '1')
 
+  // Pro per Code im Bot freischalten (Entitlement an die chat_id).
+  if (text.startsWith('/redeem')) {
+    const code = text.split(/\s+/)[1] ?? ''
+    if (!code) {
+      await sendTelegram(c.env, chatId, 'Bitte gib deinen Code an: /redeem DEIN-CODE')
+      return c.json({ ok: true })
+    }
+    const r = await consumeRedeemCode(db, code, 'telegram', chatId)
+    await sendTelegram(
+      c.env,
+      chatId,
+      r.ok
+        ? '✅ Pro freigeschaltet – du kannst jetzt mehrere Produkte beobachten und Preiswecker nutzen.'
+        : r.error === 'code_used'
+          ? 'Dieser Code wurde bereits aufgebraucht.'
+          : 'Dieser Code ist ungültig.',
+    )
+    return c.json({ ok: true })
+  }
+
   if (text.startsWith('/start')) {
     const token = text.split(/\s+/)[1] ?? ''
     if (!token) {
@@ -373,23 +445,27 @@ app.post('/api/telegram/webhook', async (c) => {
       return c.json({ ok: true })
     }
     const sub = await db
-      .prepare("SELECT id, product_key, product_label FROM subscriptions WHERE channel='telegram' AND token=? AND destination LIKE 'pending:%'")
+      .prepare("SELECT id, product_key, product_label, target_price FROM subscriptions WHERE channel='telegram' AND token=? AND destination LIKE 'pending:%'")
       .bind(token)
-      .first<{ id: string; product_key: string; product_label: string }>()
+      .first<{ id: string; product_key: string; product_label: string; target_price: number | null }>()
     if (!sub) {
       await sendTelegram(c.env, chatId, 'Dieser Aktivierungslink ist ungültig oder wurde bereits verwendet.')
       return c.json({ ok: true })
     }
 
-    // Free-Limit pro Chat.
-    const active = await db
-      .prepare("SELECT COUNT(*) AS n FROM subscriptions WHERE channel='telegram' AND destination=? AND status='confirmed'")
-      .bind(chatId)
-      .first<{ n: number }>()
-    if ((active?.n ?? 0) >= freeMax) {
-      await db.prepare('DELETE FROM subscriptions WHERE id=?').bind(sub.id).run()
-      await sendTelegram(c.env, chatId, `Im kostenlosen Tarif kannst du ${freeMax === 1 ? 'ein Produkt' : `${freeMax} Produkte`} beobachten. Mehr gibt es bald mit Pro.`)
-      return c.json({ ok: true })
+    const pro = await isPro(db, 'telegram', chatId)
+
+    // Free-Limit pro Chat (Pro umgeht es).
+    if (!pro) {
+      const active = await db
+        .prepare("SELECT COUNT(*) AS n FROM subscriptions WHERE channel='telegram' AND destination=? AND status='confirmed'")
+        .bind(chatId)
+        .first<{ n: number }>()
+      if ((active?.n ?? 0) >= freeMax) {
+        await db.prepare('DELETE FROM subscriptions WHERE id=?').bind(sub.id).run()
+        await sendTelegram(c.env, chatId, `Im kostenlosen Tarif kannst du ${freeMax === 1 ? 'ein Produkt' : `${freeMax} Produkte`} beobachten. Mit /redeem <code> schaltest du Pro frei.`)
+        return c.json({ ok: true })
+      }
     }
 
     // Schon dasselbe Produkt aktiv? Dann pending verwerfen.
@@ -403,8 +479,17 @@ app.post('/api/telegram/webhook', async (c) => {
       return c.json({ ok: true })
     }
 
+    // Preiswecker nur für Pro; sonst verwerfen und normaler Bestpreis-Alarm.
+    let extra = ''
+    if (sub.target_price != null && !pro) {
+      await db.prepare('UPDATE subscriptions SET target_price=NULL, target_metric=NULL WHERE id=?').bind(sub.id).run()
+      extra = ' Der Preiswecker ist Pro – mit /redeem <code> schaltest du ihn frei; bis dahin bekommst du den normalen Bestpreis-Alarm.'
+    } else if (sub.target_price != null && pro) {
+      extra = ' Dein Preiswecker ist aktiv.'
+    }
+
     await db.prepare("UPDATE subscriptions SET destination=?, status='confirmed', confirmed_at=? WHERE id=?").bind(chatId, now(), sub.id).run()
-    await sendTelegram(c.env, chatId, `✅ Bestpreis-Alarm aktiv für „${sub.product_label}“. Ich melde mich, sobald es ein neues Preistief gibt. Mit /stop meldest du dich wieder ab.`)
+    await sendTelegram(c.env, chatId, `✅ Bestpreis-Alarm aktiv für „${sub.product_label}“.${extra} Mit /stop meldest du dich wieder ab.`)
     return c.json({ ok: true })
   }
 

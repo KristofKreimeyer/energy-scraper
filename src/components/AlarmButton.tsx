@@ -50,10 +50,7 @@ export function AlarmButton({ offer }: { offer: GroupedOffer }) {
     setState({ kind: 'submitting', channel: ch })
     try {
       let extra: Record<string, unknown> = {}
-      if (ch === 'email') {
-        extra = { email }
-        if (weckerOn && targetPrice) extra = { ...extra, targetPrice, targetMetric }
-      }
+      if (ch === 'email') extra = { email }
       if (ch === 'push') {
         try {
           extra = { subscription: await subscribeToPush() }
@@ -62,6 +59,8 @@ export function AlarmButton({ offer }: { offer: GroupedOffer }) {
           return
         }
       }
+      // Preiswecker (Pro) für alle Kanäle mitschicken.
+      if (weckerOn && targetPrice) extra = { ...extra, targetPrice, targetMetric }
       const res = await fetch(`${API_BASE}/api/subscribe`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
@@ -107,16 +106,27 @@ export function AlarmButton({ offer }: { offer: GroupedOffer }) {
   }
 
   async function redeem() {
-    if (!email) {
-      setRedeemMsg('Bitte trage oben zuerst deine E-Mail ein.')
-      return
-    }
     setRedeemMsg('…')
     try {
+      let payload: Record<string, unknown>
+      if (channel === 'push') {
+        try {
+          payload = { code: redeemCode, channel: 'push', subscription: await subscribeToPush() }
+        } catch (err) {
+          setRedeemMsg(err instanceof PushError ? err.message : 'Push-Anmeldung fehlgeschlagen.')
+          return
+        }
+      } else {
+        if (!email) {
+          setRedeemMsg('Bitte trage oben zuerst deine E-Mail ein.')
+          return
+        }
+        payload = { code: redeemCode, channel: 'email', email }
+      }
       const res = await fetch(`${API_BASE}/api/redeem`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ code: redeemCode, email }),
+        body: JSON.stringify(payload),
       })
       const data = (await res.json()) as { message?: string }
       if (res.ok) {
@@ -190,72 +200,29 @@ export function AlarmButton({ offer }: { offer: GroupedOffer }) {
 
       {channel === 'email' && (
         <form
-          className="flex flex-col gap-2"
+          className="flex gap-1.5"
           onSubmit={(e) => {
             e.preventDefault()
             subscribe('email')
           }}
         >
-          <div className="flex gap-1.5">
-            <input
-              id={`alarm-${offer.id}`}
-              type="email"
-              required
-              autoFocus
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="deine@email.de"
-              className="flex-1 min-w-0 h-9 px-2.5 text-[0.82rem] bg-surface text-ink border border-border-strong rounded-lg outline-none"
-            />
-            <button
-              type="submit"
-              disabled={submitting}
-              className="flex-none h-9 px-3 text-[0.82rem] font-semibold text-white bg-accent border border-accent rounded-lg cursor-pointer hover:bg-accent-strong disabled:opacity-60"
-            >
-              {submitting ? '…' : 'Aktivieren'}
-            </button>
-          </div>
-
+          <input
+            id={`alarm-${offer.id}`}
+            type="email"
+            required
+            autoFocus
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="deine@email.de"
+            className="flex-1 min-w-0 h-9 px-2.5 text-[0.82rem] bg-surface text-ink border border-border-strong rounded-lg outline-none"
+          />
           <button
-            type="button"
-            className="self-start text-[0.74rem] font-semibold text-muted hover:text-accent-strong cursor-pointer"
-            aria-expanded={weckerOn}
-            onClick={() => setWeckerOn((v) => !v)}
+            type="submit"
+            disabled={submitting}
+            className="flex-none h-9 px-3 text-[0.82rem] font-semibold text-white bg-accent border border-accent rounded-lg cursor-pointer hover:bg-accent-strong disabled:opacity-60"
           >
-            {weckerOn ? '− Preiswecker' : '＋ Preiswecker (Pro)'}
+            {submitting ? '…' : 'Aktivieren'}
           </button>
-
-          {weckerOn && (
-            <div className="flex flex-col gap-1.5 rounded-lg border border-border p-2">
-              <label htmlFor={`target-${offer.id}`} className="text-[0.72rem] text-muted">
-                Benachrichtige mich, sobald der Preis ≤ Zielwert ist:
-              </label>
-              <div className="flex gap-1.5">
-                <div className="flex items-center gap-1 flex-1 min-w-0 h-8 px-2 bg-surface border border-border-strong rounded-md">
-                  <input
-                    id={`target-${offer.id}`}
-                    type="number"
-                    inputMode="decimal"
-                    min="0"
-                    step="0.01"
-                    value={targetPrice}
-                    onChange={(e) => setTargetPrice(e.target.value)}
-                    placeholder="z. B. 0.79"
-                    className="w-full min-w-0 bg-transparent text-ink text-[0.82rem] outline-none"
-                  />
-                  <span className="flex-none text-[0.72rem] text-muted">{unit}</span>
-                </div>
-                <div className="flex gap-1" role="group" aria-label="Zielgröße">
-                  <button type="button" className={seg(targetMetric === 'unit') + ' !flex-none px-2.5'} aria-pressed={targetMetric === 'unit'} onClick={() => setTargetMetric('unit')}>
-                    Dose
-                  </button>
-                  <button type="button" className={seg(targetMetric === 'liter') + ' !flex-none px-2.5'} aria-pressed={targetMetric === 'liter'} onClick={() => setTargetMetric('liter')}>
-                    €/L
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
         </form>
       )}
       {channel === 'telegram' && (
@@ -279,52 +246,104 @@ export function AlarmButton({ offer }: { offer: GroupedOffer }) {
         </button>
       )}
 
+      {/* Preiswecker (Pro) – für alle Kanäle */}
+      <button
+        type="button"
+        className="self-start text-[0.74rem] font-semibold text-muted hover:text-accent-strong cursor-pointer"
+        aria-expanded={weckerOn}
+        onClick={() => setWeckerOn((v) => !v)}
+      >
+        {weckerOn ? '− Preiswecker' : '＋ Preiswecker (Pro)'}
+      </button>
+      {weckerOn && (
+        <div className="flex flex-col gap-1.5 rounded-lg border border-border p-2">
+          <label htmlFor={`target-${offer.id}`} className="text-[0.72rem] text-muted">
+            Benachrichtige mich, sobald der Preis ≤ Zielwert ist:
+          </label>
+          <div className="flex gap-1.5">
+            <div className="flex items-center gap-1 flex-1 min-w-0 h-8 px-2 bg-surface border border-border-strong rounded-md">
+              <input
+                id={`target-${offer.id}`}
+                type="number"
+                inputMode="decimal"
+                min="0"
+                step="0.01"
+                value={targetPrice}
+                onChange={(e) => setTargetPrice(e.target.value)}
+                placeholder="z. B. 0.79"
+                className="w-full min-w-0 bg-transparent text-ink text-[0.82rem] outline-none"
+              />
+              <span className="flex-none text-[0.72rem] text-muted">{unit}</span>
+            </div>
+            <div className="flex gap-1" role="group" aria-label="Zielgröße">
+              <button type="button" className={seg(targetMetric === 'unit') + ' !flex-none px-2.5'} aria-pressed={targetMetric === 'unit'} onClick={() => setTargetMetric('unit')}>
+                Dose
+              </button>
+              <button type="button" className={seg(targetMetric === 'liter') + ' !flex-none px-2.5'} aria-pressed={targetMetric === 'liter'} onClick={() => setTargetMetric('liter')}>
+                €/L
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {state.kind === 'error' && (
         <p className="text-[0.74rem] text-warn-ink" role="alert">
           {state.message}
         </p>
       )}
 
-      {channel === 'email' && showRedeem && (
-        <div className="flex flex-col gap-1.5 rounded-lg border border-border p-2">
-          <span className="text-[0.72rem] font-semibold text-ink">Pro freischalten</span>
-          <div className="flex gap-1.5">
-            {(
-              [
-                ['monthly', 'Monatlich'],
-                ['yearly', 'Jährlich'],
-                ['lifetime', 'Lifetime'],
-              ] as const
-            ).map(([plan, text]) => (
+      {/* Pro freischalten – E-Mail: Kauf+Code · Push: Code · Telegram: im Bot */}
+      {showRedeem &&
+        (channel === 'telegram' ? (
+          <div className="rounded-lg border border-border p-2 text-[0.74rem] text-muted">
+            Pro im Bot freischalten: sende <span className="text-ink font-semibold">/redeem DEIN-CODE</span> an den Telegram-Bot.
+          </div>
+        ) : (
+          <div className="flex flex-col gap-1.5 rounded-lg border border-border p-2">
+            <span className="text-[0.72rem] font-semibold text-ink">Pro freischalten</span>
+            {channel === 'email' && (
+              <>
+                <div className="flex gap-1.5">
+                  {(
+                    [
+                      ['monthly', 'Monatlich'],
+                      ['yearly', 'Jährlich'],
+                      ['lifetime', 'Lifetime'],
+                    ] as const
+                  ).map(([plan, text]) => (
+                    <button
+                      key={plan}
+                      type="button"
+                      onClick={() => checkout(plan)}
+                      className="flex-1 h-8 text-[0.76rem] font-semibold text-white bg-accent border border-accent rounded-md cursor-pointer hover:bg-accent-strong"
+                    >
+                      {text}
+                    </button>
+                  ))}
+                </div>
+                <span className="text-[0.7rem] text-muted">oder Pro-Code einlösen:</span>
+              </>
+            )}
+            <div className="flex gap-1.5">
+              <input
+                type="text"
+                value={redeemCode}
+                onChange={(e) => setRedeemCode(e.target.value)}
+                placeholder="Code"
+                className="flex-1 min-w-0 h-9 px-2.5 text-[0.82rem] bg-surface text-ink border border-border-strong rounded-lg outline-none"
+              />
               <button
-                key={plan}
                 type="button"
-                onClick={() => checkout(plan)}
-                className="flex-1 h-8 text-[0.76rem] font-semibold text-white bg-accent border border-accent rounded-md cursor-pointer hover:bg-accent-strong"
+                onClick={redeem}
+                className="flex-none h-9 px-3 text-[0.82rem] font-semibold text-good border border-[color-mix(in_srgb,var(--good)_40%,transparent)] rounded-lg cursor-pointer hover:bg-good-tint"
               >
-                {text}
+                Einlösen
               </button>
-            ))}
+            </div>
+            {channel === 'push' && <span className="text-[0.68rem] text-muted">Pro wird an dieses Gerät gebunden.</span>}
           </div>
-          <span className="text-[0.7rem] text-muted">oder Pro-Code einlösen:</span>
-          <div className="flex gap-1.5">
-            <input
-              type="text"
-              value={redeemCode}
-              onChange={(e) => setRedeemCode(e.target.value)}
-              placeholder="Code"
-              className="flex-1 min-w-0 h-9 px-2.5 text-[0.82rem] bg-surface text-ink border border-border-strong rounded-lg outline-none"
-            />
-            <button
-              type="button"
-              onClick={redeem}
-              className="flex-none h-9 px-3 text-[0.82rem] font-semibold text-good border border-[color-mix(in_srgb,var(--good)_40%,transparent)] rounded-lg cursor-pointer hover:bg-good-tint"
-            >
-              Einlösen
-            </button>
-          </div>
-        </div>
-      )}
+        ))}
       {redeemMsg && (
         <p className="text-[0.74rem] text-muted" role="status">
           {redeemMsg}
@@ -333,9 +352,9 @@ export function AlarmButton({ offer }: { offer: GroupedOffer }) {
 
       <div className="flex items-center justify-between gap-2">
         <span className="text-[0.7rem] text-muted">Kostenlos · ein Produkt · jederzeit abbestellbar.</span>
-        {channel === 'email' && !showRedeem && (
+        {!showRedeem && (
           <button type="button" className="flex-none text-[0.7rem] text-muted underline underline-offset-2 hover:text-accent-strong cursor-pointer" onClick={() => setShowRedeem(true)}>
-            Pro-Code einlösen
+            {channel === 'telegram' ? 'Pro (Code im Bot)' : 'Pro freischalten'}
           </button>
         )}
       </div>

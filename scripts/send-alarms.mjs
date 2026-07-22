@@ -177,22 +177,26 @@ async function getWebpush() {
   return _webpush
 }
 
-/** Sendet eine Push-Nachricht; Rückgabe 'expired' bei toter Subscription (404/410). */
-async function sendPush(destination, event, offer) {
+function bestPricePush(event, offer) {
   const perLiter = event.perLiter.toFixed(2).replace('.', ',')
-  const payload = JSON.stringify({
-    title: `⚡ Bestpreis: ${event.label}`,
-    body: `${perLiter} €/L – so günstig wie nie erfasst.`,
-    url: offer?.url || SITE_URL,
-    tag: event.productKey,
-  })
+  return { title: `⚡ Bestpreis: ${event.label}`, body: `${perLiter} €/L – so günstig wie nie erfasst.`, url: offer?.url || SITE_URL, tag: event.productKey }
+}
+
+function weckerPush(sub, offer, price) {
+  const unit = sub.target_metric === 'liter' ? '€/L' : '€'
+  const cur = price.toFixed(2).replace('.', ',')
+  return { title: `🔔 Preiswecker: ${sub.product_label}`, body: `Jetzt ${cur} ${unit} – dein Ziel ist erreicht.`, url: offer?.url || SITE_URL, tag: sub.product_key }
+}
+
+/** Sendet eine Push-Nachricht; Rückgabe 'expired' bei toter Subscription (404/410). */
+async function pushSend(destination, payloadObj) {
   if (!VAPID_PUBLIC_KEY || !VAPID_PRIVATE_KEY) {
-    console.log(`  [dry] Push: ${event.label}`)
+    console.log(`  [dry] Push: ${payloadObj.title}`)
     return 'ok'
   }
   const wp = await getWebpush()
   try {
-    await wp.sendNotification(JSON.parse(destination), payload)
+    await wp.sendNotification(JSON.parse(destination), JSON.stringify(payloadObj))
     return 'ok'
   } catch (err) {
     if (err.statusCode === 404 || err.statusCode === 410) return 'expired'
@@ -248,7 +252,7 @@ async function main() {
     const offer = offerByKey.get(event.productKey)
     for (const sub of subs) {
       if (sub.channel === 'push') {
-        const result = await sendPush(sub.destination, event, offer)
+        const result = await pushSend(sub.destination, bestPricePush(event, offer))
         if (result === 'expired') {
           // Tote Subscription abmelden, nicht als versendet zählen.
           await d1Query("UPDATE subscriptions SET status='unsubscribed' WHERE id=?", [sub.id])
@@ -274,8 +278,17 @@ async function main() {
     const price = offer ? (sub.target_metric === 'liter' ? offer.perLiter : offer.perUnit) : null
     const decision = weckerDecision(price, sub.target_price, sub.notified_at)
     if (decision === 'fire') {
-      if (sub.channel === 'telegram') await sendTelegram(sub.destination, weckerEmail(sub, offer, price).text.replace(/\n/g, '\n'))
-      else await sendEmail(sub.destination, weckerEmail(sub, offer, price))
+      if (sub.channel === 'push') {
+        const r = await pushSend(sub.destination, weckerPush(sub, offer, price))
+        if (r === 'expired') {
+          await d1Query("UPDATE subscriptions SET status='unsubscribed' WHERE id=?", [sub.id])
+          continue
+        }
+      } else if (sub.channel === 'telegram') {
+        await sendTelegram(sub.destination, weckerEmail(sub, offer, price).text)
+      } else {
+        await sendEmail(sub.destination, weckerEmail(sub, offer, price))
+      }
       await d1Query('UPDATE subscriptions SET notified_at=? WHERE id=?', [new Date().toISOString(), sub.id])
       weckerSent++
     } else if (decision === 'reset') {

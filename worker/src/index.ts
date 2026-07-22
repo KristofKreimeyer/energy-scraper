@@ -1,4 +1,4 @@
-// FindMyEnergy – Bestpreis-Alarm-API (Cloudflare Worker + D1).
+// EnergyHunt – Bestpreis-Alarm-API (Cloudflare Worker + D1).
 //
 // Endpunkte:
 //   POST /api/subscribe   { email, productKey, productLabel }            -> E-Mail Double-Opt-In
@@ -542,7 +542,7 @@ app.post('/api/telegram/webhook', async (c) => {
   if (text.startsWith('/start')) {
     const token = text.split(/\s+/)[1] ?? ''
     if (!token) {
-      await sendTelegram(c.env, chatId, 'Willkommen bei FindMyEnergy ⚡ Aktiviere deinen Bestpreis-Alarm über den Button auf der Website.')
+      await sendTelegram(c.env, chatId, 'Willkommen bei EnergyHunt ⚡ Aktiviere deinen Bestpreis-Alarm über den Button auf der Website.')
       return c.json({ ok: true })
     }
     // Ein Token kann mehrere pending-Abos umfassen (Marken-Batch).
@@ -603,7 +603,7 @@ app.post('/api/telegram/webhook', async (c) => {
     return c.json({ ok: true })
   }
 
-  await sendTelegram(c.env, chatId, 'Aktiviere deinen Bestpreis-Alarm über den Button auf der FindMyEnergy-Website.')
+  await sendTelegram(c.env, chatId, 'Aktiviere deinen Bestpreis-Alarm über den Button auf der EnergyHunt-Website.')
   return c.json({ ok: true })
 })
 

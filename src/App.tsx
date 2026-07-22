@@ -178,7 +178,7 @@ function App() {
               ⚡
             </span>
             <span>
-              FindMy<em className="not-italic text-accent-strong">Energy</em>
+              Energy<em className="not-italic text-accent-strong">Hunt</em>
             </span>
           </div>
           <button
@@ -556,7 +556,7 @@ function App() {
         <div
           className={`${WRAP} flex flex-wrap gap-x-[18px] gap-y-2 items-center`}
         >
-          <span>FindMyEnergy — Angebotsübersicht</span>
+          <span>EnergyHunt — Angebotsübersicht</span>
           <span className="font-mono text-[0.76rem]">
             Datenquelle: energy-scraper · captured/*.json · Stand{" "}
             {generatedLabel}

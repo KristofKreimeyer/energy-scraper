@@ -58,12 +58,12 @@ export async function sendEmail(env: Env, mail: OutgoingEmail): Promise<void> {
 const shell = (heading: string, body: string) => `<!doctype html>
 <html lang="de"><body style="margin:0;background:#edf0f3;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:#10151b">
   <div style="max-width:520px;margin:0 auto;padding:32px 20px">
-    <div style="font-weight:750;font-size:1.1rem;margin-bottom:20px">⚡ FindMy<span style="color:#b23c07">Energy</span></div>
+    <div style="font-weight:750;font-size:1.1rem;margin-bottom:20px">⚡ Energy<span style="color:#b23c07">Hunt</span></div>
     <div style="background:#fff;border:1px solid #dbe1e7;border-radius:14px;padding:24px">
       <h1 style="font-size:1.25rem;margin:0 0 12px">${heading}</h1>
       ${body}
     </div>
-    <p style="color:#5b6772;font-size:0.78rem;margin-top:18px">FindMyEnergy · Bestpreis-Alarm für Energy-Drinks</p>
+    <p style="color:#5b6772;font-size:0.78rem;margin-top:18px">EnergyHunt · Bestpreis-Alarm für Energy-Drinks</p>
   </div>
 </body></html>`
 
@@ -88,7 +88,7 @@ export function statusPage(env: Env, heading: string, message: string): Response
   const html = shell(
     heading,
     `<p style="margin:0 0 20px;color:#5b6772">${message}</p>
-     <a href="${env.PUBLIC_SITE_URL}" style="display:inline-block;background:#e24a08;color:#fff;text-decoration:none;font-weight:650;padding:11px 20px;border-radius:10px">Zu FindMyEnergy</a>`,
+     <a href="${env.PUBLIC_SITE_URL}" style="display:inline-block;background:#e24a08;color:#fff;text-decoration:none;font-weight:650;padding:11px 20px;border-radius:10px">Zu EnergyHunt</a>`,
   )
   return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8' } })
 }

@@ -8,8 +8,8 @@
     "dev": "wrangler dev --port 8787",
     "deploy": "wrangler deploy",
     "typecheck": "tsc --noEmit",
-    "db:migrate:local": "wrangler d1 migrations apply findmyenergy --local",
-    "db:migrate": "wrangler d1 migrations apply findmyenergy --remote"
+    "db:migrate:local": "wrangler d1 migrations apply energyHunt --local",
+    "db:migrate": "wrangler d1 migrations apply energyHunt --remote"
   },
   "dependencies": {
     "hono": "^4.6.14",

@@ -1,6 +1,6 @@
 # Go-Live-Runbook
 
-Deployment von FindMyEnergy: **Cloudflare Pages** (statische Vite-App) +
+Deployment von EnergyHunt: **Cloudflare Pages** (statische Vite-App) +
 **Cloudflare Worker** (Alarm-API) + **D1** (Datenbank). CI/CD über GitHub
 Actions in `.github/workflows/`:
 
@@ -23,10 +23,10 @@ cd energy-scraper/worker
 npm install
 
 # D1 anlegen -> die ausgegebene database_id in wrangler.toml eintragen:
-npx wrangler d1 create findmyenergy
+npx wrangler d1 create energyHunt
 
 # Pages-Projekt anlegen (einmalig):
-npx wrangler pages project create findmyenergy --production-branch=main
+npx wrangler pages project create energyhunt --production-branch=main
 ```
 
 **API-Token** (Cloudflare-Dashboard → My Profile → API Tokens → Create): Rechte
@@ -40,7 +40,7 @@ npx wrangler pages project create findmyenergy --production-branch=main
 
 | Var | Wert |
 |---|---|
-| `PUBLIC_SITE_URL` | URL der Pages-Seite, z. B. `https://findmyenergy.pages.dev` |
+| `PUBLIC_SITE_URL` | URL der Pages-Seite, z. B. `https://energyhunt.pages.dev` |
 | `ALLOWED_ORIGIN` | dieselbe Origin (CORS) |
 | `EMAIL_FROM` / `EMAIL_FROM_NAME` | verifizierter Absender / Anzeigename |
 | `TELEGRAM_BOT_USERNAME` | Bot-Name ohne `@` |

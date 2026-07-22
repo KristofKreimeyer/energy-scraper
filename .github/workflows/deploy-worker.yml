@@ -40,7 +40,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: worker
-          command: d1 migrations apply findmyenergy --remote
+          command: d1 migrations apply energyHunt --remote
 
       - name: Worker deployen
         uses: cloudflare/wrangler-action@v3

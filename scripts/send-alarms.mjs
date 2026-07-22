@@ -91,10 +91,10 @@ const BREVO_API_KEY = process.env.BREVO_API_KEY
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN
 const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY
 const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY
-const VAPID_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:alarm@findmyenergy.de'
-const EMAIL_FROM = process.env.EMAIL_FROM || 'alarm@findmyenergy.de'
-const EMAIL_FROM_NAME = process.env.EMAIL_FROM_NAME || 'FindMyEnergy'
-const SITE_URL = process.env.PUBLIC_SITE_URL || 'https://findmyenergy.de'
+const VAPID_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:alarm@energyhunt.de'
+const EMAIL_FROM = process.env.EMAIL_FROM || 'alarm@energyhunt.de'
+const EMAIL_FROM_NAME = process.env.EMAIL_FROM_NAME || 'EnergyHunt'
+const SITE_URL = process.env.PUBLIC_SITE_URL || 'https://energyhunt.de'
 const API_BASE = process.env.API_BASE || '' // Worker-URL für Abmelde-Links
 
 async function d1Query(sql, params = []) {
@@ -118,7 +118,7 @@ export function alarmEmail(event, offer, unsubToken) {
     `Zum Angebot: ${url}\n\nAbmelden: ${unsubLink}`
   const html = `<!doctype html><html lang="de"><body style="margin:0;background:#edf0f3;font-family:system-ui,sans-serif;color:#10151b">
     <div style="max-width:520px;margin:0 auto;padding:32px 20px">
-      <div style="font-weight:750;font-size:1.1rem;margin-bottom:20px">⚡ FindMy<span style="color:#b23c07">Energy</span></div>
+      <div style="font-weight:750;font-size:1.1rem;margin-bottom:20px">⚡ Energy<span style="color:#b23c07">Hunt</span></div>
       <div style="background:#fff;border:1px solid #dbe1e7;border-radius:14px;padding:24px">
         <div style="display:inline-block;background:#e24a08;color:#fff;font-weight:700;font-size:0.8rem;padding:4px 10px;border-radius:7px;margin-bottom:12px">⚡ Bestpreis</div>
         <h1 style="font-size:1.25rem;margin:0 0 8px">${event.label}</h1>
@@ -141,7 +141,7 @@ export function weckerEmail(sub, offer, price) {
     `(dein Ziel: ${target} €${unit}).\n\nZum Angebot: ${url}`
   const html = `<!doctype html><html lang="de"><body style="margin:0;background:#edf0f3;font-family:system-ui,sans-serif;color:#10151b">
     <div style="max-width:520px;margin:0 auto;padding:32px 20px">
-      <div style="font-weight:750;font-size:1.1rem;margin-bottom:20px">⚡ FindMy<span style="color:#b23c07">Energy</span></div>
+      <div style="font-weight:750;font-size:1.1rem;margin-bottom:20px">⚡ Energy<span style="color:#b23c07">Hunt</span></div>
       <div style="background:#fff;border:1px solid #dbe1e7;border-radius:14px;padding:24px">
         <div style="display:inline-block;background:#0a7a42;color:#fff;font-weight:700;font-size:0.8rem;padding:4px 10px;border-radius:7px;margin-bottom:12px">🔔 Preiswecker</div>
         <h1 style="font-size:1.25rem;margin:0 0 8px">${sub.product_label}</h1>
@@ -370,7 +370,7 @@ async function dispatchBrand(sub, offer, pushPayload) {
   }
   const html = `<!doctype html><html lang="de"><body style="margin:0;background:#edf0f3;font-family:system-ui,sans-serif;color:#10151b">
     <div style="max-width:520px;margin:0 auto;padding:32px 20px">
-      <div style="font-weight:750;font-size:1.1rem;margin-bottom:20px">⚡ FindMy<span style="color:#b23c07">Energy</span></div>
+      <div style="font-weight:750;font-size:1.1rem;margin-bottom:20px">⚡ Energy<span style="color:#b23c07">Hunt</span></div>
       <div style="background:#fff;border:1px solid #dbe1e7;border-radius:14px;padding:24px">
         <h1 style="font-size:1.2rem;margin:0 0 8px">${pushPayload.title}</h1>
         <p style="margin:0 0 16px;color:#5b6772">${pushPayload.body}</p>

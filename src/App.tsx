@@ -67,6 +67,7 @@ function App() {
   const [sort, setSort] = useState<SortKey>('liter')
   const [query, setQuery] = useState('')
   const [showCreator, setShowCreator] = useState(false)
+  const [view, setView] = useState<'grid' | 'list'>('grid')
 
   // Angebote des gewählten Zeitraums – Sorten erst innerhalb des Zeitraums bündeln
   const offers = useMemo(() => groupOffers(inTimeframe(allOffers, timeframe)), [timeframe])
@@ -360,6 +361,33 @@ function App() {
                   ))}
                 </select>
               </div>
+              <div className="flex items-center gap-1 ml-auto" role="group" aria-label="Ansicht wählen">
+                <button
+                  type="button"
+                  aria-pressed={view === 'grid'}
+                  aria-label="Kachelansicht"
+                  onClick={() => setView('grid')}
+                  className={`h-11 w-11 grid place-items-center rounded-[10px] border ${view === 'grid' ? 'bg-accent text-white border-accent' : 'bg-surface text-muted border-border-strong hover:text-ink'}`}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
+                    <rect x="3" y="3" width="7" height="7" rx="1.5" />
+                    <rect x="14" y="3" width="7" height="7" rx="1.5" />
+                    <rect x="3" y="14" width="7" height="7" rx="1.5" />
+                    <rect x="14" y="14" width="7" height="7" rx="1.5" />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={view === 'list'}
+                  aria-label="Listenansicht"
+                  onClick={() => setView('list')}
+                  className={`h-11 w-11 grid place-items-center rounded-[10px] border ${view === 'list' ? 'bg-accent text-white border-accent' : 'bg-surface text-muted border-border-strong hover:text-ink'}`}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+                    <path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01" />
+                  </svg>
+                </button>
+              </div>
             </div>
 
             <div className="flex flex-wrap gap-2 mt-3 items-center" role="group" aria-label="Nach Supermarkt filtern">
@@ -433,9 +461,14 @@ function App() {
           </p>
 
           {visible.length > 0 ? (
-            <ul className="list-none mt-1.5 p-0 grid gap-4 grid-cols-[repeat(auto-fill,minmax(248px,1fr))]" aria-label="Energy-Drink-Angebote">
+            <ul
+              className={`list-none mt-1.5 p-0 ${
+                view === 'list' ? 'flex flex-col gap-2.5' : 'grid gap-4 grid-cols-[repeat(auto-fill,minmax(248px,1fr))]'
+              }`}
+              aria-label="Energy-Drink-Angebote"
+            >
               {visible.map((offer) => (
-                <OfferCard key={offer.id} offer={offer} isBest={offer.id === bestId} />
+                <OfferCard key={offer.id} offer={offer} isBest={offer.id === bestId} view={view} />
               ))}
             </ul>
           ) : (

@@ -110,9 +110,10 @@ function Sparkline({ trend, colorClass }: { trend: PriceInsight['trend']; colorC
 interface Props {
   offer: GroupedOffer
   isBest: boolean
+  view?: 'grid' | 'list'
 }
 
-export function OfferCard({ offer, isBest }: Props) {
+export function OfferCard({ offer, isBest, view = 'grid' }: Props) {
   const { label: validLabel, ending, upcoming } = validity(offer)
   const saved = savings(offer)
   const insight = priceInsight(offer)
@@ -124,6 +125,108 @@ export function OfferCard({ offer, isBest }: Props) {
 
   const validVariant = ending ? VALID_VARIANT.ending : upcoming ? VALID_VARIANT.upcoming : VALID_VARIANT.base
 
+  // Geteilte Bausteine für Kachel- und Listenansicht.
+  const insightBlock = insight && (
+    <div
+      className="flex flex-col gap-[5px] text-[0.76rem]"
+      aria-label={`Preisniveau: ${INSIGHT_COPY[insight.level].label}. Typischer Grundpreis ${formatEuro(insight.median)} pro Liter über ${insight.dayCount} erfasste Tage.`}
+    >
+      <div className="flex items-center gap-2">
+        <span className={`flex-none inline-flex items-center gap-[5px] font-bold rounded-[7px] px-2 py-[3px] border ${INSIGHT_BADGE[insight.level]}`}>
+          {INSIGHT_COPY[insight.level].icon === 'bolt' ? <BoltIcon /> : <TrendIcon />}
+          {INSIGHT_COPY[insight.level].label}
+        </span>
+        <Sparkline trend={insight.trend} colorClass={INSIGHT_SPARK[insight.level]} />
+      </div>
+      <span className="text-muted font-mono tabular-nums whitespace-nowrap overflow-hidden text-ellipsis" aria-hidden="true">
+        {insight.level === 'best' ? 'günstigster erfasster Preis' : `⌀ ${formatEuro(insight.median)}/L · ${insight.dayCount} Tage`}
+      </span>
+    </div>
+  )
+
+  const validBadge = (
+    <span className={`inline-flex items-center gap-1.5 self-start text-[0.76rem] font-semibold rounded-[7px] px-[9px] py-1 border ${validVariant}`}>
+      <ClockIcon />
+      {validLabel}
+    </span>
+  )
+
+  // --- Listenansicht: kompakte horizontale Zeile ---------------------------
+  if (view === 'list') {
+    return (
+      <li>
+        <article
+          className="offer-card group relative flex flex-col gap-2 bg-surface border border-border rounded-card p-3 shadow-card transition-[border-color] duration-150 hover:border-border-strong focus-within:border-focus"
+          aria-label={alt}
+        >
+          <div className="flex items-center gap-3">
+            <div className="relative w-14 h-14 flex-none rounded-lg bg-surface-2 border border-border grid place-items-center overflow-hidden">
+              {showImage ? (
+                <img src={offer.imageUrl!} alt={alt} loading="lazy" width="56" height="56" className="w-full h-full object-contain p-1" onError={() => setImgFailed(true)} />
+              ) : (
+                <span className="w-6 h-9 rounded" style={{ background: offer.marketColor }} role="img" aria-label={alt} />
+              )}
+            </div>
+
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-mono text-[0.68rem] tracking-[0.08em] uppercase text-accent-strong font-bold">{offer.brand}</span>
+                <span className="text-[0.66rem] font-bold text-muted border border-border-strong rounded px-1.5 py-px">{offer.market}</span>
+                {isBest && (
+                  <span className="inline-flex items-center gap-[3px] bg-good text-white text-[0.6rem] font-bold px-1.5 py-px rounded">
+                    <CheckIcon />
+                    Bester €/L
+                  </span>
+                )}
+              </div>
+              <h3 className="text-[0.95rem] leading-tight truncate mt-0.5">{offer.title}</h3>
+              <div className="flex items-center gap-2 mt-1 flex-wrap">
+                {validBadge}
+                {saved && (
+                  <span className="font-mono font-bold tabular-nums text-good text-[0.72rem] bg-good-tint border border-[color-mix(in_srgb,var(--good)_30%,transparent)] rounded px-1.5 py-px">
+                    −{saved.percent}&nbsp;%
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="flex-none text-right">
+              <div className="font-mono text-[1.1rem] font-bold tracking-[-0.02em] tabular-nums text-ink whitespace-nowrap">
+                {formatEuro(offer.perUnit)}
+                <span className="text-[0.62rem] font-medium text-muted"> {isMulti ? '/ Dose' : ''}</span>
+              </div>
+              <div className={`font-mono text-[0.82rem] font-bold tabular-nums whitespace-nowrap ${isBest ? 'text-good' : 'text-muted'}`}>
+                {offer.perLiter != null ? `${formatEuro(offer.perLiter)}/L` : '—'}
+              </div>
+            </div>
+
+            {offer.url && (
+              <a
+                data-cta=""
+                className="flex-none inline-flex items-center gap-1 text-accent-strong text-[0.82rem] font-[650] no-underline after:content-[''] after:absolute after:inset-0 after:rounded-card group-hover:text-accent focus-visible:outline-none"
+                href={offer.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Angebot ansehen: ${alt} (öffnet in neuem Tab)`}
+              >
+                <span className="hidden sm:inline">Angebot</span>
+                <ArrowIcon />
+              </a>
+            )}
+          </div>
+
+          {(insightBlock || offer.url) && (
+            <div className="flex flex-col gap-2 border-t border-border pt-2">
+              {insightBlock}
+              <AlarmButton offer={offer} />
+            </div>
+          )}
+        </article>
+      </li>
+    )
+  }
+
+  // --- Kachelansicht -------------------------------------------------------
   return (
     <li className="flex">
       <article
@@ -225,38 +328,9 @@ export function OfferCard({ offer, isBest }: Props) {
             </p>
           )}
 
-          {insight && (
-            <div
-              className="flex flex-col gap-[5px] mt-2.5 text-[0.76rem]"
-              aria-label={`Preisniveau: ${INSIGHT_COPY[insight.level].label}. Typischer Grundpreis ${formatEuro(
-                insight.median,
-              )} pro Liter über ${insight.dayCount} erfasste Tage.`}
-            >
-              <div className="flex items-center gap-2">
-                <span
-                  className={`flex-none inline-flex items-center gap-[5px] font-bold rounded-[7px] px-2 py-[3px] border ${
-                    INSIGHT_BADGE[insight.level]
-                  }`}
-                >
-                  {INSIGHT_COPY[insight.level].icon === 'bolt' ? <BoltIcon /> : <TrendIcon />}
-                  {INSIGHT_COPY[insight.level].label}
-                </span>
-                <Sparkline trend={insight.trend} colorClass={INSIGHT_SPARK[insight.level]} />
-              </div>
-              <span className="text-muted font-mono tabular-nums whitespace-nowrap overflow-hidden text-ellipsis" aria-hidden="true">
-                {insight.level === 'best'
-                  ? 'günstigster erfasster Preis'
-                  : `⌀ ${formatEuro(insight.median)}/L · ${insight.dayCount} Tage`}
-              </span>
-            </div>
-          )}
+          {insightBlock && <div className="mt-2.5">{insightBlock}</div>}
 
-          <span
-            className={`inline-flex items-center gap-1.5 self-start mt-3 text-[0.76rem] font-semibold rounded-[7px] px-[9px] py-1 border ${validVariant}`}
-          >
-            <ClockIcon />
-            {validLabel}
-          </span>
+          <div className="mt-3">{validBadge}</div>
 
           <AlarmButton offer={offer} />
 

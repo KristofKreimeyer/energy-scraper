@@ -75,7 +75,11 @@ function App() {
   const [query, setQuery] = useState("");
   const [showCreator, setShowCreator] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-  const [view, setView] = useState<"grid" | "list">("grid");
+  // Auf schmalen Viewports (Mobil) standardmäßig die Listenansicht – die wirkt
+  // dort aufgeräumter als die Kacheln. Nur Startwert; der Umschalter bleibt aktiv.
+  const [view, setView] = useState<"grid" | "list">(() =>
+    typeof window !== "undefined" && window.matchMedia("(max-width: 640px)").matches ? "list" : "grid",
+  );
 
   // Angebote des gewählten Zeitraums – Sorten erst innerhalb des Zeitraums bündeln
   const offers = useMemo(

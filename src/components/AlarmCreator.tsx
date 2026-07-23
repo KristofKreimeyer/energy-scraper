@@ -16,8 +16,8 @@ const MARKETS = allMarkets(allOffers);
 
 // Pro-Pläne (Anzeige-Copy; echter Betrag via Stripe-Price-ID).
 const PLANS = [
-  { plan: "monthly", price: "0,99 €", period: "pro Monat" },
-  { plan: "yearly", price: "9,99 €", period: "pro Jahr", badge: "spart 16 %", highlight: true },
+  { plan: "monthly", price: "1,99 €", period: "pro Monat" },
+  { plan: "yearly", price: "9,99 €", period: "pro Jahr", badge: "spart 58 %", highlight: true },
   { plan: "lifetime", price: "24,99 €", period: "einmalig, für immer" },
 ] as const;
 

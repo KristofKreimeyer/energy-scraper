@@ -5,10 +5,10 @@
  * Nutzung: useHashRoute() liefert die aktuelle Route; <LegalPage> rendert den
  *   passenden Text. Verlinkt wird über href="#/impressum" usw.
  *
- * WICHTIG: Das sind VORLAGEN, kein anwaltlich geprüfter Text. Alle mit 【…】
- * markierten Stellen müssen mit echten Daten gefüllt werden; Blöcke, die je
- * nach Rechtsform (Privat / Kleinunternehmer / Unternehmen) gelten, sind
- * entsprechend gekennzeichnet. Vor dem Live-Gang prüfen lassen.
+ * WICHTIG: Ausgefüllt für den Betreiber (Einzelunternehmen, Kleinunternehmer
+ * § 19 UStG), aber NICHT anwaltlich geprüft. Vor dem endgültigen Live-Gang
+ * (echte Zahlungen) sollte ein Gegencheck erfolgen; die „Einzelunternehmen"-/
+ * Gewerbeamt-Angaben setzen eine erfolgte Gewerbeanmeldung voraus.
  */
 
 import { LEGAL_ROUTES, type LegalRoute } from "../lib/legalRoutes";
@@ -16,14 +16,6 @@ import { LEGAL_ROUTES, type LegalRoute } from "../lib/legalRoutes";
 // --- Bausteine -------------------------------------------------------------
 
 const WRAP = "mx-auto w-full max-w-[760px] px-5";
-/** Auszufüllender Platzhalter – optisch deutlich, damit nichts vergessen wird. */
-const P = ({ children }: { children: React.ReactNode }) => (
-  <mark className="bg-warn-tint text-warn-ink font-semibold px-1 rounded">【{children}】</mark>
-);
-/** Hinweis, welcher Block je nach Rechtsform gilt (nicht Teil des Textes). */
-const Only = ({ children }: { children: React.ReactNode }) => (
-  <span className="block my-2 text-[0.78rem] font-mono text-muted border-l-2 border-border-strong pl-2">{children}</span>
-);
 const H2 = ({ children }: { children: React.ReactNode }) => (
   <h2 className="text-[1.15rem] font-bold text-ink mt-8 mb-2">{children}</h2>
 );
@@ -45,31 +37,39 @@ function Impressum() {
 
       <H2>Diensteanbieter</H2>
       <Pp>
-        <P>Vor- und Nachname</P>
+        Kristof Kreimeyer
         <br />
-        <P>Straße und Hausnummer</P>
+        Einzelunternehmen, handelnd als „EnergyHunt"
         <br />
-        <P>PLZ und Ort</P>
+        Bahnhofstr. 4
+        <br />
+        59439 Holzwickede
         <br />
         Deutschland
       </Pp>
-      <Only>Ladungsfähige Anschrift – kein Postfach. Bei Unternehmen zusätzlich Firmenname/Rechtsform.</Only>
-      <Only>Nur Unternehmen (UG/GmbH): Vertretungsberechtigte Person(en), Handelsregister + Registernummer (z. B. Amtsgericht 【Ort】, HRB 【Nr.】).</Only>
 
       <H2>Kontakt</H2>
       <Pp>
-        E-Mail: <P>Kontakt-E-Mail</P>
+        E-Mail: kontakt@energyhunt.de
         <br />
-        Telefon: <P>optional – Telefonnummer</P>
+        Website: energyhunt.pages.dev
       </Pp>
-      <Only>Eine E-Mail-Adresse ist Pflicht. Telefon ist nicht zwingend, aber eine schnelle Kontaktmöglichkeit muss bestehen.</Only>
+
+      <H2>Rechtsform &amp; Aufsicht</H2>
+      <Pp>
+        Rechtsform: Einzelunternehmen. Zuständige Aufsichtsbehörde: Gewerbeamt Unna.
+      </Pp>
+
+      <H2>Redaktionell verantwortlich</H2>
+      <Pp>
+        Kristof Kreimeyer
+        <br />
+        Bahnhofstr. 4
+        <br />
+        59439 Holzwickede
+      </Pp>
 
       <H2>Umsatzsteuer</H2>
-      <Only>Nur falls vorhanden – Unternehmen mit USt-ID:</Only>
-      <Pp>
-        Umsatzsteuer-Identifikationsnummer gemäß § 27a UStG: <P>DE… </P>
-      </Pp>
-      <Only>Nur Kleinunternehmer § 19 UStG (empfohlen bei Start der Pro-Einnahmen):</Only>
       <Pp>Als Kleinunternehmer im Sinne von § 19 UStG wird keine Umsatzsteuer berechnet und ausgewiesen.</Pp>
 
       <H2>Verbraucherstreitbeilegung</H2>
@@ -86,6 +86,14 @@ function Impressum() {
         ist kein Verkäufer der beworbenen Produkte und steht in keiner Geschäftsbeziehung zu den genannten Marken
         oder Händlern.
       </Pp>
+
+      <H2>Hinweis zu Marken</H2>
+      <Pp>
+        EnergyHunt ist ein unabhängiges, inoffizielles Projekt und wird von den genannten Marken nicht autorisiert,
+        gesponsert oder geprüft – u. a. nicht von Monster Energy, Red Bull, Rockstar oder GÖNRGY. Alle Marken-,
+        Produkt- und Händlernamen sowie Logos sind Eigentum ihrer jeweiligen Inhaber und dienen hier ausschließlich
+        der Beschreibung der jeweiligen Angebote.
+      </Pp>
     </>
   );
 }
@@ -98,7 +106,7 @@ function Datenschutz() {
       <H2>1. Verantwortlicher</H2>
       <Pp>
         Verantwortlich im Sinne der DSGVO ist der im <a className="text-accent-strong underline" href="#/impressum">Impressum</a> genannte
-        Diensteanbieter. Kontakt für Datenschutzanliegen: <P>Kontakt-E-Mail</P>.
+        Diensteanbieter. Kontakt für Datenschutzanliegen: kontakt@energyhunt.de.
       </Pp>
 
       <H2>2. Aufruf der Website (Hosting)</H2>
@@ -155,7 +163,7 @@ function Datenschutz() {
         Dir stehen die Rechte auf Auskunft (Art. 15), Berichtigung (Art. 16), Löschung (Art. 17), Einschränkung
         (Art. 18), Datenübertragbarkeit (Art. 20) und Widerspruch (Art. 21) zu. Erteilte Einwilligungen kannst du
         jederzeit mit Wirkung für die Zukunft widerrufen. Außerdem hast du ein Beschwerderecht bei einer
-        Aufsichtsbehörde (Art. 77 DSGVO). Wende dich dafür an <P>Kontakt-E-Mail</P>.
+        Aufsichtsbehörde (Art. 77 DSGVO). Wende dich dafür an kontakt@energyhunt.de.
       </Pp>
 
       <H2>6. Speicherdauer</H2>
@@ -170,11 +178,6 @@ function Datenschutz() {
 function AGB() {
   return (
     <>
-      <Only>
-        Diese AGB gelten für die kostenpflichtigen Pro-Funktionen. Solange keine Zahlung angeboten wird, ist der
-        AGB-Teil optional; sobald Stripe live ist, sollte er greifen.
-      </Only>
-
       <H2>§ 1 Geltungsbereich und Anbieter</H2>
       <Pp>
         Diese Allgemeinen Geschäftsbedingungen gelten für die über EnergyHunt angebotenen kostenpflichtigen
@@ -204,12 +207,12 @@ function AGB() {
         er nicht zum Laufzeitende gekündigt wird. Der Einmal-Kauf („Lifetime") ist eine einmalige Zahlung ohne
         wiederkehrende Abbuchung.
       </Pp>
-      <Only>Bei Kleinunternehmer § 19 UStG: „Preise verstehen sich ohne Ausweis von Umsatzsteuer (§ 19 UStG)."</Only>
+      <Pp>Alle angezeigten Preise sind Endpreise. Als Kleinunternehmer gemäß § 19 UStG wird keine Umsatzsteuer ausgewiesen.</Pp>
 
       <H2>§ 5 Laufzeit und Kündigung</H2>
       <Pp>
         Abo-Verträge können jederzeit zum Ende der laufenden Abrechnungsperiode gekündigt werden, z. B. per E-Mail an
-        <P>Kontakt-E-Mail</P>. Bereits gezahlte Beträge für die laufende Periode werden nicht anteilig erstattet, soweit
+        kontakt@energyhunt.de. Bereits gezahlte Beträge für die laufende Periode werden nicht anteilig erstattet, soweit
         gesetzlich zulässig.
       </Pp>
 
@@ -239,13 +242,11 @@ function AGB() {
 function Widerruf() {
   return (
     <>
-      <Only>Relevant, sobald kostenpflichtige Pro-Käufe möglich sind (digitale Inhalte/Dienstleistung).</Only>
-
       <H2>Widerrufsrecht</H2>
       <Pp>
         Du hast das Recht, binnen vierzehn Tagen ohne Angabe von Gründen diesen Vertrag zu widerrufen. Die
         Widerrufsfrist beträgt vierzehn Tage ab dem Tag des Vertragsschlusses. Um dein Widerrufsrecht auszuüben, musst
-        du uns (<P>Name</P>, <P>Anschrift</P>, <P>Kontakt-E-Mail</P>) mittels einer eindeutigen Erklärung (z. B. ein
+        du uns (Kristof Kreimeyer, Bahnhofstr. 4, 59439 Holzwickede, kontakt@energyhunt.de) mittels einer eindeutigen Erklärung (z. B. ein
         mit der Post versandter Brief oder eine E-Mail) über deinen Entschluss, diesen Vertrag zu widerrufen,
         informieren. Du kannst dafür das nachstehende Muster-Widerrufsformular verwenden, das jedoch nicht
         vorgeschrieben ist.
@@ -278,7 +279,7 @@ function Widerruf() {
         (Wenn du den Vertrag widerrufen willst, fülle dieses Formular aus und sende es zurück.)
       </Pp>
       <div className="rounded-lg border border-border-strong bg-surface-2 p-4 text-[0.88rem] leading-relaxed text-ink/90 space-y-2">
-        <p>An <P>Name</P>, <P>Anschrift</P>, <P>Kontakt-E-Mail</P>:</p>
+        <p>An Kristof Kreimeyer, Bahnhofstr. 4, 59439 Holzwickede, kontakt@energyhunt.de:</p>
         <p>
           Hiermit widerrufe(n) ich/wir (*) den von mir/uns (*) abgeschlossenen Vertrag über den Kauf der folgenden
           Dienstleistung (*):

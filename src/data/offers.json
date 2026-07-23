@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-07-23T13:23:05.745Z",
-  "count": 10,
+  "generatedAt": "2026-07-23T14:26:29.757Z",
+  "count": 9,
   "offers": [
     {
       "id": "aldi-nord-monster-energydrink-original-0-79",
@@ -21,7 +21,7 @@
       "validTo": null,
       "imageUrl": "https://s7g10.scene7.com/is/image/aldinord/1024623_50_2023_monsterenergy05l_01_on?bfc=on&wid=1440&fmt=webp-alpha",
       "url": "https://www.aldi-nord.de/produkt/energydrink-original-10246230001.html",
-      "scrapedAt": "2026-07-21T13:21:13.454Z"
+      "scrapedAt": "2026-07-23T14:24:41.941Z"
     },
     {
       "id": "aldi-nord-monster-energydrink-0-79",
@@ -42,7 +42,7 @@
       "validTo": null,
       "imageUrl": "https://s7g10.scene7.com/is/image/aldinord/1024624_50_2023_monsterenergy05lmixtray_02_on_comp?bfc=on&wid=1440&fmt=webp-alpha",
       "url": "https://www.aldi-nord.de/produkt/energydrink-10246240001.html",
-      "scrapedAt": "2026-07-21T13:21:13.455Z"
+      "scrapedAt": "2026-07-23T14:24:41.941Z"
     },
     {
       "id": "aldi-nord-red-bull-energydrink-4-99",
@@ -63,7 +63,7 @@
       "validTo": null,
       "imageUrl": "https://s7g10.scene7.com/is/image/aldinord/5831_30_2026_redbull6x250ml_03_on?bfc=on&wid=1440&fmt=webp-alpha",
       "url": "https://www.aldi-nord.de/produkt/energydrink-5831.html",
-      "scrapedAt": "2026-07-21T13:21:13.455Z"
+      "scrapedAt": "2026-07-23T14:24:41.941Z"
     },
     {
       "id": "205245_kw30",
@@ -87,49 +87,28 @@
       "scrapedAt": "2026-07-18T15:47:32.158Z"
     },
     {
-      "id": "24067400",
-      "brand": "Red Bull",
+      "id": "24052457",
+      "brand": "Monster",
       "title": "Energy Drink",
-      "description": "Festival-Tray taurin- und koffeinhaltig (+ 6.00 Pfand) je Karton = 24 x 0,25-l-Dose",
+      "description": "versch. Sorten, koffeinhaltig (+ 0.25 Pfand) je 0,5-l-Dose",
       "supermarket": "Kaufland",
       "market": "Kaufland",
       "marketColor": "#C4122E",
-      "price": 19.99,
-      "priceText": "19,99 €",
+      "price": 0.88,
+      "priceText": "0,88 €",
       "oldPrice": null,
-      "perLiter": 3.33,
-      "unitLabel": "24 x 0,25-l-Dose",
-      "unitCount": 24,
-      "perUnit": 0.83,
-      "validFrom": "2026-07-15T22:00:00.000Z",
-      "validTo": "2026-07-22T18:00:00.000Z",
-      "imageUrl": "https://cdn.marktguru.de/api/v1/offers/24067400/images/default/0/medium.webp",
-      "url": "https://www.marktguru.de/offers/24067400",
-      "scrapedAt": "2026-07-21T13:21:47.388Z"
-    },
-    {
-      "id": "24068285",
-      "brand": "Gönnergy",
-      "title": "Energy Drink by MontanaBlack",
-      "description": "versch. Sorten, mit und ohne Zucker, taurin- und koffeinhaltig, (+ 0.25 Pfand) je 0,5-l-Dose",
-      "supermarket": "Kaufland",
-      "market": "Kaufland",
-      "marketColor": "#C4122E",
-      "price": 1.29,
-      "priceText": "1,29 €",
-      "oldPrice": null,
-      "perLiter": 2.58,
+      "perLiter": 1.76,
       "unitLabel": "0,5-l-Dose",
       "unitCount": 1,
-      "perUnit": 1.29,
-      "validFrom": "2026-07-15T22:00:00.000Z",
-      "validTo": "2026-07-22T18:00:00.000Z",
-      "imageUrl": "https://cdn.marktguru.de/api/v1/offers/24068285/images/default/0/medium.webp",
-      "url": "https://www.marktguru.de/offers/24068285",
-      "scrapedAt": "2026-07-21T13:21:47.389Z"
+      "perUnit": 0.88,
+      "validFrom": "2026-07-22T22:00:00.000Z",
+      "validTo": "2026-07-29T18:00:59.000Z",
+      "imageUrl": "https://cdn.marktguru.de/api/v1/offers/24052457/images/default/0/medium.webp",
+      "url": "https://www.marktguru.de/offers/24052457",
+      "scrapedAt": "2026-07-23T14:25:10.234Z"
     },
     {
-      "id": "24087662",
+      "id": "24124331",
       "brand": "Red Bull",
       "title": "Energy Drink",
       "description": "Versch. Sorten. Taurin- und koffeinhaltig. Je 6x 0,25 l zzgl. 1.50 Pfand",
@@ -144,10 +123,10 @@
       "unitCount": 6,
       "perUnit": 0.88,
       "validFrom": "2026-07-19T22:00:00.000Z",
-      "validTo": "2026-07-25T21:59:00.000Z",
-      "imageUrl": "https://cdn.marktguru.de/api/v1/offers/24087662/images/default/0/medium.webp",
-      "url": "https://www.marktguru.de/offers/24087662",
-      "scrapedAt": "2026-07-21T13:22:05.883Z"
+      "validTo": "2026-07-25T21:59:59.000Z",
+      "imageUrl": "https://cdn.marktguru.de/api/v1/offers/24124331/images/default/0/medium.webp",
+      "url": "https://www.marktguru.de/offers/24124331",
+      "scrapedAt": "2026-07-23T14:25:34.334Z"
     },
     {
       "id": "24066176",
@@ -168,7 +147,7 @@
       "validTo": "2026-08-01T21:59:00.000Z",
       "imageUrl": "https://cdn.marktguru.de/api/v1/offers/24066176/images/default/0/medium.webp",
       "url": "https://www.marktguru.de/offers/24066176",
-      "scrapedAt": "2026-07-21T13:22:05.885Z"
+      "scrapedAt": "2026-07-23T14:25:34.335Z"
     },
     {
       "id": "24092822",
@@ -189,13 +168,13 @@
       "validTo": "2026-07-25T21:59:00.000Z",
       "imageUrl": "https://cdn.marktguru.de/api/v1/offers/24092822/images/default/0/medium.webp",
       "url": "https://www.marktguru.de/offers/24092822",
-      "scrapedAt": "2026-07-21T13:22:12.184Z"
+      "scrapedAt": "2026-07-23T14:25:42.855Z"
     },
     {
       "id": "netto-monster-energy-drink-0-77",
       "brand": "Monster",
       "title": "Energy Drink",
-      "description": "taurin- & koffeinhaltig, versch. Sorten 0,5 Liter zzgl. 0.25 Pfand",
+      "description": "taurin- & koffein-haltig, versch. Sorten, auch ZERO ZUCKER 0,5 Liter zzgl. 0.25 Pfand",
       "supermarket": "Netto Marken-Discount",
       "market": "Netto",
       "marketColor": "#F7C600",
@@ -206,11 +185,11 @@
       "unitLabel": "0,5 Liter",
       "unitCount": 1,
       "perUnit": 0.77,
-      "validFrom": "2026-07-19T22:00:00.000Z",
-      "validTo": "2026-07-25T18:00:00.000Z",
-      "imageUrl": "https://content-media.bonial.biz/b230b944-c56e-4240-838f-4ca0b285f135/cb819335-4de7-4bfd-828b-ff86a8f3b092.jpg?impolicy=SEO-offer-normal",
+      "validFrom": "2026-07-26T22:00:00.000Z",
+      "validTo": "2026-08-01T18:00:00.000Z",
+      "imageUrl": "https://content-media.bonial.biz/24e5894f-d5aa-4b3a-bbaf-06fc66857f77/cb1768d1-001e-4d5b-bd8b-a65c55042d69.jpg?impolicy=SEO-offer-normal",
       "url": "https://www.kaufda.de/Netto-Marken-Discount/Sortiment/Energydrink",
-      "scrapedAt": "2026-07-21T13:22:12.744Z"
+      "scrapedAt": "2026-07-23T14:25:44.147Z"
     }
   ]
 }

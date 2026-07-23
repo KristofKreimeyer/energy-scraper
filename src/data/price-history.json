@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-23T13:23:05.763Z",
+  "updatedAt": "2026-07-23T14:26:29.767Z",
   "products": {
     "aldi nord|rockstar|energydrink original|0,5-l-dose": {
       "market": "Aldi Nord",
@@ -128,6 +128,12 @@
           "price": 5.29,
           "perUnit": 0.88,
           "perLiter": 3.53
+        },
+        {
+          "date": "2026-07-23",
+          "price": 5.29,
+          "perUnit": 0.88,
+          "perLiter": 3.53
         }
       ]
     },
@@ -162,6 +168,12 @@
           "price": 0.77,
           "perUnit": 0.77,
           "perLiter": 1.54
+        },
+        {
+          "date": "2026-07-23",
+          "price": 0.77,
+          "perUnit": 0.77,
+          "perLiter": 1.54
         }
       ]
     },
@@ -190,6 +202,12 @@
           "price": 0.79,
           "perUnit": 0.79,
           "perLiter": 1.58
+        },
+        {
+          "date": "2026-07-23",
+          "price": 0.79,
+          "perUnit": 0.79,
+          "perLiter": 1.58
         }
       ]
     },
@@ -201,6 +219,12 @@
       "points": [
         {
           "date": "2026-07-21",
+          "price": 0.79,
+          "perUnit": 0.79,
+          "perLiter": 1.58
+        },
+        {
+          "date": "2026-07-23",
           "price": 0.79,
           "perUnit": 0.79,
           "perLiter": 1.58
@@ -218,6 +242,12 @@
           "price": 4.99,
           "perUnit": 0.83,
           "perLiter": 3.33
+        },
+        {
+          "date": "2026-07-23",
+          "price": 4.99,
+          "perUnit": 0.83,
+          "perLiter": 3.33
         }
       ]
     },
@@ -229,6 +259,12 @@
       "points": [
         {
           "date": "2026-07-21",
+          "price": 0.89,
+          "perUnit": 0.89,
+          "perLiter": 1.78
+        },
+        {
+          "date": "2026-07-23",
           "price": 0.89,
           "perUnit": 0.89,
           "perLiter": 1.78
@@ -246,6 +282,26 @@
           "price": 0.89,
           "perUnit": 0.89,
           "perLiter": 1.78
+        },
+        {
+          "date": "2026-07-23",
+          "price": 0.89,
+          "perUnit": 0.89,
+          "perLiter": 1.78
+        }
+      ]
+    },
+    "kaufland|monster|energy drink|0,5-l-dose": {
+      "market": "Kaufland",
+      "brand": "Monster",
+      "title": "Energy Drink",
+      "unitLabel": "0,5-l-Dose",
+      "points": [
+        {
+          "date": "2026-07-23",
+          "price": 0.88,
+          "perUnit": 0.88,
+          "perLiter": 1.76
         }
       ]
     }

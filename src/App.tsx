@@ -21,6 +21,8 @@ import {
 import { OfferCard } from "./components/OfferCard";
 import { AlarmCreator } from "./components/AlarmCreator";
 import { Modal } from "./components/Modal";
+import { LegalPage } from "./components/Legal";
+import { useHashRoute, isLegalRoute } from "./lib/legalRoutes";
 
 const WRAP = "mx-auto w-full max-w-[var(--maxw)] px-5";
 const EYEBROW =
@@ -64,6 +66,7 @@ function useTheme() {
 
 function App() {
   const { isDark, toggle } = useTheme();
+  const route = useHashRoute();
   const [timeframe, setTimeframe] = useState<Timeframe>("current");
   const [market, setMarket] = useState("all");
   const [brand, setBrand] = useState("all");
@@ -158,6 +161,42 @@ function App() {
     "disabled:opacity-40 disabled:cursor-not-allowed";
   const chipCount =
     "font-mono text-[0.74rem] opacity-75 tabular-nums group-aria-pressed:opacity-90";
+
+  const legalFooter = (
+    <footer className="border-t border-border mt-10 pt-[22px] pb-10 text-muted text-[0.84rem]">
+      <div className={`${WRAP} flex flex-wrap gap-x-[18px] gap-y-2 items-center`}>
+        <span>EnergyHunt — Angebotsübersicht</span>
+        <a className="hover:text-accent-strong underline underline-offset-2" href="#/impressum">Impressum</a>
+        <a className="hover:text-accent-strong underline underline-offset-2" href="#/datenschutz">Datenschutz</a>
+        <a className="hover:text-accent-strong underline underline-offset-2" href="#/agb">AGB</a>
+        <a className="hover:text-accent-strong underline underline-offset-2" href="#/widerruf">Widerruf</a>
+      </div>
+    </footer>
+  );
+
+  // Rechtliche Pflichtseiten als eigene Hash-Route (eigenständige Ansicht).
+  if (isLegalRoute(route)) {
+    return (
+      <>
+        <a
+          className="absolute left-3 -top-[60px] z-50 bg-surface text-ink border-2 border-focus px-4 py-2.5 rounded-lg font-semibold transition-[top] duration-150 focus:top-3"
+          href="#main"
+        >
+          Zum Inhalt springen
+        </a>
+        <header className="sticky top-0 z-20 bg-[color-mix(in_srgb,var(--surface)_88%,transparent)] backdrop-blur-[8px] backdrop-saturate-150 border-b border-border">
+          <div className={`${WRAP} flex items-center gap-4 h-[62px]`}>
+            <a href="#" className="flex items-center gap-2.5 font-[750] tracking-[-0.02em] text-[1.12rem]">
+              <span className="w-[30px] h-[30px] flex-none grid place-items-center bg-accent text-white rounded-lg text-[1.1rem]" aria-hidden="true">⚡</span>
+              <span>Energy<em className="not-italic text-accent-strong">Hunt</em></span>
+            </a>
+          </div>
+        </header>
+        <LegalPage route={route} />
+        {legalFooter}
+      </>
+    );
+  }
 
   return (
     <>
@@ -557,7 +596,11 @@ function App() {
           className={`${WRAP} flex flex-wrap gap-x-[18px] gap-y-2 items-center`}
         >
           <span>EnergyHunt — Angebotsübersicht</span>
-          <span className="font-mono text-[0.76rem]">
+          <a className="hover:text-accent-strong underline underline-offset-2" href="#/impressum">Impressum</a>
+          <a className="hover:text-accent-strong underline underline-offset-2" href="#/datenschutz">Datenschutz</a>
+          <a className="hover:text-accent-strong underline underline-offset-2" href="#/agb">AGB</a>
+          <a className="hover:text-accent-strong underline underline-offset-2" href="#/widerruf">Widerruf</a>
+          <span className="font-mono text-[0.76rem] basis-full">
             Datenquelle: energy-scraper · captured/*.json · Stand{" "}
             {generatedLabel}
           </span>

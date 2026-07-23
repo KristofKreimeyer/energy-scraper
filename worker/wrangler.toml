@@ -37,7 +37,7 @@ EMAIL_FROM = "svd49.kk@gmail.com"
 EMAIL_FROM_NAME = "EnergyHunt"
 FREE_MAX_SUBSCRIPTIONS = "1"
 # Für lokales Testen ein Platzhalter; in Produktion den echten Bot-Namen (ohne @).
-TELEGRAM_BOT_USERNAME = "EnergyHuntBot"
+TELEGRAM_BOT_USERNAME = "EnergyHunter_bot"
 # Stripe-Preis-IDs (aus dem Stripe-Dashboard). Leer = Plan nicht buchbar.
 STRIPE_PRICE_MONTHLY = ""
 STRIPE_PRICE_YEARLY = ""

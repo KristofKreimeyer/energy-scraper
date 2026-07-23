@@ -502,6 +502,17 @@ app.get('/api/unsubscribe', async (c) => {
   return statusPage(c.env, 'Abgemeldet', 'Du erhältst für dieses Produkt keine Bestpreis-Alarme mehr.')
 })
 
+/** Labels der aktiven (confirmed) Telegram-Abos einer chat_id – für klare Bot-Antworten. */
+async function activeTelegramLabels(db: D1Database, chatId: string): Promise<string[]> {
+  const rows = (
+    await db
+      .prepare("SELECT product_label FROM subscriptions WHERE channel='telegram' AND destination=? AND status='confirmed'")
+      .bind(chatId)
+      .all<{ product_label: string }>()
+  ).results
+  return rows.map((r) => r.product_label)
+}
+
 // --- Telegram-Webhook: /start <token> bindet chat_id, /stop meldet ab ------
 app.post('/api/telegram/webhook', async (c) => {
   const secret = c.env.TELEGRAM_WEBHOOK_SECRET
@@ -542,7 +553,16 @@ app.post('/api/telegram/webhook', async (c) => {
   if (text.startsWith('/start')) {
     const token = text.split(/\s+/)[1] ?? ''
     if (!token) {
-      await sendTelegram(c.env, chatId, 'Willkommen bei EnergyHunt ⚡ Aktiviere deinen Bestpreis-Alarm über den Button auf der Website.')
+      // Telegram übergibt den ?start=-Parameter nur beim ERSTEN Öffnen des Bots.
+      // Wer den Bot schon kennt, landet hier – dann lieber den Status zeigen.
+      const active = await activeTelegramLabels(db, chatId)
+      await sendTelegram(
+        c.env,
+        chatId,
+        active.length
+          ? `⚡ Dein Alarm läuft für: ${active.join(', ')}.\nMit /stop meldest du dich ab.`
+          : 'Willkommen bei EnergyHunt ⚡ Aktiviere deinen Bestpreis-Alarm über den Button auf der Website.',
+      )
       return c.json({ ok: true })
     }
     // Ein Token kann mehrere pending-Abos umfassen (Marken-Batch).
@@ -552,27 +572,37 @@ app.post('/api/telegram/webhook', async (c) => {
         .bind(token)
         .all<{ id: string; product_key: string; product_label: string; target_price: number | null }>()
     ).results
+    const active = await activeTelegramLabels(db, chatId)
     if (subs.length === 0) {
-      await sendTelegram(c.env, chatId, 'Dieser Aktivierungslink ist ungültig oder wurde bereits verwendet.')
+      // Kein wartendes Abo zu diesem Token. Häufigster Grund ist NICHT ein
+      // kaputter Link, sondern: der Bot war schon gestartet (Telegram reicht den
+      // neuen Token dann oft nicht durch) oder der Link wurde schon eingelöst.
+      await sendTelegram(
+        c.env,
+        chatId,
+        active.length
+          ? `Dein Alarm läuft bereits für: ${active.join(', ')}.\n` +
+              `Im kostenlosen Tarif ist ${freeMax === 1 ? 'eine Marke' : `${freeMax} Marken`} drin – für weitere Marken und Zielpreise gibt es Pro (/redeem <code>).\n` +
+              'Mit /stop meldest du dich ab.'
+          : 'Dieser Aktivierungslink ist abgelaufen oder wurde schon eingelöst. Starte den Alarm bitte noch einmal auf der EnergyHunt-Website.',
+      )
       return c.json({ ok: true })
     }
 
     const pro = await isPro(db, 'telegram', chatId)
-    const existing = await db
-      .prepare("SELECT COUNT(*) AS n FROM subscriptions WHERE channel='telegram' AND destination=? AND status='confirmed'")
-      .bind(chatId)
-      .first<{ n: number }>()
-    let capacity = pro ? Number.POSITIVE_INFINITY : Math.max(0, freeMax - (existing?.n ?? 0))
+    let capacity = pro ? Number.POSITIVE_INFINITY : Math.max(0, freeMax - active.length)
     const strippedTarget = subs.some((s) => s.target_price != null) && !pro
 
     const bound: string[] = []
+    const already: string[] = [] // war schon aktiv
+    const blocked: string[] = [] // am Free-Limit abgewiesen
     for (const s of subs) {
-      // schon aktiv?
       const dup = await db
         .prepare("SELECT id FROM subscriptions WHERE channel='telegram' AND destination=? AND product_key=? AND status='confirmed'")
         .bind(chatId, s.product_key)
         .first<{ id: string }>()
       if (dup || capacity <= 0) {
+        ;(dup ? already : blocked).push(s.product_label)
         await db.prepare('DELETE FROM subscriptions WHERE id=?').bind(s.id).run()
         continue
       }
@@ -588,12 +618,21 @@ app.post('/api/telegram/webhook', async (c) => {
       capacity -= 1
     }
 
-    let msg = bound.length ? `✅ Alarm aktiv für: ${bound.join(', ')}.` : 'Diese Marken sind bei dir bereits aktiv.'
-    if (!pro && (strippedTarget || bound.length < subs.length)) {
-      msg += ' Mehr Marken und Zielpreise gibt es mit Pro – schalte es per /redeem <code> frei.'
+    // Jeden Ausgang getrennt benennen – „bereits aktiv“ und „Free-Limit erreicht“
+    // sind zwei sehr verschiedene Dinge.
+    const lines: string[] = []
+    if (bound.length) lines.push(`✅ Alarm aktiv für: ${bound.join(', ')}.`)
+    if (already.length) lines.push(`ℹ️ Schon aktiv (nichts geändert): ${already.join(', ')}.`)
+    if (blocked.length) {
+      lines.push(
+        `🔒 Nicht aktiviert: ${blocked.join(', ')} – im kostenlosen Tarif ist ${freeMax === 1 ? 'eine Marke' : `${freeMax} Marken`} drin` +
+          (active.length ? ` und du beobachtest bereits ${active.join(', ')}.` : '.'),
+      )
     }
-    msg += ' Mit /stop meldest du dich wieder ab.'
-    await sendTelegram(c.env, chatId, msg)
+    if (strippedTarget) lines.push('🔒 Dein Wunschpreis wurde nicht übernommen – Zielpreise sind eine Pro-Funktion.')
+    if (!pro && (blocked.length || strippedTarget)) lines.push('Pro schaltest du im Bot frei: /redeem <code>')
+    lines.push('Mit /stop meldest du dich wieder ab.')
+    await sendTelegram(c.env, chatId, lines.join('\n'))
     return c.json({ ok: true })
   }
 

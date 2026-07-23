@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { productKey, type GroupedOffer } from "../lib/offers";
 import { subscribeToPush, PushError } from "../lib/push";
+import { useAlarmMemo, rememberAlarm, markPro, clearAlarmMemo, isBrandBlocked } from "../lib/alarmState";
 
 // Basis-URL der Alarm-API (Cloudflare Worker). Lokal: wrangler dev auf :8787.
 // Produktion: via VITE_API_BASE auf die deployte Worker-URL setzen.
@@ -52,6 +53,11 @@ export function AlarmButton({ offer }: { offer: GroupedOffer }) {
   const [redeemCode, setRedeemCode] = useState("");
   const [redeemMsg, setRedeemMsg] = useState<string | null>(null);
 
+  // Free-Tarif = eine Marke. Merker dieses Geräts (siehe lib/alarmState).
+  const memo = useAlarmMemo();
+  const blocked = isBrandBlocked(memo, offer.brand);
+  const sameBrandActive = !!memo && !blocked && !!memo.brand;
+
   const label = `${offer.brand} ${offer.title} (${offer.market})`;
   const channel: Channel =
     state.kind === "open" || state.kind === "submitting" || state.kind === "error" ? state.channel : "email";
@@ -82,6 +88,7 @@ export function AlarmButton({ offer }: { offer: GroupedOffer }) {
         setState({ kind: "error", channel: ch, message: data.message ?? "Das hat nicht geklappt. Bitte später erneut versuchen." });
         return;
       }
+      rememberAlarm(offer.brand, label, ch);
       if (ch === "telegram" && data.telegramLink) {
         window.open(data.telegramLink, "_blank", "noopener");
         setState({ kind: "pending", message: data.message ?? "Öffne Telegram und tippe auf „Start“." });
@@ -140,6 +147,7 @@ export function AlarmButton({ offer }: { offer: GroupedOffer }) {
       });
       const data = (await res.json()) as { message?: string };
       if (res.ok) {
+        markPro(); // Sperre „nur eine Marke“ aufheben
         setRedeemMsg("✅ " + (data.message ?? "Pro freigeschaltet."));
         setShowRedeem(false);
       } else {
@@ -222,6 +230,40 @@ export function AlarmButton({ offer }: { offer: GroupedOffer }) {
         <BellIcon />
         Bestpreis-Alarm für {offer.brand}
       </span>
+
+      {/* Free-Tarif: bereits eine ANDERE Marke aktiv -> gar nicht erst anbieten. */}
+      {blocked ? (
+        <div className="flex flex-col gap-2 rounded-lg border border-[color-mix(in_srgb,var(--warn-ink)_35%,transparent)] bg-warn-tint p-2.5" role="note">
+          <span className="text-[0.78rem] font-semibold text-ink">Im kostenlosen Tarif ist eine Marke drin</span>
+          <p className="text-[0.74rem] text-muted">
+            Du beobachtest bereits <span className="font-semibold text-ink">{memo?.brand}</span>. Für {offer.brand} brauchst du Pro –
+            weitere Kanäle (E-Mail, Telegram, Push) für {memo?.brand} bleiben natürlich kostenlos.
+          </p>
+          {/* Für Kauf/Code unten wird die E-Mail gebraucht – das reguläre Feld ist hier ausgeblendet. */}
+          <label htmlFor={`alarm-pro-${offer.id}`} className="text-[0.66rem] font-semibold uppercase tracking-[0.08em] text-muted">
+            E-Mail für Pro
+          </label>
+          <input
+            id={`alarm-pro-${offer.id}`}
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="du@example.com"
+            className="w-full min-w-0 h-9 px-2.5 text-[0.82rem] bg-surface text-ink border border-border-strong rounded-lg outline-none"
+          />
+          <button
+            type="button"
+            className="self-start text-[0.68rem] text-muted underline underline-offset-2 hover:text-accent-strong cursor-pointer"
+            onClick={clearAlarmMemo}
+          >
+            Stimmt nicht mehr? Hinweis zurücksetzen
+          </button>
+        </div>
+      ) : (
+        <>
+      {sameBrandActive && (
+        <p className="text-[0.72rem] text-good">✓ {memo?.brand} beobachtest du bereits – weitere Kanäle sind kostenlos.</p>
+      )}
 
       {/* Kanal */}
       <div className="flex flex-col gap-1.5">
@@ -309,6 +351,8 @@ export function AlarmButton({ offer }: { offer: GroupedOffer }) {
           </div>
         )}
       </div>
+        </>
+      )}
 
       {state.kind === "error" && (
         <p className="text-[0.74rem] text-warn-ink" role="alert">
@@ -316,8 +360,9 @@ export function AlarmButton({ offer }: { offer: GroupedOffer }) {
         </p>
       )}
 
-      {/* Pro freischalten – Kauf primär (E-Mail-Kanal), Code sekundär */}
-      {showRedeem && (
+      {/* Pro freischalten – Kauf primär (E-Mail-Kanal), Code sekundär.
+          Bei gesperrter Marke ist Pro der einzige Weg, also direkt zeigen. */}
+      {(showRedeem || blocked) && (
         <div className="flex flex-col gap-2 rounded-lg border border-border bg-surface-2 p-2.5">
           <span className="text-[0.74rem] font-semibold text-ink">Pro – unbegrenzt Marken + Wunschpreis</span>
 
@@ -372,18 +417,21 @@ export function AlarmButton({ offer }: { offer: GroupedOffer }) {
         </p>
       )}
 
-      {/* Primärer Button – ganz unten, volle Breite */}
-      <button
-        type="submit"
-        disabled={submitting}
-        className="w-full h-10 text-[0.85rem] font-semibold text-white bg-accent border border-accent rounded-lg cursor-pointer hover:bg-accent-strong disabled:opacity-60"
-      >
-        {submitting ? "…" : primaryLabel}
-      </button>
+      {/* Primärer Button – ganz unten, volle Breite. Bei gesperrter Marke
+          entfällt er: Speichern würde ohnehin am Free-Limit scheitern. */}
+      {!blocked && (
+        <button
+          type="submit"
+          disabled={submitting}
+          className="w-full h-10 text-[0.85rem] font-semibold text-white bg-accent border border-accent rounded-lg cursor-pointer hover:bg-accent-strong disabled:opacity-60"
+        >
+          {submitting ? "…" : primaryLabel}
+        </button>
+      )}
 
       <div className="flex items-center justify-between gap-2">
         <span className="text-[0.7rem] text-muted">Kostenlos · ein Produkt · jederzeit abbestellbar.</span>
-        {!showRedeem && (
+        {!showRedeem && !blocked && (
           <button
             type="button"
             className="flex-none text-[0.7rem] font-semibold text-accent-strong hover:text-accent cursor-pointer"

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { offers as allOffers, allBrands, allMarkets } from "../lib/offers";
 import { subscribeToPush, PushError } from "../lib/push";
+import { useAlarmMemo, rememberAlarm, markPro, clearAlarmMemo, normBrand } from "../lib/alarmState";
 import { Modal } from "./Modal";
 
 // Globaler Preiswecker-Dialog: markenbasiert, von überall aufrufbar.
@@ -34,6 +35,12 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
   const [showPro, setShowPro] = useState(false);
   const [codeOpen, setCodeOpen] = useState(false);
   const [code, setCode] = useState("");
+
+  // Free-Tarif = eine Marke. Läuft schon eine, sind alle anderen Chips gesperrt
+  // (siehe lib/alarmState – Geräte-Merker, das harte Limit setzt der Worker).
+  const memo = useAlarmMemo();
+  const lockedBrand = memo && !memo.pro && memo.brand ? memo.brand : null;
+  const isLocked = (b: string) => !!lockedBrand && normBrand(b) !== normBrand(lockedBrand);
 
   const toggleIn = (set: Set<string>, setSet: (s: Set<string>) => void, v: string) => {
     const n = new Set(set);
@@ -79,11 +86,16 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
       if (!res.ok) {
         if (data.error === "pro_required") setShowPro(true);
         setMsg({ ok: false, text: data.message ?? "Das hat nicht geklappt." });
-      } else if (channel === "telegram" && data.telegramLink) {
-        window.open(data.telegramLink, "_blank", "noopener");
-        setMsg({ ok: true, text: data.message ?? "Öffne Telegram und tippe auf „Start“." });
       } else {
-        setMsg({ ok: true, text: data.message ?? "Gespeichert." });
+        // Merken, damit die UI im Free-Tarif keine zweite Marke mehr anbietet.
+        const first = [...brands][0];
+        if (first) rememberAlarm(first, first, channel);
+        if (channel === "telegram" && data.telegramLink) {
+          window.open(data.telegramLink, "_blank", "noopener");
+          setMsg({ ok: true, text: data.message ?? "Öffne Telegram und tippe auf „Start“." });
+        } else {
+          setMsg({ ok: true, text: data.message ?? "Gespeichert." });
+        }
       }
     } catch {
       setMsg({ ok: false, text: "Keine Verbindung zum Alarm-Dienst." });
@@ -126,7 +138,10 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
       const res = await fetch(`${API_BASE}/api/redeem`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) });
       const data = (await res.json()) as { message?: string };
       setMsg({ ok: res.ok, text: (res.ok ? "✅ " : "") + (data.message ?? (res.ok ? "Pro freigeschaltet." : "Code ungültig.")) });
-      if (res.ok) setShowPro(false);
+      if (res.ok) {
+        markPro(); // Sperre „nur eine Marke“ aufheben
+        setShowPro(false);
+      }
     } catch {
       setMsg({ ok: false, text: "Keine Verbindung zum Alarm-Dienst." });
     }
@@ -170,11 +185,28 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
           <span className="text-[0.66rem] font-semibold uppercase tracking-[0.08em] text-muted">Marken</span>
           <div className="flex flex-wrap gap-1.5">
             {BRANDS.map((b) => (
-              <button key={b} type="button" className={chip(brands.has(b))} aria-pressed={brands.has(b)} onClick={() => toggleIn(brands, setBrands, b)}>
+              <button
+                key={b}
+                type="button"
+                className={chip(brands.has(b)) + (isLocked(b) ? " opacity-40 cursor-not-allowed" : "")}
+                aria-pressed={brands.has(b)}
+                disabled={isLocked(b)}
+                title={isLocked(b) ? `Im kostenlosen Tarif ist eine Marke drin – du beobachtest bereits ${lockedBrand}.` : undefined}
+                onClick={() => toggleIn(brands, setBrands, b)}
+              >
                 {b}
               </button>
             ))}
           </div>
+          {lockedBrand && (
+            <p className="text-[0.72rem] text-muted">
+              Kostenlos ist <span className="font-semibold text-ink">eine</span> Marke drin – du beobachtest bereits{" "}
+              <span className="font-semibold text-ink">{lockedBrand}</span>. Weitere Kanäle dafür sind frei; für weitere Marken gibt es Pro.{" "}
+              <button type="button" className="underline underline-offset-2 hover:text-accent-strong cursor-pointer" onClick={clearAlarmMemo}>
+                Stimmt nicht mehr?
+              </button>
+            </p>
+          )}
         </div>
 
         {/* Stores */}

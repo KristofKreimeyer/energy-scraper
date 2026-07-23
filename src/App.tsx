@@ -22,6 +22,7 @@ import { OfferCard } from "./components/OfferCard";
 import { AlarmCreator } from "./components/AlarmCreator";
 import { Modal } from "./components/Modal";
 import { LegalPage } from "./components/Legal";
+import { PayBanner } from "./components/PayBanner";
 import { useHashRoute, isLegalRoute } from "./lib/legalRoutes";
 
 const WRAP = "mx-auto w-full max-w-[var(--maxw)] px-5";
@@ -206,6 +207,8 @@ function App() {
       >
         Zum Inhalt springen
       </a>
+
+      <PayBanner />
 
       <header className="sticky top-0 z-20 bg-[color-mix(in_srgb,var(--surface)_88%,transparent)] backdrop-blur-[8px] backdrop-saturate-150 border-b border-border">
         <div className={`${WRAP} flex items-center gap-4 h-[62px]`}>

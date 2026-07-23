@@ -7,7 +7,7 @@ self.addEventListener('push', (event) => {
   try {
     data = event.data ? event.data.json() : {}
   } catch {
-    data = { title: 'FindMyEnergy', body: event.data ? event.data.text() : '' }
+    data = { title: 'EnergyHunt', body: event.data ? event.data.text() : '' }
   }
   const title = data.title || '⚡ Bestpreis-Alarm'
   const options = {

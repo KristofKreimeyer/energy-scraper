@@ -446,7 +446,16 @@ app.post('/api/stripe/webhook', async (c) => {
   }
 
   const db = c.env.DB
-  const untilFromSub = (sub: Stripe.Subscription) => new Date(sub.current_period_end * 1000).toISOString()
+  // current_period_end lag bis API 2025-02 auf der Subscription, ab 2025-03
+  // (basil/dahlia) auf den Items. Beide Formen abfangen, mit sicherem Fallback.
+  const untilFromSub = (sub: Stripe.Subscription): string => {
+    const s = sub as Stripe.Subscription & {
+      current_period_end?: number
+      items?: { data?: { current_period_end?: number }[] }
+    }
+    const ts = s.current_period_end ?? s.items?.data?.[0]?.current_period_end
+    return new Date((ts ? ts * 1000 : Date.now() + 32 * 86_400_000)).toISOString()
+  }
 
   switch (event.type) {
     case 'checkout.session.completed': {
@@ -462,8 +471,13 @@ app.post('/api/stripe/webhook', async (c) => {
       break
     }
     case 'invoice.paid': {
-      const inv = event.data.object
-      const subId = inv.subscription ? String(inv.subscription) : null
+      // inv.subscription (bis 2025-02) bzw. inv.parent.subscription_details.subscription (ab basil/dahlia).
+      const inv = event.data.object as Stripe.Invoice & {
+        subscription?: string | { id: string } | null
+        parent?: { subscription_details?: { subscription?: string | { id: string } | null } | null } | null
+      }
+      const rawSub = inv.subscription ?? inv.parent?.subscription_details?.subscription ?? null
+      const subId = rawSub ? (typeof rawSub === 'string' ? rawSub : rawSub.id) : null
       if (!subId) break
       const sub = await stripe.subscriptions.retrieve(subId)
       const email = (sub.metadata?.email || inv.customer_email || '').toLowerCase()

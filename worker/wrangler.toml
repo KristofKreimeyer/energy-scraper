@@ -39,6 +39,6 @@ FREE_MAX_SUBSCRIPTIONS = "1"
 # Für lokales Testen ein Platzhalter; in Produktion den echten Bot-Namen (ohne @).
 TELEGRAM_BOT_USERNAME = "EnergyHunter_bot"
 # Stripe-Preis-IDs (aus dem Stripe-Dashboard). Leer = Plan nicht buchbar.
-STRIPE_PRICE_MONTHLY = ""
-STRIPE_PRICE_YEARLY = ""
-STRIPE_PRICE_LIFETIME = ""
+STRIPE_PRICE_MONTHLY = "price_1TwSCkHzHXh3He03I5j5Y9EB"
+STRIPE_PRICE_YEARLY = "price_1TwSCkHzHXh3He03x90pfDuV"
+STRIPE_PRICE_LIFETIME = "price_1TwSCkHzHXh3He03IKVbBnR8"

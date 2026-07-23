@@ -179,6 +179,12 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
             <input id="creator-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="du@example.com" className="w-full h-9 px-2.5 text-[0.85rem] bg-surface text-ink border border-border-strong rounded-lg outline-none" />
           </div>
         )}
+        {channel === "push" && (
+          <p className="text-[0.74rem] text-muted">
+            Nach dem Speichern fragt dein Browser nach der Erlaubnis. Die Zustellung kann sich je nach Akku-Einstellungen
+            deines Geräts verzögern – zuverlässiger sind E-Mail oder Telegram.
+          </p>
+        )}
 
         {/* Marken */}
         <div className="flex flex-col gap-1.5">

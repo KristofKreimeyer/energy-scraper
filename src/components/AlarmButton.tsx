@@ -306,7 +306,10 @@ export function AlarmButton({ offer }: { offer: GroupedOffer }) {
         <p className="text-[0.74rem] text-muted">Nach dem Speichern öffnet sich Telegram – dort einmal „Start“ tippen.</p>
       )}
       {channel === "push" && (
-        <p className="text-[0.74rem] text-muted">Nach dem Speichern fragt dein Browser nach der Erlaubnis für Push-Nachrichten.</p>
+        <p className="text-[0.74rem] text-muted">
+          Nach dem Speichern fragt dein Browser nach der Erlaubnis für Push-Nachrichten. Die Zustellung kann sich je nach
+          Akku-Einstellungen deines Geräts verzögern – zuverlässiger sind E-Mail oder Telegram.
+        </p>
       )}
 
       {/* Preiswecker (Pro) */}

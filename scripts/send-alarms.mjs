@@ -208,7 +208,9 @@ async function pushSend(destination, payloadObj) {
   }
   const wp = await getWebpush()
   try {
-    await wp.sendNotification(JSON.parse(destination), JSON.stringify(payloadObj))
+    // urgency:'high' + TTL 3 Tage: hilft, den Doze-/Akkusparmodus (v. a. Android)
+    // zu durchbrechen bzw. die Nachricht bis zum nächsten Online-Sein zu halten.
+    await wp.sendNotification(JSON.parse(destination), JSON.stringify(payloadObj), { urgency: 'high', TTL: 259200 })
     return 'ok'
   } catch (err) {
     if (err.statusCode === 404 || err.statusCode === 410) return 'expired'

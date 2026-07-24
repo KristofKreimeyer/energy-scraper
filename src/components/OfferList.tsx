@@ -3,6 +3,7 @@ import { productKey, type GroupedOffer } from "../lib/offers";
 import type { SortKey } from "../types";
 import { WRAP } from "../utils/helper";
 import type { ReportsByProduct } from "../hooks/useCommunityReports";
+import type { VotesByProduct } from "../hooks/useCommunityVotes";
 
 // Ergebnis-Zeile + Angebots-Liste/-Grid. Reine Präsentations-Komponente;
 // gefilterte/sortierte Angebote kommen fertig aus App.
@@ -23,6 +24,7 @@ interface OfferListProps {
   view: "grid" | "list";
   bestId: string | null;
   reports: ReportsByProduct;
+  votes: VotesByProduct;
 }
 
 export default function OfferList({
@@ -33,6 +35,7 @@ export default function OfferList({
   view,
   bestId,
   reports,
+  votes,
 }: OfferListProps) {
   return (
     <div className={WRAP}>
@@ -74,6 +77,7 @@ export default function OfferList({
               isBest={offer.id === bestId}
               view={view}
               reports={reports[productKey(offer)]}
+              votes={votes[productKey(offer)]}
             />
           ))}
         </ul>

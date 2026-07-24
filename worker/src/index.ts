@@ -423,6 +423,56 @@ app.get('/api/reports/approved', async (c) => {
   return c.json({ reports: byProduct }, 200, { 'cache-control': 'public, max-age=120' })
 })
 
+// --- „Noch verfügbar?"-Votes -----------------------------------------------
+
+const VOTE_RATE_MAX = 40 // Stimmen pro IP und Stunde
+const VOTE_WINDOW_DAYS = 10 // nur Stimmen der letzten Tage zählen (Wochenangebote)
+
+app.post('/api/vote', async (c) => {
+  const body = (await c.req.json().catch(() => ({}))) as { productKey?: string; vote?: string; voterId?: string }
+  const productKey = clip(body.productKey, 200)
+  const voterId = clip(body.voterId, 64)
+  const vote = body.vote === 'up' ? 1 : body.vote === 'down' ? -1 : 0
+  if (!productKey || !voterId || vote === 0) {
+    return c.json({ error: 'invalid_vote', message: 'Ungültige Stimme.' }, 400)
+  }
+
+  const db = c.env.DB
+  const ipHash = await sha256Hex('energyhunt-vote:' + (c.req.header('cf-connecting-ip') ?? 'unknown'))
+  const since = new Date(Date.now() - 3_600_000).toISOString()
+  const recent = await db.prepare('SELECT COUNT(*) AS n FROM availability_votes WHERE ip_hash=? AND created_at>?').bind(ipHash, since).first<{ n: number }>()
+  if ((recent?.n ?? 0) >= VOTE_RATE_MAX) return c.json({ error: 'rate_limited', message: 'Zu viele Stimmen – bitte später.' }, 429)
+
+  // Eine Stimme je (Produkt, Browser); Meinungsänderung aktualisiert sie.
+  await db
+    .prepare(
+      'INSERT INTO availability_votes (id, created_at, product_key, vote, voter_id, ip_hash) VALUES (?, ?, ?, ?, ?, ?) ' +
+        'ON CONFLICT(product_key, voter_id) DO UPDATE SET vote=excluded.vote, created_at=excluded.created_at, ip_hash=excluded.ip_hash',
+    )
+    .bind(crypto.randomUUID(), now(), productKey, vote, voterId, ipHash)
+    .run()
+  return c.json({ ok: true })
+})
+
+// Aggregierte Verfügbarkeits-Signale je Produkt (nur jüngste Stimmen).
+app.get('/api/votes', async (c) => {
+  const since = new Date(Date.now() - VOTE_WINDOW_DAYS * 86_400_000).toISOString()
+  const rows = (
+    await c.env.DB
+      .prepare(
+        'SELECT product_key, ' +
+          'SUM(CASE WHEN vote=1 THEN 1 ELSE 0 END) AS up, ' +
+          'SUM(CASE WHEN vote=-1 THEN 1 ELSE 0 END) AS down ' +
+          'FROM availability_votes WHERE created_at>? GROUP BY product_key',
+      )
+      .bind(since)
+      .all<{ product_key: string; up: number; down: number }>()
+  ).results
+  const votes: Record<string, { up: number; down: number }> = {}
+  for (const r of rows) votes[r.product_key] = { up: r.up, down: r.down }
+  return c.json({ votes }, 200, { 'cache-control': 'public, max-age=60' })
+})
+
 // --- Moderation (tokengeschützt) -------------------------------------------
 const esc = (s: string) => s.replace(/[&<>"]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[m]!)
 

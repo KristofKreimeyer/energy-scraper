@@ -14,6 +14,7 @@ import OfferList from "./components/OfferList";
 import SkipLink from "./components/SkipLink";
 import { useOfferBrowser } from "./hooks/useOfferBrowser";
 import { useCommunityReports } from "./hooks/useCommunityReports";
+import { useCommunityVotes } from "./hooks/useCommunityVotes";
 
 function App() {
   const route = useHashRoute();
@@ -47,6 +48,7 @@ function App() {
     resetFilters,
   } = useOfferBrowser();
   const communityReports = useCommunityReports();
+  const communityVotes = useCommunityVotes();
 
   // Rechtliche Pflichtseiten als eigene Hash-Route (eigenständige Ansicht).
   if (isLegalRoute(route)) {
@@ -97,6 +99,7 @@ function App() {
           view={view}
           bestId={bestId}
           reports={communityReports}
+          votes={communityVotes}
         />
       </main>
 

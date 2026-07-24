@@ -9,7 +9,9 @@ import {
 } from '../lib/offers'
 import { AlarmButton } from './AlarmButton'
 import { ReportPriceButton } from './ReportPriceButton'
+import { AvailabilityVote } from './AvailabilityVote'
 import type { CommunityReport } from '../hooks/useCommunityReports'
+import type { VoteTally } from '../hooks/useCommunityVotes'
 
 /** Textbausteine je Preisniveau (relativ zur eigenen Historie des Produkts). */
 const INSIGHT_COPY: Record<PriceInsight['level'], { label: string; icon: 'bolt' | 'trend' }> = {
@@ -114,9 +116,10 @@ interface Props {
   isBest: boolean
   view?: 'grid' | 'list'
   reports?: CommunityReport[]
+  votes?: VoteTally
 }
 
-export function OfferCard({ offer, isBest, view = 'grid', reports }: Props) {
+export function OfferCard({ offer, isBest, view = 'grid', reports, votes }: Props) {
   const { label: validLabel, ending, upcoming } = validity(offer)
   const saved = savings(offer)
   const insight = priceInsight(offer)
@@ -236,6 +239,7 @@ export function OfferCard({ offer, isBest, view = 'grid', reports }: Props) {
           <div className="flex flex-col gap-2 border-t border-border pt-2">
             {insightBlock}
             {communityBlock}
+            <AvailabilityVote offer={offer} tally={votes} />
             <AlarmButton offer={offer} />
             <ReportPriceButton offer={offer} />
           </div>
@@ -352,6 +356,7 @@ export function OfferCard({ offer, isBest, view = 'grid', reports }: Props) {
 
           <div className="mt-3">{validBadge}</div>
 
+          <AvailabilityVote offer={offer} tally={votes} />
           <AlarmButton offer={offer} />
           <ReportPriceButton offer={offer} />
 

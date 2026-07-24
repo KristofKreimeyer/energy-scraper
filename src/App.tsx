@@ -98,8 +98,8 @@ function App() {
           onReset={resetFilters}
           view={view}
           bestId={bestId}
-          reports={communityReports}
-          votes={communityVotes}
+          communityReports={communityReports}
+          communityVotes={communityVotes}
         />
       </main>
 

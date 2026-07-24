@@ -23,8 +23,8 @@ interface OfferListProps {
   onReset: () => void;
   view: "grid" | "list";
   bestId: string | null;
-  reports: ReportsByProduct;
-  votes: VotesByProduct;
+  communityReports: ReportsByProduct;
+  communityVotes: VotesByProduct;
 }
 
 export default function OfferList({
@@ -34,8 +34,8 @@ export default function OfferList({
   onReset,
   view,
   bestId,
-  reports,
-  votes,
+  communityReports,
+  communityVotes,
 }: OfferListProps) {
   return (
     <div className={WRAP}>
@@ -76,8 +76,8 @@ export default function OfferList({
               offer={offer}
               isBest={offer.id === bestId}
               view={view}
-              reports={reports[productKey(offer)]}
-              votes={votes[productKey(offer)]}
+              reports={communityReports[productKey(offer)]}
+              votes={communityVotes[productKey(offer)]}
             />
           ))}
         </ul>

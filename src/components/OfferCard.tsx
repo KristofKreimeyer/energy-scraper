@@ -10,6 +10,7 @@ import {
 import { AlarmButton } from './AlarmButton'
 import { ReportPriceButton } from './ReportPriceButton'
 import { AvailabilityVote } from './AvailabilityVote'
+import { ShareButton } from './ShareButton'
 import type { CommunityReport } from '../hooks/useCommunityReports'
 import type { VoteTally } from '../hooks/useCommunityVotes'
 
@@ -83,6 +84,15 @@ const TrendIcon = () => (
   </svg>
 )
 
+const ShareIcon = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
+    <circle cx="18" cy="5" r="3" />
+    <circle cx="6" cy="12" r="3" />
+    <circle cx="18" cy="19" r="3" />
+    <path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" strokeLinecap="round" />
+  </svg>
+)
+
 /** Winzige €/L-Verlaufslinie; der jüngste (aktuelle) Punkt ist hervorgehoben. */
 function Sparkline({ trend, colorClass }: { trend: PriceInsight['trend']; colorClass: string }) {
   const w = 60
@@ -130,6 +140,22 @@ export function OfferCard({ offer, isBest, view = 'grid', reports, votes }: Prop
   const alt = `${offer.brand} ${offer.title}, Angebot bei ${offer.supermarket}`
 
   const validVariant = ending ? VALID_VARIANT.ending : upcoming ? VALID_VARIANT.upcoming : VALID_VARIANT.base
+
+  // Teilen: Deal-Details im Text, Link auf die Seite (seitenweite OG-Vorschau).
+  const shareUrl = typeof window !== 'undefined' ? window.location.origin + '/' : 'https://energyhunt.pages.dev/'
+  const sharePerLiter = offer.perLiter != null ? ` (${formatEuro(offer.perLiter)}/L)` : ''
+  const shareText = `${offer.brand} ${offer.title} bei ${offer.market} für ${formatEuro(offer.perUnit)}${sharePerLiter} – gefunden auf EnergyHunt`
+  const shareButton = (
+    <ShareButton
+      text={shareText}
+      url={shareUrl}
+      ariaLabel={`${offer.brand} ${offer.title} teilen`}
+      className="inline-flex items-center gap-1.5 text-[0.78rem] font-semibold text-muted hover:text-accent-strong cursor-pointer"
+    >
+      <ShareIcon />
+      Teilen
+    </ShareButton>
+  )
 
   // Geteilte Bausteine für Kachel- und Listenansicht.
   const insightBlock = insight && (
@@ -242,6 +268,7 @@ export function OfferCard({ offer, isBest, view = 'grid', reports, votes }: Prop
             <AvailabilityVote offer={offer} tally={votes} />
             <AlarmButton offer={offer} />
             <ReportPriceButton offer={offer} />
+            {shareButton}
           </div>
         </article>
       </li>
@@ -359,6 +386,7 @@ export function OfferCard({ offer, isBest, view = 'grid', reports, votes }: Prop
           <AvailabilityVote offer={offer} tally={votes} />
           <AlarmButton offer={offer} />
           <ReportPriceButton offer={offer} />
+          <div className="mt-2">{shareButton}</div>
 
           {offer.url && (
             <a

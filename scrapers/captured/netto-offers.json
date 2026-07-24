@@ -3,17 +3,34 @@
     "brand": "Monster",
     "supermarket": "Netto Marken-Discount",
     "title": "Energy Drink",
+    "description": "taurin- & koffein-haltig, versch. Sorten, auch ZERO ZUCKER 0,5 Liter zzgl. 0.25 Pfand",
+    "productBrand": "Monster Energy",
+    "price": "0,77 €",
+    "priceNumber": 0.77,
+    "oldPrice": "1,49 €",
+    "pricePerBaseUnit": "(1.54 / l)",
+    "validFrom": "2026-07-26T22:00:00.000+0000",
+    "validTo": "2026-08-01T18:00:00.000+0000",
+    "imageUrl": "https://content-media.bonial.biz/24e5894f-d5aa-4b3a-bbaf-06fc66857f77/cb1768d1-001e-4d5b-bd8b-a65c55042d69.jpg?impolicy=SEO-offer-normal",
+    "sourcePage": 52,
+    "sourceUrl": "https://www.kaufda.de/Netto-Marken-Discount/Sortiment/Energydrink",
+    "scrapedAt": "2026-07-23T14:25:44.147Z"
+  },
+  {
+    "brand": "Monster",
+    "supermarket": "Netto Marken-Discount",
+    "title": "Energy Drink",
     "description": "taurin- & koffeinhaltig, versch. Sorten 0,5 Liter zzgl. 0.25 Pfand",
     "productBrand": "Monster",
     "price": "0,77 €",
     "priceNumber": 0.77,
     "oldPrice": "1,49 €",
     "pricePerBaseUnit": "(1.54 / l)",
-    "validFrom": "2026-07-19T22:00:00.000+0000",
+    "validFrom": "2026-07-22T22:00:00.000+0000",
     "validTo": "2026-07-25T18:00:00.000+0000",
-    "imageUrl": "https://content-media.bonial.biz/b230b944-c56e-4240-838f-4ca0b285f135/cb819335-4de7-4bfd-828b-ff86a8f3b092.jpg?impolicy=SEO-offer-normal",
-    "sourcePage": 66,
+    "imageUrl": "https://content-media.bonial.biz/db19e470-cd54-4754-bb67-2ed63e8bb74b/cb819335-4de7-4bfd-828b-ff86a8f3b092.jpg?impolicy=SEO-offer-normal",
+    "sourcePage": 15,
     "sourceUrl": "https://www.kaufda.de/Netto-Marken-Discount/Sortiment/Energydrink",
-    "scrapedAt": "2026-07-21T13:22:12.744Z"
+    "scrapedAt": "2026-07-23T14:25:44.147Z"
   }
 ]

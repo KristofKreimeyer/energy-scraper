@@ -11,11 +11,11 @@
     "unit": "Liter",
     "quantity": 6,
     "validFrom": "2026-07-19T22:00:00Z",
-    "validTo": "2026-07-25T21:59:00Z",
-    "imageUrl": "https://cdn.marktguru.de/api/v1/offers/24087662/images/default/0/medium.webp",
-    "offerId": 24087662,
-    "sourceUrl": "https://www.marktguru.de/offers/24087662",
-    "scrapedAt": "2026-07-21T13:22:05.883Z"
+    "validTo": "2026-07-25T21:59:59Z",
+    "imageUrl": "https://cdn.marktguru.de/api/v1/offers/24124331/images/default/0/medium.webp",
+    "offerId": 24124331,
+    "sourceUrl": "https://www.marktguru.de/offers/24124331",
+    "scrapedAt": "2026-07-23T14:25:34.334Z"
   },
   {
     "brand": "Monster",
@@ -33,6 +33,6 @@
     "imageUrl": "https://cdn.marktguru.de/api/v1/offers/24066176/images/default/0/medium.webp",
     "offerId": 24066176,
     "sourceUrl": "https://www.marktguru.de/offers/24066176",
-    "scrapedAt": "2026-07-21T13:22:05.885Z"
+    "scrapedAt": "2026-07-23T14:25:34.335Z"
   }
 ]

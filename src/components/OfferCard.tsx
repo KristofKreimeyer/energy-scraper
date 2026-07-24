@@ -8,6 +8,8 @@ import {
   type PriceInsight,
 } from '../lib/offers'
 import { AlarmButton } from './AlarmButton'
+import { ReportPriceButton } from './ReportPriceButton'
+import type { CommunityReport } from '../hooks/useCommunityReports'
 
 /** Textbausteine je Preisniveau (relativ zur eigenen Historie des Produkts). */
 const INSIGHT_COPY: Record<PriceInsight['level'], { label: string; icon: 'bolt' | 'trend' }> = {
@@ -111,9 +113,10 @@ interface Props {
   offer: GroupedOffer
   isBest: boolean
   view?: 'grid' | 'list'
+  reports?: CommunityReport[]
 }
 
-export function OfferCard({ offer, isBest, view = 'grid' }: Props) {
+export function OfferCard({ offer, isBest, view = 'grid', reports }: Props) {
   const { label: validLabel, ending, upcoming } = validity(offer)
   const saved = savings(offer)
   const insight = priceInsight(offer)
@@ -149,6 +152,21 @@ export function OfferCard({ offer, isBest, view = 'grid' }: Props) {
       <ClockIcon />
       {validLabel}
     </span>
+  )
+
+  // Freigegebene Community-Meldungen (günstiger gesehen). Neueste zuerst, max. 2.
+  const communityBlock = reports && reports.length > 0 && (
+    <div className="flex flex-col gap-1 text-[0.75rem]" aria-label="Von der Community gemeldete Preise">
+      {reports.slice(0, 2).map((r, i) => (
+        <span key={i} className="inline-flex items-center gap-1.5 text-muted">
+          <span aria-hidden="true">💬</span>
+          <span>
+            Community: <b className="font-mono tabular-nums text-good">{formatEuro(r.price)}</b> bei {r.market}
+            {r.storeLocation ? ` · ${r.storeLocation}` : ''}
+          </span>
+        </span>
+      ))}
+    </div>
   )
 
   // --- Listenansicht: kompakte horizontale Zeile ---------------------------
@@ -215,12 +233,12 @@ export function OfferCard({ offer, isBest, view = 'grid' }: Props) {
             )}
           </div>
 
-          {(insightBlock || offer.url) && (
-            <div className="flex flex-col gap-2 border-t border-border pt-2">
-              {insightBlock}
-              <AlarmButton offer={offer} />
-            </div>
-          )}
+          <div className="flex flex-col gap-2 border-t border-border pt-2">
+            {insightBlock}
+            {communityBlock}
+            <AlarmButton offer={offer} />
+            <ReportPriceButton offer={offer} />
+          </div>
         </article>
       </li>
     )
@@ -330,9 +348,12 @@ export function OfferCard({ offer, isBest, view = 'grid' }: Props) {
 
           {insightBlock && <div className="mt-2.5">{insightBlock}</div>}
 
+          {communityBlock && <div className="mt-2.5">{communityBlock}</div>}
+
           <div className="mt-3">{validBadge}</div>
 
           <AlarmButton offer={offer} />
+          <ReportPriceButton offer={offer} />
 
           {offer.url && (
             <a

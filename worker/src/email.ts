@@ -20,6 +20,8 @@ export interface Env {
   STRIPE_PRICE_MONTHLY?: string
   STRIPE_PRICE_YEARLY?: string
   STRIPE_PRICE_LIFETIME?: string
+  // Community-Preismeldungen (Moderation)
+  MODERATION_TOKEN?: string
 }
 
 export interface OutgoingEmail {

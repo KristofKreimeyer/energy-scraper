@@ -352,6 +352,120 @@ app.post('/api/subscribe', async (c) => {
   return c.json({ status: 'pending', message: 'Fast geschafft! Bitte bestätige den Link in deiner E-Mail.' })
 })
 
+// --- Community-Preismeldungen ----------------------------------------------
+
+/** SHA-256-Hex einer Zeichenkette (für IP-Hash: privatschonender als Klartext). */
+async function sha256Hex(input: string): Promise<string> {
+  const data = new TextEncoder().encode(input)
+  const digest = await crypto.subtle.digest('SHA-256', data)
+  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('')
+}
+
+const REPORT_RATE_MAX = 5 // Meldungen pro IP und Stunde
+const clip = (s: unknown, max: number) => String(s ?? '').trim().slice(0, max)
+
+// Nutzer meldet einen (günstigeren) Preis für ein bestehendes Angebot.
+// Landet als 'pending' – wird NIE automatisch veröffentlicht.
+app.post('/api/report-price', async (c) => {
+  const body = (await c.req.json().catch(() => ({}))) as {
+    productKey?: string
+    brand?: string
+    title?: string
+    market?: string
+    price?: number | string
+    storeLocation?: string
+    note?: string
+  }
+  const productKey = clip(body.productKey, 200)
+  const brand = clip(body.brand, 80)
+  const title = clip(body.title, 160)
+  const market = clip(body.market, 80)
+  if (!productKey || !brand || !title || !market) {
+    return c.json({ error: 'missing_fields', message: 'Angebotsdaten unvollständig.' }, 400)
+  }
+  const price = Number(body.price)
+  if (!Number.isFinite(price) || price <= 0 || price > 999) {
+    return c.json({ error: 'invalid_price', message: 'Bitte gib einen gültigen Preis an.' }, 400)
+  }
+
+  const db = c.env.DB
+  const ipHash = await sha256Hex('energyhunt-report:' + (c.req.header('cf-connecting-ip') ?? 'unknown'))
+  const since = new Date(Date.now() - 3_600_000).toISOString()
+  const recent = await db
+    .prepare('SELECT COUNT(*) AS n FROM price_reports WHERE ip_hash=? AND created_at>?')
+    .bind(ipHash, since)
+    .first<{ n: number }>()
+  if ((recent?.n ?? 0) >= REPORT_RATE_MAX) {
+    return c.json({ error: 'rate_limited', message: 'Danke! Du hast gerade viele Meldungen geschickt – bitte später erneut.' }, 429)
+  }
+
+  await db
+    .prepare(
+      'INSERT INTO price_reports (id, created_at, status, product_key, brand, title, market, reported_price, store_location, note, ip_hash) ' +
+        "VALUES (?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?, ?)",
+    )
+    .bind(crypto.randomUUID(), now(), productKey, brand, title, market, Math.round(price * 100) / 100, clip(body.storeLocation, 80) || null, clip(body.note, 200) || null, ipHash)
+    .run()
+  return c.json({ ok: true, message: 'Danke für deine Meldung! Wir prüfen sie und zeigen sie dann an.' })
+})
+
+// Freigegebene Meldungen je Produkt – für den Community-Hinweis auf der Karte.
+app.get('/api/reports/approved', async (c) => {
+  const rows = (
+    await c.env.DB
+      .prepare("SELECT product_key, reported_price, market, store_location, note, created_at FROM price_reports WHERE status='approved' ORDER BY created_at DESC")
+      .all<{ product_key: string; reported_price: number; market: string; store_location: string | null; note: string | null; created_at: string }>()
+  ).results
+  const byProduct: Record<string, { price: number; market: string; storeLocation: string | null; note: string | null; createdAt: string }[]> = {}
+  for (const r of rows) {
+    ;(byProduct[r.product_key] ??= []).push({ price: r.reported_price, market: r.market, storeLocation: r.store_location, note: r.note, createdAt: r.created_at })
+  }
+  return c.json({ reports: byProduct }, 200, { 'cache-control': 'public, max-age=120' })
+})
+
+// --- Moderation (tokengeschützt) -------------------------------------------
+const esc = (s: string) => s.replace(/[&<>"]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[m]!)
+
+app.get('/api/admin/reports', async (c) => {
+  const token = c.req.query('token') ?? ''
+  if (!c.env.MODERATION_TOKEN || token !== c.env.MODERATION_TOKEN) return c.text('Forbidden', 403)
+  const rows = (
+    await c.env.DB
+      .prepare("SELECT id, created_at, product_key, brand, title, market, reported_price, store_location, note FROM price_reports WHERE status='pending' ORDER BY created_at ASC")
+      .all<{ id: string; created_at: string; product_key: string; brand: string; title: string; market: string; reported_price: number; store_location: string | null; note: string | null }>()
+  ).results
+  const t = encodeURIComponent(token)
+  const items = rows
+    .map((r) => {
+      const price = r.reported_price.toFixed(2).replace('.', ',')
+      const extra = [r.store_location, r.note].filter(Boolean).map((x) => esc(x!)).join(' · ')
+      return `<li style="border:1px solid #ddd;border-radius:10px;padding:12px;margin:0 0 10px;list-style:none">
+        <b>${esc(r.brand)} ${esc(r.title)}</b> – <b style="color:#e24a08">${price} €</b> bei ${esc(r.market)}<br>
+        <small style="color:#5b6772">${esc(r.product_key)}${extra ? ' · ' + extra : ''} · ${esc(r.created_at)}</small><br>
+        <a href="/api/admin/reports/action?id=${r.id}&action=approve&token=${t}" style="color:#0a7d34;font-weight:650;margin-right:14px">✔ Freigeben</a>
+        <a href="/api/admin/reports/action?id=${r.id}&action=reject&token=${t}" style="color:#b00020;font-weight:650">✕ Ablehnen</a>
+      </li>`
+    })
+    .join('')
+  const html = `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Moderation – Preismeldungen</title>
+    <div style="font-family:system-ui,sans-serif;max-width:760px;margin:24px auto;padding:0 16px">
+    <h1 style="font-size:1.3rem">Preismeldungen · ${rows.length} offen</h1>
+    <ul style="padding:0">${items || '<p style="color:#5b6772">Nichts zu moderieren. 🎉</p>'}</ul></div>`
+  return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8' } })
+})
+
+app.get('/api/admin/reports/action', async (c) => {
+  const token = c.req.query('token') ?? ''
+  if (!c.env.MODERATION_TOKEN || token !== c.env.MODERATION_TOKEN) return c.text('Forbidden', 403)
+  const id = c.req.query('id') ?? ''
+  const action = c.req.query('action') ?? ''
+  if (action !== 'approve' && action !== 'reject') return c.text('Bad action', 400)
+  const status = action === 'approve' ? 'approved' : 'rejected'
+  await c.env.DB.prepare("UPDATE price_reports SET status=?, moderated_at=? WHERE id=? AND status='pending'").bind(status, now(), id).run()
+  // Zurück zur Liste.
+  return Response.redirect(new URL(`/api/admin/reports?token=${encodeURIComponent(token)}`, c.req.url).toString(), 302)
+})
+
 // --- Pro-Status abfragen (für die UI; E-Mail & Push) ----------------------
 app.get('/api/entitlement', async (c) => {
   const email = (c.req.query('email') ?? '').trim().toLowerCase()

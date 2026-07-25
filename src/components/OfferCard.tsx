@@ -256,7 +256,7 @@ export function OfferCard({ offer, isBest, view = 'grid', reports, votes }: Prop
                 rel="noopener noreferrer"
                 aria-label={`Angebot ansehen: ${alt} (öffnet in neuem Tab)`}
               >
-                <span className="hidden sm:inline">Angebot</span>
+                <span className="hidden sm:inline">Sichern</span>
                 <ArrowIcon />
               </a>
             )}
@@ -397,7 +397,7 @@ export function OfferCard({ offer, isBest, view = 'grid', reports, votes }: Prop
               rel="noopener noreferrer"
               aria-label={`Angebot ansehen: ${alt} (öffnet in neuem Tab)`}
             >
-              Zum Angebot bei {offer.market}
+              Deal sichern bei {offer.market}
               <ArrowIcon />
             </a>
           )}

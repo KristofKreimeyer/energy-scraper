@@ -13,7 +13,8 @@ interface ShareButtonProps {
 
 export function ShareButton({ text, url, className, children, ariaLabel }: ShareButtonProps) {
   const [open, setOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
+  // Welcher Kopier-Eintrag zeigt gerade die „kopiert"-Bestätigung.
+  const [copiedKey, setCopiedKey] = useState<"link" | "discord" | null>(null);
 
   async function onClick(e: React.MouseEvent) {
     e.stopPropagation();
@@ -29,11 +30,12 @@ export function ShareButton({ text, url, className, children, ariaLabel }: Share
     setOpen((v) => !v);
   }
 
-  async function copy() {
+  // Discord hat kein Web-Share-Intent – wir kopieren den Link zum Einfügen.
+  async function copyLink(key: "link" | "discord") {
     try {
-      await navigator.clipboard.writeText(url);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
+      await navigator.clipboard.writeText(`${text} ${url}`);
+      setCopiedKey(key);
+      setTimeout(() => setCopiedKey(null), 1800);
     } catch {
       /* Clipboard nicht verfügbar */
     }
@@ -60,8 +62,11 @@ export function ShareButton({ text, url, className, children, ariaLabel }: Share
             <a role="menuitem" className={item} href={tgHref} target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)}>
               Telegram
             </a>
-            <button role="menuitem" type="button" className={item} onClick={copy}>
-              {copied ? "✓ Link kopiert" : "Link kopieren"}
+            <button role="menuitem" type="button" className={item} onClick={() => copyLink("discord")}>
+              {copiedKey === "discord" ? "✓ kopiert – in Discord einfügen" : "Discord"}
+            </button>
+            <button role="menuitem" type="button" className={item} onClick={() => copyLink("link")}>
+              {copiedKey === "link" ? "✓ Link kopiert" : "Link kopieren"}
             </button>
           </span>
         </>

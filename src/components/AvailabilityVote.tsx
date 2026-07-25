@@ -8,6 +8,10 @@ import type { VoteTally } from "../hooks/useCommunityVotes";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8787";
 
+// Ab so vielen „noch da"-Stimmen zeigen wir das Vertrauens-Signal – vorher
+// wäre „von 0 Huntern bestätigt" toter als gar nichts (Cold-Start).
+const CONFIRM_THRESHOLD = 3;
+
 export function AvailabilityVote({ offer, tally }: { offer: GroupedOffer; tally?: VoteTally }) {
   const pk = productKey(offer);
   const [counts, setCounts] = useState<VoteTally>({ up: tally?.up ?? 0, down: tally?.down ?? 0 });
@@ -40,30 +44,37 @@ export function AvailabilityVote({ offer, tally }: { offer: GroupedOffer; tally?
 
   return (
     <div
-      className="relative z-10 mt-2 flex items-center gap-2 text-[0.78rem]"
+      className="relative z-10 mt-2 flex flex-col gap-1"
       onClick={(e) => e.stopPropagation()}
     >
-      <span className="text-muted">Noch verfügbar?</span>
-      <button
-        type="button"
-        className={btn(mine === "up")}
-        aria-pressed={mine === "up"}
-        aria-label="Noch verfügbar"
-        onClick={() => vote("up")}
-      >
-        <span aria-hidden="true">👍</span>
-        <span className="tabular-nums">{counts.up}</span>
-      </button>
-      <button
-        type="button"
-        className={btn(mine === "down")}
-        aria-pressed={mine === "down"}
-        aria-label="Vergriffen"
-        onClick={() => vote("down")}
-      >
-        <span aria-hidden="true">👎</span>
-        <span className="tabular-nums">{counts.down}</span>
-      </button>
+      {counts.up >= CONFIRM_THRESHOLD && (
+        <span className="text-[0.75rem] font-semibold text-good">
+          🔥 von {counts.up} {counts.up === 1 ? "Hunter" : "Huntern"} bestätigt
+        </span>
+      )}
+      <div className="flex items-center gap-2 text-[0.78rem]">
+        <span className="text-muted">Noch verfügbar?</span>
+        <button
+          type="button"
+          className={btn(mine === "up")}
+          aria-pressed={mine === "up"}
+          aria-label="Noch verfügbar – bestätigen"
+          onClick={() => vote("up")}
+        >
+          <span aria-hidden="true">🔥</span>
+          <span className="tabular-nums">{counts.up}</span>
+        </button>
+        <button
+          type="button"
+          className={btn(mine === "down")}
+          aria-pressed={mine === "down"}
+          aria-label="Vergriffen melden"
+          onClick={() => vote("down")}
+        >
+          <span aria-hidden="true">👎</span>
+          <span className="tabular-nums">{counts.down}</span>
+        </button>
+      </div>
     </div>
   );
 }

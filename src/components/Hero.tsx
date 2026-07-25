@@ -45,14 +45,20 @@ export default function Hero({
         id="page-title"
         className="text-[clamp(1.7rem,3.4vw,2.5rem)] leading-[1.08] tracking-[-0.025em] mb-2.5 text-balance"
       >
-        {timeframe === "current"
-          ? "Die besten Energy-Deals der Woche – gefunden für die Community."
-          : "Ein Blick voraus: die Energy-Deals der nächsten Woche."}
+        {timeframe === "current" ? (
+          <>
+            Willkommen zur Jagd. <b>Die besten Energy-Deals</b> der Woche.
+          </>
+        ) : (
+          <>
+            Die Jagd von morgen: <b>Energy-Deals</b> der nächsten Woche.
+          </>
+        )}
       </h1>
       <p className="text-muted text-[1.02rem] ">
-        Automatisch gesammelt aus den Prospekten von Aldi, Kaufland, Lidl,
-        Netto, Penny und Rewe. Vergleiche Dosenpreis <em>und</em> Grundpreis auf
-        einen Blick.
+        Automatisch aus den Prospekten von Aldi, Kaufland, Lidl, Netto, Penny und
+        Rewe – verglichen nach Preis pro Liter. Setz dir einen Alarm und verpasse
+        keinen Drop mehr.
       </p>
 
       {deal && dealSaving && (

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { productKey, type GroupedOffer } from "../lib/offers";
+import { authHeader } from "../auth/session";
 
 // „Günstiger gesehen?" – anonyme Community-Preismeldung für ein bestehendes
 // Angebot. Meldung geht als 'pending' an den Worker und wird erst nach
@@ -32,7 +33,7 @@ export function ReportPriceButton({ offer }: { offer: GroupedOffer }) {
     try {
       const res = await fetch(`${API_BASE}/api/report-price`, {
         method: "POST",
-        headers: { "content-type": "application/json" },
+        headers: { "content-type": "application/json", ...authHeader() },
         body: JSON.stringify({
           productKey: productKey(offer),
           brand: offer.brand,

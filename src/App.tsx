@@ -15,6 +15,7 @@ import SkipLink from "./components/SkipLink";
 import { useOfferBrowser } from "./hooks/useOfferBrowser";
 import { useCommunityReports } from "./hooks/useCommunityReports";
 import { useCommunityVotes } from "./hooks/useCommunityVotes";
+import AuthCallback from "./auth/AuthCallback";
 
 function App() {
   const route = useHashRoute();
@@ -49,6 +50,17 @@ function App() {
   } = useOfferBrowser();
   const communityReports = useCommunityReports();
   const communityVotes = useCommunityVotes();
+
+  // Magic-Link-Ziel: Token gegen Session tauschen, dann zurück zur Startseite.
+  if (route.startsWith("#/auth")) {
+    return (
+      <>
+        <SkipLink />
+        <LegalHeader />
+        <AuthCallback />
+      </>
+    );
+  }
 
   // Rechtliche Pflichtseiten als eigene Hash-Route (eigenständige Ansicht).
   if (isLegalRoute(route)) {

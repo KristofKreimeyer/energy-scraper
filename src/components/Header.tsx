@@ -1,4 +1,5 @@
 import { WRAP, useTheme } from "../utils/helper";
+import { AccountButton } from "./AccountButton";
 
 export default function Header({
   onOpenCreator,
@@ -29,6 +30,7 @@ export default function Header({
           <span aria-hidden="true">⏰</span>
           Preis-Alarm
         </button>
+        <AccountButton />
         <button
           className="flex-none h-10 min-w-[44px] px-3 bg-surface text-ink border border-border-strong rounded-[10px] text-[0.85rem] font-semibold cursor-pointer inline-flex items-center gap-[7px] hover:bg-surface-2"
           type="button"

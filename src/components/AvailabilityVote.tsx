@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { productKey, type GroupedOffer } from "../lib/offers";
 import { getVoterId, getMyVote, setMyVote, type VoteChoice } from "../utils/community";
+import { authHeader } from "../auth/session";
 import type { VoteTally } from "../hooks/useCommunityVotes";
 
 // „Noch verfügbar?" – anonymes Daumen-hoch/runter je Angebot. Eine Stimme je
@@ -28,7 +29,7 @@ export function AvailabilityVote({ offer, tally }: { offer: GroupedOffer; tally?
     setMyVote(pk, choice);
     fetch(`${API_BASE}/api/vote`, {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: { "content-type": "application/json", ...authHeader() },
       body: JSON.stringify({ productKey: pk, vote: choice, voterId: getVoterId() }),
     }).catch(() => {
       /* Netzfehler ignorieren – die optimistische Anzeige bleibt, nicht kritisch. */

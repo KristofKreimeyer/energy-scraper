@@ -29,7 +29,12 @@ interface HeroProps {
   stats: HeroStats | null;
 }
 
-export default function Hero({ timeframe, deal, dealSaving, stats }: HeroProps) {
+export default function Hero({
+  timeframe,
+  deal,
+  dealSaving,
+  stats,
+}: HeroProps) {
   return (
     <section className={`${WRAP} pt-[34px] pb-2`} aria-labelledby="page-title">
       <p className={`${EYEBROW} mb-2.5`}>
@@ -38,13 +43,13 @@ export default function Hero({ timeframe, deal, dealSaving, stats }: HeroProps) 
       </p>
       <h1
         id="page-title"
-        className="text-[clamp(1.7rem,3.4vw,2.5rem)] leading-[1.08] tracking-[-0.025em] mb-2.5 text-balance max-w-[20ch]"
+        className="text-[clamp(1.7rem,3.4vw,2.5rem)] leading-[1.08] tracking-[-0.025em] mb-2.5 text-balance"
       >
         {timeframe === "current"
-          ? "Alle Energy-Deals der Woche, nach Preis pro Liter sortiert."
+          ? "Die besten Energy-Deals der Woche – gefunden für die Community."
           : "Ein Blick voraus: die Energy-Deals der nächsten Woche."}
       </h1>
-      <p className="text-muted text-[1.02rem] max-w-[56ch]">
+      <p className="text-muted text-[1.02rem] ">
         Automatisch gesammelt aus den Prospekten von Aldi, Kaufland, Lidl,
         Netto, Penny und Rewe. Vergleiche Dosenpreis <em>und</em> Grundpreis auf
         einen Blick.

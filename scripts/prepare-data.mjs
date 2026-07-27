@@ -87,6 +87,47 @@ function derivePerLiter(o, priceNumber) {
 
 const round2 = (n) => Math.round(n * 100) / 100
 
+/**
+ * App-/Loyalty-gebundene Preise erkennen und regulären vs. App-Preis trennen.
+ *
+ * Warum nötig: Bei marktguru steht die Bedingung nur im Freitext, und das
+ * API-Feld `offer.price` ist UNEINHEITLICH – mal ist es der App-Preis
+ * ("MIT PENNY APP … ohne Penny App 1.49"  -> 0.79 = App-Preis), mal der
+ * reguläre ("MIT PENNY APP 0.88 €"  -> 0.99 = regulär, 0.88 = App). Blind
+ * `offer.price` zu ranken machte z. B. Rockstar fälschlich zum Bestpreis.
+ * Verlässlich ist nur der Text; REWE liefert zusätzlich `loyaltyBonus`.
+ *
+ * Regel: Eine Zahl DIREKT hinter "mit … app" ist der App-Preis, eine Zahl
+ * direkt hinter "ohne … app" der reguläre – so werden Pfand-/Volumenzahlen
+ * ("0.25 Pfand", "0,5 l") nicht versehentlich als Preis gelesen.
+ *
+ * @returns {{ requiresApp: boolean, appPrice: number|null, regularPrice: number|null }}
+ *   Preise soweit ableitbar, sonst null.
+ */
+function detectAppPricing(o, apiPrice) {
+  const text = `${o.description || ''} ${o.details || ''}`
+  const hasAppText = /\bmit\s+[\w-]*\s*app\b|app[- ]?preis|nur\s+mit\s+app/i.test(text)
+  if (!hasAppText && !o.loyaltyBonus) {
+    return { requiresApp: false, appPrice: null, regularPrice: null }
+  }
+
+  // Zahl unmittelbar hinter der Bedingung (max. ein €/Leerzeichen dazwischen).
+  const ohne = text.match(/ohne\s+[\w-]*\s*app\s*€?\s*(\d+(?:[.,]\d+)?)/i)
+  const mit = text.match(/mit\s+[\w-]*\s*app\s*€?\s*(\d+(?:[.,]\d+)?)/i)
+
+  let regularPrice = ohne ? round2(parseFloat(ohne[1].replace(',', '.'))) : null
+  let appPrice = mit ? round2(parseFloat(mit[1].replace(',', '.'))) : null
+
+  if (regularPrice != null && appPrice == null) {
+    // "ohne App X" bekannt -> das API-Feld ist der App-Preis.
+    appPrice = apiPrice
+  } else if (appPrice != null && regularPrice == null) {
+    // "mit App X" bekannt -> das API-Feld ist der reguläre Preis.
+    regularPrice = apiPrice
+  }
+  return { requiresApp: true, appPrice, regularPrice }
+}
+
 /** Gültigkeitsdaten normalisieren -> ISO-Strings oder null. */
 function parseDate(value, fallbackYear) {
   if (!value) return null
@@ -147,21 +188,44 @@ function normalize(o) {
     ((o.description || o.details) ? String(o.description || o.details).split(/[,;]/)[0].trim() : '') ||
     '—'
 
+  // App-/Loyalty-Preis erkennen. Für Ranking & Historie zählt der REGULÄRE
+  // Preis (den jeder zahlen kann); der App-Preis wird separat als Badge
+  // ausgewiesen. Nur wenn ein regulärer Preis bekannt ist, ersetzen wir den
+  // (u. U. app-gebundenen) API-Preis – sonst bleibt es beim API-Preis, dann
+  // aber via requiresApp markiert.
+  const { requiresApp, appPrice, regularPrice } = detectAppPricing(o, priceNumber)
+  const overrode = requiresApp && regularPrice != null && regularPrice !== priceNumber
+  const canonicalPrice = overrode ? regularPrice : priceNumber
+
+  // Grundpreis (€/L) für einen beliebigen Preis aus dem Volumen ableiten –
+  // nötig, weil die API-`referencePrice` am (evtl. App-)API-Preis hängt und
+  // nach dem Umschwenken auf den regulären Preis nicht mehr passt.
+  const liters = parseLiters(o.salesUnit) ?? parseLiters(o.description) ?? parseLiters(o.title)
+  const perLiterFor = (p) => (p != null && liters && liters > 0 ? round2(p / liters) : null)
+  const perLiter = overrode ? (perLiterFor(canonicalPrice) ?? derivePerLiter(o, canonicalPrice))
+                            : derivePerLiter(o, canonicalPrice)
+  const appPerLiter = requiresApp && appPrice != null
+    ? (perLiterFor(appPrice) ?? (appPrice === priceNumber ? derivePerLiter(o, priceNumber) : null))
+    : null
+
   const unitCount = parseUnitCount(o)
-  const perUnit = priceNumber != null ? round2(priceNumber / unitCount) : null
+  const perUnit = canonicalPrice != null ? round2(canonicalPrice / unitCount) : null
 
   return {
-    id: String(o.offerId || o.webshopIdentifier || slug(meta.label, o.brand, o.title, String(priceNumber))),
+    id: String(o.offerId || o.webshopIdentifier || slug(meta.label, o.brand, o.title, String(canonicalPrice))),
     brand: o.brand || o.productBrand || 'Unbekannt',
     title: (o.title || '').trim(),
     description: (o.description || o.details || '').trim() || null,
     supermarket,
     market: meta.label,
     marketColor: meta.color,
-    price: priceNumber,
-    priceText: o.price || (priceNumber != null ? `${priceNumber.toFixed(2).replace('.', ',')} €` : null),
+    price: canonicalPrice,
+    priceText: canonicalPrice != null ? `${canonicalPrice.toFixed(2).replace('.', ',')} €` : (o.price || null),
     oldPrice: parsePrice(o.oldPrice),
-    perLiter: derivePerLiter(o, priceNumber),
+    perLiter,
+    requiresApp,
+    appPrice: requiresApp && appPrice != null && appPrice !== canonicalPrice ? appPrice : null,
+    appPerLiter: requiresApp && appPrice != null && appPrice !== canonicalPrice ? appPerLiter : null,
     unitLabel,
     unitCount,
     perUnit,

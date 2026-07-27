@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-27T11:28:29.004Z",
+  "generatedAt": "2026-07-27T12:20:48.963Z",
   "count": 11,
   "offers": [
     {
@@ -228,16 +228,16 @@
       "scrapedAt": "2026-07-27T06:08:53.948Z"
     },
     {
-      "id": "24148713",
+      "id": "80a49b5d-4c41-4967-92af-15b16106e2b4",
       "brand": "Red Bull",
-      "title": "Energy Drink",
-      "description": "HINWEIS: MIT PENNY APP 0.88 € Versch. Sorten, koffein- und taurinhaltig, zzgl. 0.25 Pfand, je 250 ml",
+      "title": "Energy-Drink",
+      "description": "je 250 ml",
       "supermarket": "Penny",
       "market": "Penny",
       "marketColor": "#C4122E",
       "price": 0.99,
       "priceText": "0,99 €",
-      "oldPrice": null,
+      "oldPrice": 1.49,
       "perLiter": 3.96,
       "sugar": "both",
       "requiresApp": true,
@@ -248,15 +248,15 @@
       "perUnit": 0.99,
       "validFrom": "2026-07-26T22:00:00.000Z",
       "validTo": "2026-08-01T21:59:00.000Z",
-      "imageUrl": "https://cdn.marktguru.de/api/v1/offers/24148713/images/default/0/medium.webp",
-      "url": "https://www.marktguru.de/offers/24148713",
-      "scrapedAt": "2026-07-27T06:09:02.725Z"
+      "imageUrl": "https://cdn.penny.de/dam/jcr:17e1d9ec-97fe-4c70-8fa1-c44df4be1a50/40365703.png?impolicy=penny&imwidth=250",
+      "url": "https://www.penny.de/angebote/top-angebote/red-bull-energy-drink",
+      "scrapedAt": "2026-07-27T12:20:02.058Z"
     },
     {
-      "id": "24142478",
+      "id": "599afe22-9e3a-4667-87f6-20c24fad32f2",
       "brand": "Rockstar",
       "title": "Energy-Drink",
-      "description": "HINWEIS: MIT PENNY APP Versch. Sorten, koffein- und taurinhaltig, zzgl. 0.25 Pfand, je 0,5 l, ohne Penny App 1.49",
+      "description": "je 0,5 l",
       "supermarket": "Penny",
       "market": "Penny",
       "marketColor": "#C4122E",
@@ -273,9 +273,9 @@
       "perUnit": 1.49,
       "validFrom": "2026-07-26T22:00:00.000Z",
       "validTo": "2026-08-01T21:59:00.000Z",
-      "imageUrl": "https://cdn.marktguru.de/api/v1/offers/24142478/images/default/0/medium.webp",
-      "url": "https://www.marktguru.de/offers/24142478",
-      "scrapedAt": "2026-07-27T06:09:02.725Z"
+      "imageUrl": "https://cdn.penny.de/dam/jcr:d26baef1-1a7e-4275-8093-45b908177a70/Rockstar.png?impolicy=penny&imwidth=250",
+      "url": "https://www.penny.de/angebote/getraenke/rockstar-energy-drink",
+      "scrapedAt": "2026-07-27T12:20:02.058Z"
     }
   ]
 }

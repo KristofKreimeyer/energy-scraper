@@ -14,7 +14,7 @@
 import { Hono, type Context } from 'hono'
 import { cors } from 'hono/cors'
 import Stripe from 'stripe'
-import { type Env, sendEmail, confirmEmail, statusPage } from './email'
+import { type Env, sendEmail, confirmEmail, loginEmail, statusPage } from './email'
 import { sendTelegram } from './telegram'
 
 const app = new Hono<{ Bindings: Env }>()
@@ -399,12 +399,13 @@ app.post('/api/report-price', async (c) => {
     return c.json({ error: 'rate_limited', message: 'Danke! Du hast gerade viele Meldungen geschickt – bitte später erneut.' }, 429)
   }
 
+  const userId = await sessionUserId(c)
   await db
     .prepare(
-      'INSERT INTO price_reports (id, created_at, status, product_key, brand, title, market, reported_price, store_location, note, ip_hash) ' +
-        "VALUES (?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?, ?)",
+      'INSERT INTO price_reports (id, created_at, status, product_key, brand, title, market, reported_price, store_location, note, ip_hash, user_id) ' +
+        "VALUES (?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?, ?, ?)",
     )
-    .bind(crypto.randomUUID(), now(), productKey, brand, title, market, Math.round(price * 100) / 100, clip(body.storeLocation, 80) || null, clip(body.note, 200) || null, ipHash)
+    .bind(crypto.randomUUID(), now(), productKey, brand, title, market, Math.round(price * 100) / 100, clip(body.storeLocation, 80) || null, clip(body.note, 200) || null, ipHash, userId)
     .run()
   return c.json({ ok: true, message: 'Danke für deine Meldung! Wir prüfen sie und zeigen sie dann an.' })
 })
@@ -444,12 +445,13 @@ app.post('/api/vote', async (c) => {
   if ((recent?.n ?? 0) >= VOTE_RATE_MAX) return c.json({ error: 'rate_limited', message: 'Zu viele Stimmen – bitte später.' }, 429)
 
   // Eine Stimme je (Produkt, Browser); Meinungsänderung aktualisiert sie.
+  const userId = await sessionUserId(c)
   await db
     .prepare(
-      'INSERT INTO availability_votes (id, created_at, product_key, vote, voter_id, ip_hash) VALUES (?, ?, ?, ?, ?, ?) ' +
-        'ON CONFLICT(product_key, voter_id) DO UPDATE SET vote=excluded.vote, created_at=excluded.created_at, ip_hash=excluded.ip_hash',
+      'INSERT INTO availability_votes (id, created_at, product_key, vote, voter_id, ip_hash, user_id) VALUES (?, ?, ?, ?, ?, ?, ?) ' +
+        'ON CONFLICT(product_key, voter_id) DO UPDATE SET vote=excluded.vote, created_at=excluded.created_at, ip_hash=excluded.ip_hash, user_id=excluded.user_id',
     )
-    .bind(crypto.randomUUID(), now(), productKey, vote, voterId, ipHash)
+    .bind(crypto.randomUUID(), now(), productKey, vote, voterId, ipHash, userId)
     .run()
   return c.json({ ok: true })
 })
@@ -514,6 +516,96 @@ app.get('/api/admin/reports/action', async (c) => {
   await c.env.DB.prepare("UPDATE price_reports SET status=?, moderated_at=? WHERE id=? AND status='pending'").bind(status, now(), id).run()
   // Zurück zur Liste.
   return Response.redirect(new URL(`/api/admin/reports?token=${encodeURIComponent(token)}`, c.req.url).toString(), 302)
+})
+
+// --- Leichte Identität (E-Mail-Magic-Link) ---------------------------------
+
+/** 32 Byte Zufall als Hex – für Login- und Session-Tokens. */
+function randomToken(): string {
+  const b = new Uint8Array(32)
+  crypto.getRandomValues(b)
+  return [...b].map((x) => x.toString(16).padStart(2, '0')).join('')
+}
+
+/** user_id der gültigen Session aus dem Bearer-Token, sonst null. */
+async function sessionUserId(c: Context<{ Bindings: Env }>): Promise<string | null> {
+  const m = (c.req.header('authorization') || '').match(/^Bearer\s+(.+)$/i)
+  if (!m) return null
+  const row = await c.env.DB.prepare('SELECT user_id, expires_at FROM sessions WHERE token=?').bind(m[1]).first<{ user_id: string; expires_at: string }>()
+  if (!row || row.expires_at < now()) return null
+  return row.user_id
+}
+
+// Magic-Link anfordern. Antwort immer gleich (keine E-Mail-Enumeration).
+app.post('/api/auth/request', async (c) => {
+  const body = (await c.req.json().catch(() => ({}))) as { email?: string }
+  const email = String(body.email ?? '').trim().toLowerCase()
+  const ok = { ok: true, message: 'Wenn die Adresse gültig ist, haben wir dir einen Anmeldelink geschickt.' }
+  if (!EMAIL_RE.test(email)) return c.json(ok)
+
+  const db = c.env.DB
+  // Rate-Limit: max. 5 Anfragen je Adresse und Stunde.
+  const since = new Date(Date.now() - 3_600_000).toISOString()
+  const recent = await db.prepare('SELECT COUNT(*) AS n FROM login_tokens WHERE email=? AND created_at>?').bind(email, since).first<{ n: number }>()
+  if ((recent?.n ?? 0) >= 5) return c.json(ok)
+
+  const token = randomToken()
+  const expires = new Date(Date.now() + 15 * 60_000).toISOString()
+  await db.prepare('INSERT INTO login_tokens (token, email, created_at, expires_at, used) VALUES (?, ?, ?, ?, 0)').bind(token, email, now(), expires).run()
+  const link = `${c.env.PUBLIC_SITE_URL}/#/auth?token=${token}`
+  await sendEmail(c.env, { to: email, ...loginEmail(link) })
+  return c.json(ok)
+})
+
+// Magic-Link einlösen -> User anlegen/finden, Session ausgeben.
+app.post('/api/auth/verify', async (c) => {
+  const body = (await c.req.json().catch(() => ({}))) as { token?: string }
+  const token = String(body.token ?? '').trim()
+  if (!token) return c.json({ error: 'missing_token' }, 400)
+  const db = c.env.DB
+
+  const lt = await db.prepare('SELECT email, expires_at, used FROM login_tokens WHERE token=?').bind(token).first<{ email: string; expires_at: string; used: number }>()
+  if (!lt || lt.used || lt.expires_at < now()) return c.json({ error: 'invalid_token', message: 'Der Anmeldelink ist ungültig oder abgelaufen.' }, 400)
+  await db.prepare('UPDATE login_tokens SET used=1 WHERE token=?').bind(token).run()
+
+  let user = await db.prepare('SELECT id FROM users WHERE email=?').bind(lt.email).first<{ id: string }>()
+  if (!user) {
+    const id = crypto.randomUUID()
+    await db.prepare('INSERT INTO users (id, email, created_at) VALUES (?, ?, ?)').bind(id, lt.email, now()).run()
+    user = { id }
+  }
+
+  const session = randomToken()
+  const expires = new Date(Date.now() + 30 * 86_400_000).toISOString()
+  await db.prepare('INSERT INTO sessions (token, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)').bind(session, user.id, now(), expires).run()
+  return c.json({ token: session, email: lt.email })
+})
+
+// Aktueller Login-Status.
+app.get('/api/auth/me', async (c) => {
+  const userId = await sessionUserId(c)
+  if (!userId) return c.json({ error: 'unauthorized' }, 401)
+  const u = await c.env.DB.prepare('SELECT email FROM users WHERE id=?').bind(userId).first<{ email: string }>()
+  if (!u) return c.json({ error: 'unauthorized' }, 401)
+  return c.json({ email: u.email })
+})
+
+// Abmelden (Session widerrufen).
+app.post('/api/auth/logout', async (c) => {
+  const m = (c.req.header('authorization') || '').match(/^Bearer\s+(.+)$/i)
+  if (m) await c.env.DB.prepare('DELETE FROM sessions WHERE token=?').bind(m[1]).run()
+  return c.json({ ok: true })
+})
+
+// „Meine Beiträge": Zähler für das eingeloggte Konto.
+app.get('/api/me/contributions', async (c) => {
+  const userId = await sessionUserId(c)
+  if (!userId) return c.json({ error: 'unauthorized' }, 401)
+  const db = c.env.DB
+  const reports = await db.prepare("SELECT COUNT(*) AS n FROM price_reports WHERE user_id=?").bind(userId).first<{ n: number }>()
+  const approved = await db.prepare("SELECT COUNT(*) AS n FROM price_reports WHERE user_id=? AND status='approved'").bind(userId).first<{ n: number }>()
+  const votes = await db.prepare('SELECT COUNT(*) AS n FROM availability_votes WHERE user_id=?').bind(userId).first<{ n: number }>()
+  return c.json({ reports: reports?.n ?? 0, reportsApproved: approved?.n ?? 0, votes: votes?.n ?? 0 })
 })
 
 // --- Pro-Status abfragen (für die UI; E-Mail & Push) ----------------------

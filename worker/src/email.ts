@@ -85,6 +85,21 @@ export function confirmEmail(productLabel: string, confirmLink: string): Omit<Ou
   return { subject: 'Bitte bestätige deinen Bestpreis-Alarm', html, text }
 }
 
+/** Magic-Link-Login: passwortloser Anmeldelink (kurzlebig, einmalig). */
+export function loginEmail(loginLink: string): Omit<OutgoingEmail, 'to'> {
+  const text =
+    `Dein Anmeldelink für EnergyHunt:\n${loginLink}\n\n` +
+    `Der Link ist 15 Minuten gültig und nur einmal verwendbar.\n` +
+    `Wenn du das nicht warst, ignoriere diese Mail einfach.`
+  const html = shell(
+    'Bei EnergyHunt anmelden',
+    `<p style="margin:0 0 20px;color:#5b6772">Klicke zum Anmelden auf den Button. Der Link ist <strong style="color:#10151b">15 Minuten</strong> gültig und nur einmal verwendbar.</p>
+     <a href="${loginLink}" style="display:inline-block;background:#e24a08;color:#fff;text-decoration:none;font-weight:650;padding:11px 20px;border-radius:10px">Jetzt anmelden</a>
+     <p style="margin:18px 0 0;color:#9aa6b1;font-size:0.8rem">Nicht angefordert? Dann ignoriere diese Mail – ohne Klick passiert nichts.</p>`,
+  )
+  return { subject: 'Dein Anmeldelink für EnergyHunt', html, text }
+}
+
 /** Minimal-Seite, die der Worker nach Klick auf Bestätigen/Abmelden zurückgibt. */
 export function statusPage(env: Env, heading: string, message: string): Response {
   const html = shell(

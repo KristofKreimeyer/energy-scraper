@@ -28,6 +28,8 @@ function App() {
     setMarket,
     brand,
     setBrand,
+    sugar,
+    setSugar,
     sort,
     setSort,
     query,
@@ -44,6 +46,7 @@ function App() {
     visible,
     marketTally,
     brandTally,
+    sugarTally,
     bestId,
     filtersActive,
     resetFilters,
@@ -131,6 +134,9 @@ function App() {
           marketTally={marketTally}
           brands={brands}
           brandTally={brandTally}
+          sugar={sugar}
+          onSugarChange={setSugar}
+          sugarTally={sugarTally}
           totalCount={offers.length}
           visibleCount={visible.length}
           filtersActive={filtersActive}

@@ -106,7 +106,10 @@ export function groupOffers(list: Offer[]): GroupedOffer[] {
   }
   return [...groups.values()].map((arr) => {
     const rep = arr.find((o) => /\boriginal\b/i.test(o.title)) ?? arr[0]
-    return { ...rep, variantCount: arr.length, variantTitles: arr.map((o) => o.title) }
+    // Gebündelte Sorten mit uneinheitlichem Zuckergehalt zählen als 'both',
+    // damit die Karte in beiden Zucker-Filtern auftaucht.
+    const sugar = arr.every((o) => o.sugar === arr[0].sugar) ? arr[0].sugar : 'both'
+    return { ...rep, sugar, variantCount: arr.length, variantTitles: arr.map((o) => o.title) }
   })
 }
 
@@ -263,16 +266,21 @@ export function sortOffers<T extends Offer>(list: T[], key: SortKey): T[] {
 export interface FilterState {
   market: string
   brand: string
+  /** 'all' | 'zero' (zuckerfrei) | 'sugar' (mit Zucker). */
+  sugar: 'all' | 'zero' | 'sugar'
   query: string
 }
 
-/** Wendet Markt-, Marken- und Suchfilter (UND-verknüpft) an. */
+/** Wendet Markt-, Marken-, Zucker- und Suchfilter (UND-verknüpft) an. */
 export function filterOffers<T extends Offer>(list: T[], f: FilterState): T[] {
   const q = f.query.trim().toLowerCase()
   return list.filter(
     (o) =>
       (f.market === 'all' || o.market === f.market) &&
       (f.brand === 'all' || o.brand === f.brand) &&
+      // 'both'-Angebote (Sortenbündel) matchen jeden Zucker-Filter, da sie die
+      // zuckerfreie wie die gezuckerte Variante enthalten.
+      (f.sugar === 'all' || o.sugar === 'both' || o.sugar === f.sugar) &&
       (q === '' || `${o.brand} ${o.title}`.toLowerCase().includes(q)),
   )
 }

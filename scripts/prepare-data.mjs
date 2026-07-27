@@ -88,6 +88,24 @@ function derivePerLiter(o, priceNumber) {
 const round2 = (n) => Math.round(n * 100) / 100
 
 /**
+ * Zuckergehalt aus Produkttext klassifizieren: 'zero' | 'sugar' | 'both'.
+ *
+ * Prospekte spezifizieren den Zuckergehalt selten pro Angebot – die meisten
+ * bewerben "Versch. Sorten" (die gesamte Range zu einem Preis). Solche Bündel
+ * und unklare Fälle bekommen 'both': Sie enthalten die Zero-Variante ebenso wie
+ * die gezuckerte und sollen daher in BEIDEN Filtern ("zuckerfrei"/"mit Zucker")
+ * erscheinen. Nur explizit ausgezeichnete Einzelprodukte werden 'zero'/'sugar'.
+ */
+function classifySugar(o) {
+  const t = `${o.title || ''} ${o.description || ''} ${o.salesUnit || ''}`.toLowerCase()
+  const zero = /zuckerfrei|zero|sugar\s?-?free|ohne zucker|no sugar/.test(t)
+  const sugar = /\bclassic\b|\boriginal\b|mit zucker/.test(t)
+  if (zero && !sugar) return 'zero'
+  if (sugar && !zero) return 'sugar'
+  return 'both'
+}
+
+/**
  * App-/Loyalty-gebundene Preise erkennen und regulären vs. App-Preis trennen.
  *
  * Warum nötig: Bei marktguru steht die Bedingung nur im Freitext, und das
@@ -223,6 +241,7 @@ function normalize(o) {
     priceText: canonicalPrice != null ? `${canonicalPrice.toFixed(2).replace('.', ',')} €` : (o.price || null),
     oldPrice: parsePrice(o.oldPrice),
     perLiter,
+    sugar: classifySugar(o),
     requiresApp,
     appPrice: requiresApp && appPrice != null && appPrice !== canonicalPrice ? appPrice : null,
     appPerLiter: requiresApp && appPrice != null && appPrice !== canonicalPrice ? appPerLiter : null,

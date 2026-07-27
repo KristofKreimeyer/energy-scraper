@@ -18,6 +18,12 @@ export interface Offer {
   /** Grundpreis in € pro Liter, oder null wenn nicht ableitbar. */
   perLiter: number | null
   /**
+   * Zuckergehalt laut Produkttext: 'zero' (explizit zuckerfrei),
+   * 'sugar' (explizit gezuckert) oder 'both' (Sortenbündel/unspezifiziert –
+   * erscheint in beiden Zucker-Filtern).
+   */
+  sugar: 'zero' | 'sugar' | 'both'
+  /**
    * Preis ist an eine Kundenkarte/App gebunden (z. B. Penny App, Lidl Plus).
    * price/perLiter geben in diesem Fall bewusst den REGULÄREN Preis wieder,
    * der App-Preis steht separat in appPrice/appPerLiter.

@@ -22,6 +22,7 @@ export function useOfferBrowser() {
   const [timeframe, setTimeframe] = useState<Timeframe>("current");
   const [market, setMarket] = useState("all");
   const [brand, setBrand] = useState("all");
+  const [sugar, setSugar] = useState<"all" | "zero" | "sugar">("all");
   const [sort, setSort] = useState<SortKey>("liter");
   const [query, setQuery] = useState("");
   // Auf schmalen Viewports (Mobil) standardmäßig die Listenansicht – die wirkt
@@ -68,36 +69,46 @@ export function useOfferBrowser() {
   const dealSaving = deal ? savings(deal) : null;
 
   const visible = useMemo(
-    () => sortOffers(filterOffers(offers, { market, brand, query }), sort),
-    [offers, market, brand, sort, query],
+    () => sortOffers(filterOffers(offers, { market, brand, sugar, query }), sort),
+    [offers, market, brand, sugar, sort, query],
   );
 
-  // Kontextuelle Zähler: Markt-Chips zählen bei aktuellem Marken-/Suchfilter,
-  // Marken-Chips bei aktuellem Markt-/Suchfilter (faceted search).
+  // Kontextuelle Zähler: jede Facette zählt unter den JEWEILS anderen aktiven
+  // Filtern (faceted search) – so zeigen die Chips, was ein Klick noch bringt.
   const marketTally = useMemo(
     () =>
       countBy(
-        filterOffers(offers, { market: "all", brand, query }),
+        filterOffers(offers, { market: "all", brand, sugar, query }),
         (o) => o.market,
       ),
-    [offers, brand, query],
+    [offers, brand, sugar, query],
   );
   const brandTally = useMemo(
     () =>
       countBy(
-        filterOffers(offers, { market, brand: "all", query }),
+        filterOffers(offers, { market, brand: "all", sugar, query }),
         (o) => o.brand,
       ),
-    [offers, market, query],
+    [offers, market, sugar, query],
   );
+  // Zucker-Facette: wie viele Angebote je Option, unter Markt/Marke/Suche.
+  // 'both'-Angebote zählen in beide Optionen (sie matchen beide Filter).
+  const sugarTally = useMemo(() => {
+    const base = filterOffers(offers, { market, brand, sugar: "all", query });
+    const m = new Map<string, number>([["all", base.length]]);
+    m.set("zero", base.filter((o) => o.sugar === "zero" || o.sugar === "both").length);
+    m.set("sugar", base.filter((o) => o.sugar === "sugar" || o.sugar === "both").length);
+    return m;
+  }, [offers, market, brand, query]);
 
   const bestId = useMemo(() => bestPerLiterId(visible), [visible]);
   const filtersActive =
-    market !== "all" || brand !== "all" || query.trim() !== "";
+    market !== "all" || brand !== "all" || sugar !== "all" || query.trim() !== "";
 
   function resetFilters() {
     setMarket("all");
     setBrand("all");
+    setSugar("all");
     setQuery("");
   }
 
@@ -109,6 +120,8 @@ export function useOfferBrowser() {
     setMarket,
     brand,
     setBrand,
+    sugar,
+    setSugar,
     sort,
     setSort,
     query,
@@ -126,6 +139,7 @@ export function useOfferBrowser() {
     visible,
     marketTally,
     brandTally,
+    sugarTally,
     bestId,
     filtersActive,
     resetFilters,

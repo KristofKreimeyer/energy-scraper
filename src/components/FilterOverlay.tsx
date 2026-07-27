@@ -36,6 +36,9 @@ interface FilterOverlayProps {
   marketTally: Map<string, number>;
   brands: string[];
   brandTally: Map<string, number>;
+  sugar: "all" | "zero" | "sugar";
+  onSugarChange: (sugar: "all" | "zero" | "sugar") => void;
+  sugarTally: Map<string, number>;
   totalCount: number;
   visibleCount: number;
   filtersActive: boolean;
@@ -54,6 +57,9 @@ export default function FilterOverlay({
   marketTally,
   brands,
   brandTally,
+  sugar,
+  onSugarChange,
+  sugarTally,
   totalCount,
   visibleCount,
   filtersActive,
@@ -126,6 +132,40 @@ export default function FilterOverlay({
             );
           })}
         </div>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <span className={`${EYEBROW} !text-[0.68rem] !tracking-[0.1em]`}>
+          Zucker
+        </span>
+        <div className="flex flex-wrap gap-2">
+          {(
+            [
+              { value: "all", text: "Alle" },
+              { value: "zero", text: "Zuckerfrei" },
+              { value: "sugar", text: "Mit Zucker" },
+            ] as const
+          ).map((opt) => {
+            const count = sugarTally.get(opt.value) ?? 0;
+            const selected = sugar === opt.value;
+            return (
+              <button
+                key={opt.value}
+                className={chip}
+                type="button"
+                aria-pressed={selected}
+                disabled={count === 0 && !selected}
+                onClick={() => onSugarChange(opt.value)}
+              >
+                {opt.text} <span className={chipCount}>{count}</span>
+              </button>
+            );
+          })}
+        </div>
+        <p className="text-[0.72rem] text-muted">
+          Sortenbündel („versch. Sorten“) enthalten beide Varianten und zählen
+          zu beiden Optionen.
+        </p>
       </div>
 
       <div className="flex flex-col gap-2">

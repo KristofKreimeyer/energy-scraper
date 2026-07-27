@@ -120,7 +120,16 @@ Push auf `main` startet `deploy-site` (und bei `worker/**` auch
 Nach dem ersten Doppel-Deploy die URL-abhängigen Werte final setzen (siehe
 Reihenfolge-Tipp oben) und den Worker einmal neu deployen.
 
-## 7. Smoke-Test nach Go-Live
+## 7. D1-Migrationen
+
+`deploy-worker` wendet vor dem Deploy `worker/migrations/*.sql` an
+(`wrangler d1 migrations apply`). Konvention und – falls ein File halb angewandt
+den Deploy blockiert (`duplicate column name`) – die Recovery-Schritte stehen in
+[`worker/migrations/README.md`](worker/migrations/README.md). Kurz: je ein
+`ALTER TABLE … ADD COLUMN` in ein eigenes File, `CREATE … IF NOT EXISTS`, und
+deployte Files nur anhängen, nie ändern.
+
+## 8. Smoke-Test nach Go-Live
 
 - Seite lädt, Theme-Toggle, Kachel/Liste, Filter-Overlay (Tab-Falle, Escape).
 - Preis-Alarm E-Mail: Anmeldung → Double-Opt-In-Mail → Bestätigen.

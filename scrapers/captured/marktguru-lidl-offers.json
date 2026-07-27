@@ -1,23 +1,5 @@
 [
   {
-    "brand": "Red Bull",
-    "supermarket": "Lidl",
-    "title": "Energy Drink",
-    "productBrand": "Red Bull",
-    "description": "Versch. Sorten. Taurin- und koffeinhaltig. Je 6x 0,25 l zzgl. 1.50 Pfand",
-    "price": "5,29 €",
-    "priceNumber": 5.29,
-    "referencePrice": 3.53,
-    "unit": "Liter",
-    "quantity": 6,
-    "validFrom": "2026-07-19T22:00:00Z",
-    "validTo": "2026-07-25T21:59:59Z",
-    "imageUrl": "https://cdn.marktguru.de/api/v1/offers/24124331/images/default/0/medium.webp",
-    "offerId": 24124331,
-    "sourceUrl": "https://www.marktguru.de/offers/24124331",
-    "scrapedAt": "2026-07-23T14:25:34.334Z"
-  },
-  {
     "brand": "Monster",
     "supermarket": "Lidl",
     "title": "Energy Drink",
@@ -30,9 +12,27 @@
     "quantity": 1,
     "validFrom": "2026-07-26T22:00:00Z",
     "validTo": "2026-08-01T21:59:00Z",
-    "imageUrl": "https://cdn.marktguru.de/api/v1/offers/24066176/images/default/0/medium.webp",
-    "offerId": 24066176,
-    "sourceUrl": "https://www.marktguru.de/offers/24066176",
-    "scrapedAt": "2026-07-23T14:25:34.335Z"
+    "imageUrl": "https://cdn.marktguru.de/api/v1/offers/24146638/images/default/0/medium.webp",
+    "offerId": 24146638,
+    "sourceUrl": "https://www.marktguru.de/offers/24146638",
+    "scrapedAt": "2026-07-27T06:08:53.947Z"
+  },
+  {
+    "brand": "Rockstar",
+    "supermarket": "Lidl",
+    "title": "Energy-Drink",
+    "productBrand": "Rockstar",
+    "description": "Versch. Sorten. Taurin- und koffeinhaltig. Je 0,5 l zzgl. 0.25 Pfand",
+    "price": "0,89 €",
+    "priceNumber": 0.89,
+    "referencePrice": 1.78,
+    "unit": "Liter",
+    "quantity": 1,
+    "validFrom": "2026-08-02T22:00:00Z",
+    "validTo": "2026-08-08T21:59:00Z",
+    "imageUrl": "https://cdn.marktguru.de/api/v1/offers/24173463/images/default/0/medium.webp",
+    "offerId": 24173463,
+    "sourceUrl": "https://www.marktguru.de/offers/24173463",
+    "scrapedAt": "2026-07-27T06:08:53.948Z"
   }
 ]

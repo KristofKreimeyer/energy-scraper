@@ -34,7 +34,7 @@ const jobs = [
   { name: 'Aldi Nord', script: 'aldi-nord-scraper.js', args: [] },
   { name: 'Kaufland (marktguru)', script: 'marktguru-api-scraper.js', args: ['kaufland'] },
   { name: 'Lidl (marktguru)', script: 'marktguru-api-scraper.js', args: ['lidl'] },
-  { name: 'Penny (marktguru)', script: 'marktguru-api-scraper.js', args: ['penny'] },
+  { name: 'Penny (nativer Feed)', script: 'penny-native-scraper.js', args: [] },
   { name: 'Netto (kaufda)', script: 'netto-kaufda-scraper.js', args: [] },
   { name: 'Rewe', script: 'rewe-scraper.js', args: [] },
 ]

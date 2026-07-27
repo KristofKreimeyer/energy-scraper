@@ -123,6 +123,15 @@ function classifySugar(o) {
  *   Preise soweit ableitbar, sonst null.
  */
 function detectAppPricing(o, apiPrice) {
+  // Strukturierte Felder (z. B. penny-native-scraper) haben Vorrang vor der
+  // Freitext-Heuristik: hier ist der App-Preis bereits ein sauberes Feld.
+  if (o.appPriceNumber != null) {
+    return {
+      requiresApp: true,
+      appPrice: round2(o.appPriceNumber),
+      regularPrice: apiPrice,
+    }
+  }
   const text = `${o.description || ''} ${o.details || ''}`
   const hasAppText = /\bmit\s+[\w-]*\s*app\b|app[- ]?preis|nur\s+mit\s+app/i.test(text)
   if (!hasAppText && !o.loyaltyBonus) {
@@ -222,8 +231,10 @@ function normalize(o) {
   const perLiterFor = (p) => (p != null && liters && liters > 0 ? round2(p / liters) : null)
   const perLiter = overrode ? (perLiterFor(canonicalPrice) ?? derivePerLiter(o, canonicalPrice))
                             : derivePerLiter(o, canonicalPrice)
+  // Quell-gelieferter App-Grundpreis (penny-native) hat Vorrang, sonst aus dem
+  // Volumen ableiten.
   const appPerLiter = requiresApp && appPrice != null
-    ? (perLiterFor(appPrice) ?? (appPrice === priceNumber ? derivePerLiter(o, priceNumber) : null))
+    ? (o.appPerLiter ?? perLiterFor(appPrice) ?? (appPrice === priceNumber ? derivePerLiter(o, priceNumber) : null))
     : null
 
   const unitCount = parseUnitCount(o)

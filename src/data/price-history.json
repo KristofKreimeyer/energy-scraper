@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-27T11:28:29.024Z",
+  "updatedAt": "2026-07-27T12:20:48.979Z",
   "products": {
     "aldi nord|rockstar|energydrink original|0,5-l-dose": {
       "market": "Aldi Nord",
@@ -426,6 +426,20 @@
           "price": 1.49,
           "perUnit": 1.49,
           "perLiter": 2.98
+        }
+      ]
+    },
+    "penny|red bull|energy-drink|250 ml": {
+      "market": "Penny",
+      "brand": "Red Bull",
+      "title": "Energy-Drink",
+      "unitLabel": "250 ml",
+      "points": [
+        {
+          "date": "2026-07-27",
+          "price": 0.99,
+          "perUnit": 0.99,
+          "perLiter": 3.96
         }
       ]
     }

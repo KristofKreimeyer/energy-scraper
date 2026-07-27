@@ -17,6 +17,16 @@ export interface Offer {
   oldPrice: number | null
   /** Grundpreis in € pro Liter, oder null wenn nicht ableitbar. */
   perLiter: number | null
+  /**
+   * Preis ist an eine Kundenkarte/App gebunden (z. B. Penny App, Lidl Plus).
+   * price/perLiter geben in diesem Fall bewusst den REGULÄREN Preis wieder,
+   * der App-Preis steht separat in appPrice/appPerLiter.
+   */
+  requiresApp: boolean
+  /** Günstigerer App-/Loyalty-Preis (€), oder null wenn keiner abweicht. */
+  appPrice: number | null
+  /** Grundpreis (€/L) des App-Preises, oder null. */
+  appPerLiter: number | null
   /** Größenangabe, z. B. "0,5-L-Dose" oder "24 x 0,25-l-Dose". */
   unitLabel: string
   /** Anzahl Einzeldosen im Gebinde (1 bei Einzeldose, 24 beim Karton). */

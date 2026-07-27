@@ -362,6 +362,24 @@ export function OfferCard({ offer, isBest, view = 'grid', reports, votes }: Prop
             </p>
           )}
 
+          {offer.requiresApp && offer.appPrice != null && (
+            <p className="flex items-center gap-2 mt-2.5 text-[0.8rem]">
+              <span className="flex-none font-semibold text-accent-strong bg-[color-mix(in_srgb,var(--accent)_12%,transparent)] border border-[color-mix(in_srgb,var(--accent)_30%,transparent)] rounded-[7px] px-2 py-[3px]">
+                <span aria-hidden="true">📱</span> mit App
+              </span>
+              <span className="text-muted font-mono tabular-nums">
+                <span aria-hidden="true">
+                  {formatEuro(offer.appPrice)}
+                  {offer.appPerLiter != null ? ` · ${formatEuro(offer.appPerLiter)}/L` : ''}
+                </span>
+                <span className="visually-hidden">
+                  Mit Kundenkarte oder App {formatEuro(offer.appPrice)}
+                  {offer.appPerLiter != null ? `, ${formatEuro(offer.appPerLiter)} pro Liter` : ''}. Der angezeigte Preis gilt ohne App.
+                </span>
+              </span>
+            </p>
+          )}
+
           {saved && (
             <p className="flex items-center gap-2 mt-2.5 text-[0.8rem]">
               <span className="flex-none font-mono font-bold tabular-nums text-good bg-good-tint border border-[color-mix(in_srgb,var(--good)_30%,transparent)] rounded-[7px] px-2 py-[3px]">

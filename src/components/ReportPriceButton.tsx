@@ -22,8 +22,9 @@ const TagIcon = () => (
   </svg>
 );
 
-export function ReportPriceButton({ offer }: { offer: GroupedOffer }) {
-  const [state, setState] = useState<State>({ kind: "idle" });
+export function ReportPriceButton({ offer, embedded = false, onClose }: { offer: GroupedOffer; embedded?: boolean; onClose?: () => void }) {
+  // Eingebettet startet das Formular direkt; „Abbrechen“ schließt das Panel.
+  const [state, setState] = useState<State>(embedded ? { kind: "open" } : { kind: "idle" });
   const [price, setPrice] = useState("");
   const [store, setStore] = useState("");
   const [note, setNote] = useState("");
@@ -151,7 +152,7 @@ export function ReportPriceButton({ offer }: { offer: GroupedOffer }) {
         </button>
         <button
           type="button"
-          onClick={() => setState({ kind: "idle" })}
+          onClick={() => (embedded ? onClose?.() : setState({ kind: "idle" }))}
           className="text-[0.76rem] text-muted hover:text-ink cursor-pointer"
         >
           Abbrechen

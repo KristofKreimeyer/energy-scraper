@@ -40,8 +40,10 @@ const BellIcon = () => (
   </svg>
 );
 
-export function AlarmButton({ offer }: { offer: GroupedOffer }) {
-  const [state, setState] = useState<State>({ kind: "idle" });
+export function AlarmButton({ offer, embedded = false }: { offer: GroupedOffer; embedded?: boolean }) {
+  // Eingebettet (in der Karten-Aktionsleiste) startet das Formular direkt –
+  // der eigene „idle“-Trigger entfällt, das Öffnen steuert die Leiste.
+  const [state, setState] = useState<State>(embedded ? { kind: "open", channel: "email" } : { kind: "idle" });
   const [email, setEmail] = useState("");
   // Preiswecker (Pro)
   const [weckerOn, setWeckerOn] = useState(false);

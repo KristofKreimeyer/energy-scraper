@@ -262,13 +262,15 @@ export function OfferCard({ offer, isBest, view = 'grid', reports, votes }: Prop
             )}
           </div>
 
-          <div className="flex flex-col gap-2 border-t border-border pt-2">
+          <div className="flex flex-col gap-2.5 border-t border-border pt-2.5">
             {insightBlock}
             {communityBlock}
-            <AvailabilityVote offer={offer} tally={votes} />
+            <div className="flex items-center justify-between gap-3">
+              <AvailabilityVote offer={offer} tally={votes} />
+              {shareButton}
+            </div>
             <AlarmButton offer={offer} />
             <ReportPriceButton offer={offer} />
-            {shareButton}
           </div>
         </article>
       </li>
@@ -401,10 +403,12 @@ export function OfferCard({ offer, isBest, view = 'grid', reports, votes }: Prop
 
           <div className="mt-3">{validBadge}</div>
 
-          <AvailabilityVote offer={offer} tally={votes} />
+          <div className="mt-3 flex items-center justify-between gap-3">
+            <AvailabilityVote offer={offer} tally={votes} />
+            {shareButton}
+          </div>
           <AlarmButton offer={offer} />
           <ReportPriceButton offer={offer} />
-          <div className="mt-2">{shareButton}</div>
 
           {offer.url && (
             <a

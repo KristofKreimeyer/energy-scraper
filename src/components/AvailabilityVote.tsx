@@ -45,7 +45,7 @@ export function AvailabilityVote({ offer, tally }: { offer: GroupedOffer; tally?
 
   return (
     <div
-      className="relative z-10 mt-2 flex flex-col gap-1"
+      className="relative z-10 flex flex-col gap-1"
       onClick={(e) => e.stopPropagation()}
     >
       {counts.up >= CONFIRM_THRESHOLD && (

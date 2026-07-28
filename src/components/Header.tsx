@@ -11,7 +11,7 @@ export default function Header({
   return (
     <header className="sticky top-0 z-20 bg-[color-mix(in_srgb,var(--surface)_88%,transparent)] backdrop-blur-[8px] backdrop-saturate-150 border-b border-border">
       <div className={`${WRAP} flex items-center gap-2 sm:gap-4 h-[62px]`}>
-        <div className="flex items-center gap-2.5 font-[750] tracking-[-0.02em] text-[1.12rem] min-w-0">
+        <div className="font-display flex items-center gap-2.5 font-[700] tracking-[-0.02em] text-[1.15rem] min-w-0">
           <span
             className="w-[30px] h-[30px] flex-none grid place-items-center bg-accent text-white rounded-lg text-[1.1rem]"
             aria-hidden="true"

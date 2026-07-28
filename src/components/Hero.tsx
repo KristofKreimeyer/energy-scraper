@@ -36,29 +36,28 @@ export default function Hero({
   stats,
 }: HeroProps) {
   return (
-    <section className={`${WRAP} pt-[34px] pb-2`} aria-labelledby="page-title">
-      <p className={`${EYEBROW} mb-2.5`}>
+    <section className={`${WRAP} hero-enter pt-[38px] pb-3`} aria-labelledby="page-title">
+      <p className={`${EYEBROW} mb-3`}>
         Energy-Drink-Angebote ·{" "}
         {timeframe === "current" ? "Diese Woche" : "Nächste Woche · Vorschau"}
       </p>
       <h1
         id="page-title"
-        className="text-[clamp(1.7rem,3.4vw,2.5rem)] leading-[1.08] tracking-[-0.025em] mb-2.5 text-balance"
+        className="text-[clamp(2rem,4.2vw,3rem)] font-[700] leading-[1.04] tracking-[-0.03em] mb-3.5 text-balance"
       >
         {timeframe === "current" ? (
           <>
-            Willkommen zur Jagd. <b>Die besten Energy-Deals</b> der Woche.
+            Willkommen zur Jagd. <b className="text-accent-strong">Die besten Energy-Deals</b> der Woche.
           </>
         ) : (
           <>
-            Die Jagd von morgen: <b>Energy-Deals</b> der nächsten Woche.
+            Die Jagd von morgen: <b className="text-accent-strong">Energy-Deals</b> der nächsten Woche.
           </>
         )}
       </h1>
-      <p className="text-muted text-[1.02rem] ">
-        Automatisch aus den Prospekten von Aldi, Kaufland, Lidl, Netto, Penny und
-        Rewe – verglichen nach Preis pro Liter. Setz dir einen Alarm und verpasse
-        keinen Drop mehr.
+      <p className="text-muted text-[1.05rem] leading-relaxed max-w-[62ch]">
+        Jede Woche automatisch aus den Prospekten von Aldi, Lidl, Rewe &amp; Co.,
+        verglichen nach Preis pro Liter.
       </p>
 
       {deal && dealSaving && (

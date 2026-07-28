@@ -1,5 +1,31 @@
 @import 'tailwindcss';
 
+/* ---- Display-Schrift (self-hosted, kein Google-Fonts-Link) ----------------
+   Space Grotesk: geometrisch, leicht eigenwillig – trägt den Dark-Tech-/
+   Jagd-Ton der Marke, ohne die Lesbarkeit der System-Sans im Fließtext zu
+   opfern. Nur für Überschriften & Wortmarke. */
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/space-grotesk-500.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/space-grotesk-600.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/space-grotesk-700.woff2') format('woff2');
+}
+
 /* ---- Design-Tokens (WCAG 2.2 AA) ----------------------------------------
    Die Farbwerte leben als CSS-Variablen, damit ein einziger Satz Utilities
    (bg-surface, text-muted …) sowohl der System-Vorgabe (prefers-color-scheme)
@@ -72,6 +98,34 @@
 @theme {
   --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', Menlo, Consolas, monospace;
+  --font-display: 'Space Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+/* Überschriften & Wortmarke tragen die Display-Schrift (Basis-Regel, damit
+   Komponenten nichts wissen müssen). */
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* Dezente Hero-Einblendung – zieht den Blick beim Laden auf die Kernaussage.
+   Nur wenn der Nutzer Motion nicht reduziert hat. */
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero-enter {
+    animation: hero-rise 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
 }
 
 /* inline = Utilities referenzieren die Runtime-Variablen direkt und schalten

@@ -8,7 +8,7 @@ export default function LegalHeader() {
       <div className={`${WRAP} flex items-center gap-4 h-[62px]`}>
         <a
           href="#"
-          className="flex items-center gap-2.5 font-[750] tracking-[-0.02em] text-[1.12rem]"
+          className="font-display flex items-center gap-2.5 font-[700] tracking-[-0.02em] text-[1.15rem]"
         >
           <span
             className="w-[30px] h-[30px] flex-none grid place-items-center bg-accent text-white rounded-lg text-[1.1rem]"

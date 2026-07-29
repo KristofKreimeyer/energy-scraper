@@ -13,7 +13,7 @@ export default function Header({
       <div className={`${WRAP} flex items-center gap-2 sm:gap-4 h-[62px]`}>
         <div className="font-display flex items-center gap-2.5 font-[700] tracking-[-0.02em] text-[1.15rem] min-w-0">
           <span
-            className="w-[30px] h-[30px] flex-none grid place-items-center bg-accent text-white rounded-lg text-[1.1rem]"
+            className="w-[30px] h-[30px] flex-none grid place-items-center bg-fill text-on-fill rounded-lg text-[1.1rem]"
             aria-hidden="true"
           >
             ⚡
@@ -23,7 +23,7 @@ export default function Header({
           </span>
         </div>
         <button
-          className="flex-none ml-auto h-10 px-3 sm:px-3.5 bg-accent text-white border border-accent rounded-[10px] text-[0.85rem] font-semibold cursor-pointer inline-flex items-center gap-1.5 hover:bg-accent-strong"
+          className="flex-none ml-auto h-10 px-3 sm:px-3.5 bg-fill text-on-fill border border-fill rounded-[10px] text-[0.85rem] font-semibold cursor-pointer inline-flex items-center gap-1.5 hover:opacity-90"
           type="button"
           onClick={onOpenCreator}
         >

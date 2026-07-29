@@ -39,7 +39,7 @@ export function AvailabilityVote({ offer, tally }: { offer: GroupedOffer; tally?
   const btn = (active: boolean) =>
     `inline-flex items-center gap-1 h-7 px-2 rounded-md border text-[0.76rem] font-semibold cursor-pointer ${
       active
-        ? "bg-accent text-white border-accent"
+        ? "bg-fill text-on-fill border-fill"
         : "bg-surface text-muted border-border-strong hover:text-ink"
     }`;
 

@@ -195,7 +195,7 @@ export function AlarmButton({ offer, embedded = false }: { offer: GroupedOffer; 
   const submitting = state.kind === "submitting";
   const seg = (active: boolean) =>
     `flex-1 h-8 text-[0.78rem] font-semibold rounded-md cursor-pointer border ${
-      active ? "bg-accent text-white border-accent" : "bg-surface text-muted border-border-strong hover:text-ink"
+      active ? "bg-fill text-on-fill border-fill" : "bg-surface text-muted border-border-strong hover:text-ink"
     }`;
   const unit = targetMetric === "liter" ? "€/L" : "€/Dose";
   const primaryLabel = channel === "telegram" ? "In Telegram öffnen" : channel === "push" ? "Push aktivieren" : "Preis-Alarm speichern";
@@ -428,7 +428,7 @@ export function AlarmButton({ offer, embedded = false }: { offer: GroupedOffer; 
         <button
           type="submit"
           disabled={submitting}
-          className="w-full h-10 text-[0.85rem] font-semibold text-white bg-accent border border-accent rounded-lg cursor-pointer hover:bg-accent-strong disabled:opacity-60"
+          className="w-full h-10 text-[0.85rem] font-semibold text-on-fill bg-fill border border-fill rounded-lg cursor-pointer hover:opacity-90 disabled:opacity-60"
         >
           {submitting ? "…" : primaryLabel}
         </button>

@@ -50,11 +50,11 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
   };
   const seg = (active: boolean) =>
     `h-8 px-3 text-[0.78rem] font-semibold rounded-md cursor-pointer border ${
-      active ? "bg-accent text-white border-accent" : "bg-surface text-muted border-border-strong hover:text-ink"
+      active ? "bg-fill text-on-fill border-fill" : "bg-surface text-muted border-border-strong hover:text-ink"
     }`;
   const chip = (active: boolean) =>
     `h-8 px-3 text-[0.78rem] font-semibold rounded-full cursor-pointer border ${
-      active ? "bg-accent text-white border-accent" : "bg-surface text-ink border-border-strong hover:border-accent"
+      active ? "bg-fill text-on-fill border-fill" : "bg-surface text-ink border-border-strong hover:border-accent"
     }`;
 
   async function save() {
@@ -312,7 +312,7 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
         )}
 
         {/* Speichern – ganz unten */}
-        <button type="button" onClick={save} disabled={submitting} className="w-full h-11 text-[0.9rem] font-semibold text-white bg-accent border border-accent rounded-lg cursor-pointer hover:bg-accent-strong disabled:opacity-60">
+        <button type="button" onClick={save} disabled={submitting} className="w-full h-11 text-[0.9rem] font-semibold text-on-fill bg-fill border border-fill rounded-lg cursor-pointer hover:opacity-90 disabled:opacity-60">
           {submitting ? "…" : "Preis-Alarm speichern"}
         </button>
 

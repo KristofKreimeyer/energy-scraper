@@ -11,7 +11,7 @@ export default function LegalHeader() {
           className="font-display flex items-center gap-2.5 font-[700] tracking-[-0.02em] text-[1.15rem]"
         >
           <span
-            className="w-[30px] h-[30px] flex-none grid place-items-center bg-accent text-white rounded-lg text-[1.1rem]"
+            className="w-[30px] h-[30px] flex-none grid place-items-center bg-fill text-on-fill rounded-lg text-[1.1rem]"
             aria-hidden="true"
           >
             ⚡

@@ -146,7 +146,7 @@ export function ReportPriceButton({ offer, embedded = false, onClose }: { offer:
         <button
           type="submit"
           disabled={submitting}
-          className="h-9 px-4 text-[0.82rem] font-semibold text-white bg-accent border border-accent rounded-lg cursor-pointer hover:bg-accent-strong disabled:opacity-60"
+          className="h-9 px-4 text-[0.82rem] font-semibold text-on-fill bg-fill border border-fill rounded-lg cursor-pointer hover:opacity-90 disabled:opacity-60"
         >
           {submitting ? "…" : "Melden"}
         </button>

@@ -21,7 +21,7 @@ const INSIGHT_COPY: Record<PriceInsight['level'], { label: string; icon: 'bolt' 
 
 /** Badge-Farben je Preisniveau. */
 const INSIGHT_BADGE: Record<PriceInsight['level'], string> = {
-  best: 'text-white bg-accent border-accent',
+  best: 'text-on-fill bg-fill border-fill',
   good: 'text-good bg-good-tint border-[color-mix(in_srgb,var(--good)_30%,transparent)]',
   normal: 'text-muted bg-surface-2 border-border',
   high: 'text-warn-ink bg-warn-tint border-[color-mix(in_srgb,var(--warn-ink)_30%,transparent)]',

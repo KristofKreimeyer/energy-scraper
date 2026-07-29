@@ -126,7 +126,7 @@ export function AccountButton() {
               <button
                 type="submit"
                 disabled={busy}
-                className="w-full h-10 text-[0.85rem] font-semibold text-white bg-accent border border-accent rounded-lg cursor-pointer hover:bg-accent-strong disabled:opacity-60"
+                className="w-full h-10 text-[0.85rem] font-semibold text-on-fill bg-fill border border-fill rounded-lg cursor-pointer hover:opacity-90 disabled:opacity-60"
               >
                 {busy ? "…" : "Anmeldelink schicken"}
               </button>

@@ -126,7 +126,7 @@ export function CardActions({
   const chip = (active: boolean) =>
     `inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md border text-[0.76rem] font-semibold cursor-pointer transition-colors duration-150 ${
       active
-        ? "bg-accent text-white border-accent"
+        ? "bg-fill text-on-fill border-fill"
         : "bg-surface text-muted border-border-strong hover:text-ink"
     }`;
 

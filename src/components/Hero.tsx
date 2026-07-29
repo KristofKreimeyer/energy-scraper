@@ -47,17 +47,17 @@ export default function Hero({
       >
         {timeframe === "current" ? (
           <>
-            Willkommen zur Jagd. <b className="text-accent-strong">Die besten Energy-Deals</b> der Woche.
+            Schnäppchenjagd auf <b className="text-accent-strong">Energy-Drinks</b>.
           </>
         ) : (
           <>
-            Die Jagd von morgen: <b className="text-accent-strong">Energy-Deals</b> der nächsten Woche.
+            Der Ausblick: <b className="text-accent-strong">Energy-Deals</b> der nächsten Woche.
           </>
         )}
       </h1>
       <p className="text-muted text-[1.05rem] leading-relaxed max-w-[62ch]">
-        Jede Woche automatisch aus den Prospekten von Aldi, Lidl, Rewe &amp; Co.,
-        verglichen nach Preis pro Liter.
+        Jede Woche automatisch aus allen Prospekten, verglichen nach Preis pro
+        Liter — das beste €/L steht oben.
       </p>
 
       {deal && dealSaving && (
@@ -71,8 +71,8 @@ export default function Hero({
           <div className="flex-1 min-w-0">
             <p className={`${EYEBROW} !text-good mb-1.5`}>
               {timeframe === "current"
-                ? "Größter Preissturz"
-                : "Größter Preissturz · nächste Woche"}
+                ? "Top-Deal der Woche"
+                : "Top-Deal · nächste Woche"}
             </p>
             <h2
               id="deal-title"
@@ -83,6 +83,17 @@ export default function Hero({
             <p className="mt-[3px] text-muted text-[0.9rem]">
               {deal.market} · {deal.unitLabel}
             </p>
+            {deal.url && (
+              <a
+                href={deal.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group mt-2 inline-flex items-center gap-1.5 text-[0.85rem] font-[650] text-good"
+              >
+                Zum Angebot bei {deal.market}
+                <span aria-hidden="true" className="transition-transform duration-150 group-hover:translate-x-[3px]">→</span>
+              </a>
+            )}
           </div>
           <div className="flex-none text-right flex flex-col gap-0.5 max-[560px]:text-left max-[560px]:w-full max-[560px]:flex-row max-[560px]:items-baseline max-[560px]:gap-2.5 max-[560px]:pt-3 max-[560px]:border-t max-[560px]:border-[color-mix(in_srgb,var(--good)_25%,transparent)]">
             <span className="font-mono text-[1.7rem] font-bold tracking-[-0.03em] tabular-nums text-ink">

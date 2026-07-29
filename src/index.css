@@ -49,9 +49,9 @@
   --warn-tint: #f6ecd6;
   --focus: #1155dd;
 
-  --radius: 14px;
-  --radius-sm: 9px;
-  --shadow: 0 1px 2px rgba(16, 21, 27, 0.06), 0 6px 20px rgba(16, 21, 27, 0.06);
+  --radius: 18px;
+  --radius-sm: 12px;
+  --shadow: 0 1px 2px rgba(16, 21, 27, 0.05), 0 10px 30px rgba(16, 21, 27, 0.10);
   --maxw: 1160px;
 
   color-scheme: light dark;
@@ -74,7 +74,7 @@
     --warn-ink: #e6b65c;
     --warn-tint: #2a2213;
     --focus: #6fa8ff;
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 14px 34px rgba(0, 0, 0, 0.4);
   }
 }
 
@@ -84,14 +84,14 @@
   --ink: #10151b; --muted: #5b6772; --border: #dbe1e7; --border-strong: #c3ccd5;
   --accent: #e24a08; --accent-strong: #b23c07; --accent-tint: #fbeae1;
   --good: #0a7a42; --good-tint: #e1f1e8; --warn-ink: #7a4b00; --warn-tint: #f6ecd6;
-  --focus: #1155dd; --shadow: 0 1px 2px rgba(16, 21, 27, 0.06), 0 6px 20px rgba(16, 21, 27, 0.06);
+  --focus: #1155dd; --shadow: 0 1px 2px rgba(16, 21, 27, 0.05), 0 10px 30px rgba(16, 21, 27, 0.10);
 }
 :root[data-theme='dark'] {
   --ground: #0d1116; --surface: #151b22; --surface-2: #1b222b;
   --ink: #e8edf2; --muted: #9aa6b1; --border: #29323c; --border-strong: #3a4653;
   --accent: #ff6a33; --accent-strong: #ff7a45; --accent-tint: #2a1810;
   --good: #35c978; --good-tint: #10281c; --warn-ink: #e6b65c; --warn-tint: #2a2213;
-  --focus: #6fa8ff; --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px rgba(0, 0, 0, 0.35);
+  --focus: #6fa8ff; --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 14px 34px rgba(0, 0, 0, 0.4);
 }
 
 /* ---- Tokens für Tailwind-Utilities verfügbar machen --------------------- */

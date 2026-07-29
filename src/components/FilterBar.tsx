@@ -23,7 +23,7 @@ export default function FilterBar({
     (market !== "all" ? 1 : 0) + (brand !== "all" ? 1 : 0);
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <div className="flex items-center gap-2 flex-1 basis-[220px] min-w-[180px] bg-surface border border-border-strong rounded-[10px] px-3 h-11">
+      <div className="flex items-center gap-2 flex-1 basis-[220px] min-w-[180px] bg-surface border border-border-strong rounded-[14px] px-3 h-11">
         <svg
           width="18"
           height="18"
@@ -51,7 +51,7 @@ export default function FilterBar({
         type="button"
         onClick={onOpenFilters}
         aria-haspopup="dialog"
-        className="flex-none h-11 px-3.5 inline-flex items-center gap-1.5 text-[0.85rem] font-semibold rounded-[10px] border bg-surface text-ink border-border-strong hover:bg-surface-2"
+        className="flex-none h-11 px-3.5 inline-flex items-center gap-1.5 text-[0.85rem] font-semibold rounded-[14px] border bg-surface text-ink border-border-strong hover:bg-surface-2"
       >
         <svg
           width="17"
@@ -68,13 +68,13 @@ export default function FilterBar({
         </svg>
         Filtern
         {activeFilterCount > 0 && (
-          <span className="ml-0.5 text-[0.7rem] font-mono font-bold text-white bg-accent rounded-full min-w-[18px] text-center px-1">
+          <span className="ml-0.5 text-[0.7rem] font-mono font-bold text-on-fill bg-fill rounded-full min-w-[18px] text-center px-1">
             {activeFilterCount}
           </span>
         )}
       </button>
       <div
-        className="flex items-center gap-1 ml-auto"
+        className="flex items-center gap-1 ml-auto p-1 bg-surface-2 border border-border rounded-[14px]"
         role="group"
         aria-label="Ansicht wählen"
       >
@@ -83,7 +83,7 @@ export default function FilterBar({
           aria-pressed={view === "grid"}
           aria-label="Kachelansicht"
           onClick={() => onViewChange("grid")}
-          className={`h-11 w-11 grid place-items-center rounded-[10px] border ${view === "grid" ? "bg-accent text-white border-accent" : "bg-surface text-muted border-border-strong hover:text-ink"}`}
+          className={`h-9 w-9 grid place-items-center rounded-[11px] transition-colors duration-150 ${view === "grid" ? "bg-fill text-on-fill" : "bg-transparent text-muted hover:text-ink"}`}
         >
           <svg
             width="18"
@@ -105,7 +105,7 @@ export default function FilterBar({
           aria-pressed={view === "list"}
           aria-label="Listenansicht"
           onClick={() => onViewChange("list")}
-          className={`h-11 w-11 grid place-items-center rounded-[10px] border ${view === "list" ? "bg-accent text-white border-accent" : "bg-surface text-muted border-border-strong hover:text-ink"}`}
+          className={`h-9 w-9 grid place-items-center rounded-[11px] transition-colors duration-150 ${view === "list" ? "bg-fill text-on-fill" : "bg-transparent text-muted hover:text-ink"}`}
         >
           <svg
             width="18"

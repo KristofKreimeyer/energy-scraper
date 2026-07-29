@@ -43,6 +43,8 @@
   --accent: #e24a08; /* Signal-Orange: nur groß oder als Fläche mit weißem Text */
   --accent-strong: #b23c07; /* Text/Links auf hellem Grund */
   --accent-tint: #fbeae1;
+  --fill: #b23c07; /* gefüllte Akzentfläche (aktive Segmente/Chips), AA mit --on-fill */
+  --on-fill: #ffffff;
   --good: #0a7a42; /* semantisch: bester Grundpreis */
   --good-tint: #e1f1e8;
   --warn-ink: #7a4b00;
@@ -69,6 +71,8 @@
     --accent: #ff6a33;
     --accent-strong: #ff7a45;
     --accent-tint: #2a1810;
+    --fill: #ff6a33;
+    --on-fill: #10151b;
     --good: #35c978;
     --good-tint: #10281c;
     --warn-ink: #e6b65c;
@@ -82,14 +86,14 @@
 :root[data-theme='light'] {
   --ground: #edf0f3; --surface: #ffffff; --surface-2: #f4f6f8;
   --ink: #10151b; --muted: #5b6772; --border: #dbe1e7; --border-strong: #c3ccd5;
-  --accent: #e24a08; --accent-strong: #b23c07; --accent-tint: #fbeae1;
+  --accent: #e24a08; --accent-strong: #b23c07; --accent-tint: #fbeae1; --fill: #b23c07; --on-fill: #ffffff;
   --good: #0a7a42; --good-tint: #e1f1e8; --warn-ink: #7a4b00; --warn-tint: #f6ecd6;
   --focus: #1155dd; --shadow: 0 1px 2px rgba(16, 21, 27, 0.05), 0 10px 30px rgba(16, 21, 27, 0.10);
 }
 :root[data-theme='dark'] {
   --ground: #0d1116; --surface: #151b22; --surface-2: #1b222b;
   --ink: #e8edf2; --muted: #9aa6b1; --border: #29323c; --border-strong: #3a4653;
-  --accent: #ff6a33; --accent-strong: #ff7a45; --accent-tint: #2a1810;
+  --accent: #ff6a33; --accent-strong: #ff7a45; --accent-tint: #2a1810; --fill: #ff6a33; --on-fill: #10151b;
   --good: #35c978; --good-tint: #10281c; --warn-ink: #e6b65c; --warn-tint: #2a2213;
   --focus: #6fa8ff; --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 14px 34px rgba(0, 0, 0, 0.4);
 }
@@ -141,6 +145,8 @@ h3,
   --color-accent: var(--accent);
   --color-accent-strong: var(--accent-strong);
   --color-accent-tint: var(--accent-tint);
+  --color-fill: var(--fill);
+  --color-on-fill: var(--on-fill);
   --color-good: var(--good);
   --color-good-tint: var(--good-tint);
   --color-warn-ink: var(--warn-ink);
@@ -233,4 +239,20 @@ h3,
     outline: 3px solid var(--focus);
     outline-offset: 2px;
   }
+}
+
+/* ---- Live-Preis-Ticker (Redesign) --------------------------------------- */
+@keyframes ticker-marq {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+.ticker-track {
+  display: inline-block;
+  white-space: nowrap;
+  padding-left: 100%;
+  animation: ticker-marq 34s linear infinite;
+}
+/* Ticker lebt von der Bewegung – bei reduzierter Motion ganz ausblenden. */
+@media (prefers-reduced-motion: reduce) {
+  .app-ticker { display: none; }
 }

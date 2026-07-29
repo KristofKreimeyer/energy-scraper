@@ -11,6 +11,7 @@ import ControlsBar from "./components/ControlsBar";
 import FilterOverlay from "./components/FilterOverlay";
 import Hero from "./components/Hero";
 import OfferList from "./components/OfferList";
+import Ticker from "./components/Ticker";
 import SkipLink from "./components/SkipLink";
 import { useOfferBrowser } from "./hooks/useOfferBrowser";
 import { useCommunityReports } from "./hooks/useCommunityReports";
@@ -84,6 +85,8 @@ function App() {
       <PayBanner />
 
       <Header onOpenCreator={() => setShowCreator(true)} />
+
+      <Ticker offers={offers} />
 
       <main id="main">
         <Hero

@@ -39,7 +39,7 @@ export default function ControlsBar({
     <div className="sticky top-[62px] z-[15] bg-[color-mix(in_srgb,var(--ground)_92%,transparent)] backdrop-blur-[6px] py-4 mt-[30px] border-b border-border">
       <div className={WRAP}>
         <div
-          className="inline-flex gap-1 p-1 mb-3.5 bg-surface-2 border border-border rounded-xl"
+          className="inline-flex gap-1 p-1 mb-3.5 bg-surface-2 border border-border rounded-[14px]"
           role="group"
           aria-label="Zeitraum wählen"
         >
@@ -47,12 +47,12 @@ export default function ControlsBar({
             <button
               key={t.value}
               type="button"
-              className="group inline-flex items-center gap-2 min-h-10 px-4 bg-transparent text-muted border-0 rounded-[9px] text-[0.9rem] font-[650] cursor-pointer hover:text-ink aria-pressed:bg-surface aria-pressed:text-ink aria-pressed:shadow-card"
+              className="group inline-flex items-center gap-2 min-h-10 px-4 bg-transparent text-muted border-0 rounded-[11px] text-[0.9rem] font-[650] cursor-pointer transition-colors duration-150 hover:text-ink aria-pressed:bg-fill aria-pressed:text-on-fill"
               aria-pressed={timeframe === t.value}
               onClick={() => onTimeframeChange(t.value)}
             >
               {t.label}
-              <span className="font-mono text-[0.74rem] tabular-nums text-muted bg-ground rounded-full px-[7px] py-px group-aria-pressed:text-accent-strong group-aria-pressed:bg-accent-tint">
+              <span className="font-mono text-[0.74rem] tabular-nums text-muted bg-ground rounded-full px-[7px] py-px group-aria-pressed:text-on-fill group-aria-pressed:bg-[color-mix(in_srgb,var(--on-fill)_16%,transparent)]">
                 {timeframeCounts[t.value]}
               </span>
             </button>

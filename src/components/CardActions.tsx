@@ -124,7 +124,7 @@ export function CardActions({
   const shareText = `${offer.brand} ${offer.title} bei ${offer.market} für ${formatEuro(offer.perUnit)}${perLiter} – gefunden auf EnergyHunt`;
 
   const chip = (active: boolean) =>
-    `inline-flex items-center gap-1.5 h-8 px-2.5 rounded-md border text-[0.76rem] font-semibold cursor-pointer transition-colors duration-150 ${
+    `inline-flex items-center gap-1 h-8 px-2 rounded-lg border text-[0.75rem] font-semibold cursor-pointer transition-colors duration-150 ${
       active
         ? "bg-fill text-on-fill border-fill"
         : "bg-surface text-muted border-border-strong hover:text-ink"

@@ -192,7 +192,7 @@ export function OfferCard({ offer, isBest, view = 'grid', reports, votes }: Prop
                 <span className="font-mono text-[0.68rem] tracking-[0.08em] uppercase text-accent-strong font-bold">{offer.brand}</span>
                 <span className="text-[0.66rem] font-bold text-muted border border-border-strong rounded px-1.5 py-px">{offer.market}</span>
                 {isBest && (
-                  <span className="inline-flex items-center gap-[3px] bg-good text-white text-[0.6rem] font-bold px-1.5 py-px rounded">
+                  <span className="inline-flex items-center gap-[3px] bg-good text-ground text-[0.6rem] font-bold px-1.5 py-px rounded">
                     <CheckIcon />
                     Bester €/L
                   </span>
@@ -256,7 +256,7 @@ export function OfferCard({ offer, isBest, view = 'grid', reports, votes }: Prop
             {offer.market}
           </span>
           {isBest && (
-            <span className="absolute right-2.5 top-2.5 inline-flex items-center gap-[5px] bg-good text-white text-[0.7rem] font-bold tracking-[0.03em] px-[9px] py-1 rounded-[7px]">
+            <span className="absolute right-2.5 top-2.5 inline-flex items-center gap-[5px] bg-good text-ground text-[0.7rem] font-bold tracking-[0.03em] px-[9px] py-1 rounded-[7px]">
               <CheckIcon />
               Bester €/L
             </span>
@@ -276,7 +276,7 @@ export function OfferCard({ offer, isBest, view = 'grid', reports, votes }: Prop
           )}
         </div>
 
-        <div className="pt-[14px] px-[15px] pb-4 flex flex-col gap-1 flex-1">
+        <div className="pt-4 px-[18px] pb-5 flex flex-col gap-1 flex-1">
           <span className="font-mono text-[0.72rem] tracking-[0.08em] uppercase text-accent-strong font-bold">
             {offer.brand}
           </span>

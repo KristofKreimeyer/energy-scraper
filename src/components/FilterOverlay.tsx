@@ -18,9 +18,9 @@ const SORT_OPTIONS: { value: SortKey; text: string }[] = [
 // Chip-Grundstil (Markt- & Marken-Filter) – Zustände via aria-pressed/disabled
 const chip =
   "group inline-flex items-center gap-[7px] min-h-[38px] px-3.5 bg-surface text-ink border border-border-strong " +
-  "rounded-full text-[0.85rem] font-semibold cursor-pointer enabled:aria-[pressed=false]:hover:bg-surface-2 " +
-  "aria-pressed:bg-accent aria-pressed:text-white aria-pressed:border-accent " +
-  "aria-pressed:hover:bg-accent-strong aria-pressed:hover:border-accent-strong " +
+  "rounded-full text-[0.85rem] font-semibold cursor-pointer transition-colors duration-150 enabled:aria-[pressed=false]:hover:bg-surface-2 " +
+  "aria-pressed:bg-fill aria-pressed:text-on-fill aria-pressed:border-fill " +
+  "aria-pressed:hover:opacity-90 " +
   "disabled:opacity-40 disabled:cursor-not-allowed";
 const chipCount =
   "font-mono text-[0.74rem] opacity-75 tabular-nums group-aria-pressed:opacity-90";
@@ -212,7 +212,7 @@ export default function FilterOverlay({
         <button
           type="button"
           onClick={onClose}
-          className="h-10 px-5 text-[0.85rem] font-semibold text-white bg-accent border border-accent rounded-lg cursor-pointer hover:bg-accent-strong"
+          className="h-10 px-5 text-[0.85rem] font-semibold text-on-fill bg-fill border border-fill rounded-[12px] cursor-pointer hover:opacity-90"
         >
           {visibleCount} {visibleCount === 1 ? "Angebot" : "Angebote"} zeigen
         </button>

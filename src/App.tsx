@@ -12,6 +12,7 @@ import FilterOverlay from "./components/FilterOverlay";
 import Hero from "./components/Hero";
 import OfferList from "./components/OfferList";
 import Ticker from "./components/Ticker";
+import TrustCards from "./components/TrustCards";
 import SkipLink from "./components/SkipLink";
 import { useOfferBrowser } from "./hooks/useOfferBrowser";
 import { useCommunityReports } from "./hooks/useCommunityReports";
@@ -119,6 +120,8 @@ function App() {
           communityReports={communityReports}
           communityVotes={communityVotes}
         />
+
+        <TrustCards />
       </main>
 
       <Footer />

@@ -475,6 +475,26 @@ app.get('/api/votes', async (c) => {
   return c.json({ votes }, 200, { 'cache-control': 'public, max-age=60' })
 })
 
+// Community-Zusammenfassung für die Vertrauens-Karten der Startseite:
+// Gesamtzahl „noch verfügbar"-Bestätigungen im Fenster + jüngster freigegebener
+// Community-Fund. Beide Teile können null/0 sein (dann blendet die UI sie aus).
+app.get('/api/community/summary', async (c) => {
+  const db = c.env.DB
+  const since = new Date(Date.now() - VOTE_WINDOW_DAYS * 86_400_000).toISOString()
+  const conf = await db.prepare("SELECT COUNT(*) AS n FROM availability_votes WHERE vote=1 AND created_at>?").bind(since).first<{ n: number }>()
+  const fund = await db
+    .prepare("SELECT brand, title, market, reported_price, store_location, note FROM price_reports WHERE status='approved' ORDER BY created_at DESC LIMIT 1")
+    .first<{ brand: string; title: string; market: string; reported_price: number; store_location: string | null; note: string | null }>()
+  return c.json(
+    {
+      confirmed: conf?.n ?? 0,
+      fund: fund ? { brand: fund.brand, title: fund.title, market: fund.market, price: fund.reported_price, storeLocation: fund.store_location, note: fund.note } : null,
+    },
+    200,
+    { 'cache-control': 'public, max-age=120' },
+  )
+})
+
 // --- Moderation (tokengeschützt) -------------------------------------------
 const esc = (s: string) => s.replace(/[&<>"]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[m]!)
 

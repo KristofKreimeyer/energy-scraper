@@ -162,7 +162,11 @@ h3,
 @layer base {
   body {
     margin: 0;
-    background: var(--ground);
+    background:
+      radial-gradient(72% 55% at 88% -8%, color-mix(in srgb, var(--accent) 11%, transparent), transparent 55%),
+      radial-gradient(65% 60% at 3% 108%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 55%),
+      var(--ground);
+    background-attachment: fixed;
     color: var(--ink);
     font-family: var(--font-sans);
     font-size: 16px;
@@ -210,6 +214,22 @@ h3,
 
 /* ---- Widgets, die als reine Utilities unleserlich/unmöglich wären ------- */
 @layer components {
+  /* Frosted-Glass-Fläche: halbtransparent + Blur, damit der ambiente
+     Hintergrund-Verlauf durchscheint. Fallback für reduzierte Transparenz. */
+  .glass-card {
+    background: color-mix(in srgb, var(--surface) 68%, transparent);
+    backdrop-filter: blur(16px) saturate(1.25);
+    border: 1px solid color-mix(in srgb, var(--ink) 9%, transparent);
+  }
+  @supports (prefers-reduced-transparency: reduce) {
+    @media (prefers-reduced-transparency: reduce) {
+      .glass-card {
+        background: var(--surface);
+        backdrop-filter: none;
+      }
+    }
+  }
+
   /* Platzhalter-Dose (Pseudo-Element, wenn kein Produktbild vorliegt) */
   .can {
     width: 46px;

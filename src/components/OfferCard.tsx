@@ -175,7 +175,7 @@ export function OfferCard({ offer, isBest, view = 'grid', reports, votes }: Prop
     return (
       <li>
         <article
-          className="offer-card group relative flex flex-col gap-2 bg-surface border border-border rounded-card p-3 shadow-card transition-[border-color] duration-150 hover:border-border-strong focus-within:border-focus"
+          className="offer-card glass-card group relative flex flex-col gap-2 rounded-card p-3 shadow-card transition-[border-color] duration-150 hover:border-border-strong focus-within:border-focus"
           aria-label={alt}
         >
           <div className="flex items-center gap-3">
@@ -248,10 +248,10 @@ export function OfferCard({ offer, isBest, view = 'grid', reports, votes }: Prop
   return (
     <li className="flex">
       <article
-        className="offer-card group relative flex flex-col h-full w-full bg-surface border border-border rounded-card overflow-hidden shadow-card transition-[transform,border-color] duration-150 hover:-translate-y-[3px] hover:border-border-strong focus-within:border-focus"
+        className="offer-card glass-card group relative flex flex-col h-full w-full rounded-card overflow-hidden shadow-card transition-[transform,border-color] duration-150 hover:-translate-y-[3px] hover:border-border-strong focus-within:border-focus"
         aria-label={alt}
       >
-        <div className="relative aspect-[5/4] bg-surface-2 grid place-items-center border-b border-border overflow-hidden">
+        <div className="relative h-[200px] bg-[color-mix(in_srgb,var(--surface-2)_55%,transparent)] grid place-items-center border-b border-border overflow-hidden">
           <span className="absolute left-2.5 top-2.5 text-[0.72rem] font-bold bg-surface text-ink border border-border-strong rounded-[7px] px-2 py-[3px]">
             {offer.market}
           </span>

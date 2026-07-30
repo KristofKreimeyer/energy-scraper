@@ -368,6 +368,11 @@ export function OfferCard({ offer, isBest, view = 'grid', reports, votes }: Prop
 
           {communityBlock && <div className="mt-2.5">{communityBlock}</div>}
 
+          {/* Dehnt sich: fehlende App-/Rabatt-Zeilen erzeugen den Leerraum HIER,
+              damit Gültigkeits-Badge, Aktionen und CTA kartenübergreifend bündig
+              am unteren Rand sitzen. */}
+          <div className="flex-1" aria-hidden="true" />
+
           <div className="mt-3">{validBadge}</div>
 
           <div className="mt-3">
@@ -377,7 +382,7 @@ export function OfferCard({ offer, isBest, view = 'grid', reports, votes }: Prop
           {offer.url && (
             <a
               data-cta=""
-              className="mt-auto pt-3 border-t border-border text-accent-strong text-[0.84rem] font-[650] no-underline inline-flex items-center gap-1.5 after:content-[''] after:absolute after:inset-0 after:rounded-card group-hover:text-accent focus-visible:outline-none"
+              className="mt-3 pt-3 border-t border-border text-accent-strong text-[0.84rem] font-[650] no-underline inline-flex items-center gap-1.5 after:content-[''] after:absolute after:inset-0 after:rounded-card group-hover:text-accent focus-visible:outline-none"
               href={offer.url}
               target="_blank"
               rel="noopener noreferrer"

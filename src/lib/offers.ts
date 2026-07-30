@@ -91,15 +91,34 @@ export interface GroupedOffer extends Offer {
 }
 
 /**
+ * Kanonisches Gebinde-Volumen (Liter, gerundet) aus dem Gebinde-Freitext –
+ * damit identische Mengen in unterschiedlicher Schreibweise („0,25-L-Dose" vs.
+ * „250-ml-Dose") denselben Gruppenschlüssel ergeben. Fällt auf den getrimmten
+ * Rohstring zurück, wenn kein Volumen erkennbar ist.
+ */
+function canonicalUnit(unitLabel: string): string {
+  const s = String(unitLabel ?? '').toLowerCase()
+  const m = s.match(/(\d+(?:[.,]\d+)?)\s*-?\s*(ml|liter|l)(?![a-z])/)
+  if (m) {
+    let vol = parseFloat(m[1].replace(',', '.'))
+    if (m[2] === 'ml') vol /= 1000
+    if (vol > 0) return `${Math.round(vol * 1000)}ml`
+  }
+  return s.trim()
+}
+
+/**
  * Fasst identisch bepreiste Sorten desselben Produkts (gleicher Markt, Marke,
  * Preis und Gebinde) zu einer repräsentativen Karte zusammen – z. B. die drei
- * Rockstar-Sorten bei Aldi Nord (alle 0,79 € / 1,58 €/L). Als Repräsentant
- * wird bevorzugt die „Original"-Sorte gewählt, sonst die erste.
+ * Rockstar-Sorten bei Aldi Nord (alle 0,79 € / 1,58 €/L). Das Gebinde wird auf
+ * ein kanonisches Volumen normalisiert, damit gleiche Mengen in verschiedener
+ * Schreibweise nicht zu doppelten Karten führen. Als Repräsentant wird bevorzugt
+ * die „Original"-Sorte gewählt, sonst die erste.
  */
 export function groupOffers(list: Offer[]): GroupedOffer[] {
   const groups = new Map<string, Offer[]>()
   for (const o of list) {
-    const key = `${o.market}|${o.brand}|${o.price}|${o.unitLabel}`
+    const key = `${o.market}|${o.brand}|${o.price}|${canonicalUnit(o.unitLabel)}`
     const arr = groups.get(key)
     if (arr) arr.push(o)
     else groups.set(key, [o])

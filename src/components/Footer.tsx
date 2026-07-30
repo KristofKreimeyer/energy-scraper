@@ -14,7 +14,9 @@ export default function Footer() {
       <div
         className={`${WRAP} flex flex-wrap gap-x-[18px] gap-y-2 items-center`}
       >
-        <span>EnergyHunt — Angebotsübersicht</span>
+        <span className="font-display font-bold text-ink inline-flex items-center gap-2">
+          <span aria-hidden="true">⚡</span>EnergyHunt
+        </span>
         <a
           className="hover:text-accent-strong underline underline-offset-2"
           href="#/impressum"
@@ -40,7 +42,8 @@ export default function Footer() {
           Widerruf
         </a>
         <span className="font-mono text-[0.76rem] basis-full">
-          Datenquelle: energy-scraper · captured/*.json · Stand {generatedLabel}
+          Datenquelle: Wochenprospekte · Stand {generatedLabel} · unabhängig,
+          nicht von Monster, Red Bull, Rockstar oder GÖNRGY autorisiert.
         </span>
       </div>
     </footer>

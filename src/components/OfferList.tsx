@@ -66,7 +66,7 @@ export default function OfferList({
           className={`list-none mt-1.5 p-0 ${
             view === "list"
               ? "flex flex-col gap-2.5"
-              : "grid gap-5 grid-cols-1 md:grid-cols-2 items-start"
+              : "grid gap-5 grid-cols-1 md:grid-cols-2"
           }`}
           aria-label="Energy-Drink-Angebote"
         >

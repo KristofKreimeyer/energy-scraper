@@ -377,7 +377,7 @@ export function OfferCard({ offer, isBest, view = 'grid', reports, votes }: Prop
           {offer.url && (
             <a
               data-cta=""
-              className="mt-3.5 pt-3 border-t border-border text-accent-strong text-[0.84rem] font-[650] no-underline inline-flex items-center gap-1.5 after:content-[''] after:absolute after:inset-0 after:rounded-card group-hover:text-accent focus-visible:outline-none"
+              className="mt-auto pt-3 border-t border-border text-accent-strong text-[0.84rem] font-[650] no-underline inline-flex items-center gap-1.5 after:content-[''] after:absolute after:inset-0 after:rounded-card group-hover:text-accent focus-visible:outline-none"
               href={offer.url}
               target="_blank"
               rel="noopener noreferrer"

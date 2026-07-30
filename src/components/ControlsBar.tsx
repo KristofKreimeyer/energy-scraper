@@ -37,9 +37,9 @@ export default function ControlsBar({
 }: ControlsBarProps) {
   return (
     <div className="sticky top-[62px] z-[15] bg-[color-mix(in_srgb,var(--ground)_92%,transparent)] backdrop-blur-[6px] py-4 mt-[30px] border-b border-border">
-      <div className={WRAP}>
+      <div className={`${WRAP} flex flex-wrap items-center gap-3`}>
         <div
-          className="inline-flex gap-1 p-1 mb-3.5 bg-surface-2 border border-border rounded-[14px]"
+          className="inline-flex flex-none gap-1 p-1 bg-surface-2 border border-border rounded-[14px]"
           role="group"
           aria-label="Zeitraum wählen"
         >
@@ -58,15 +58,17 @@ export default function ControlsBar({
             </button>
           ))}
         </div>
-        <FilterBar
-          market={market}
-          brand={brand}
-          query={query}
-          onQueryChange={onQueryChange}
-          onOpenFilters={onOpenFilters}
-          view={view}
-          onViewChange={onViewChange}
-        />
+        <div className="flex-1 min-w-[260px]">
+          <FilterBar
+            market={market}
+            brand={brand}
+            query={query}
+            onQueryChange={onQueryChange}
+            onOpenFilters={onOpenFilters}
+            view={view}
+            onViewChange={onViewChange}
+          />
+        </div>
       </div>
     </div>
   );

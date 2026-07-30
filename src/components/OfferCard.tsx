@@ -113,11 +113,13 @@ interface Props {
   offer: GroupedOffer
   isBest: boolean
   view?: 'grid' | 'list'
+  /** Reihen-Nachbar (md+) hat eine Sorten-Zeile → Höhe reservieren, falls diese Karte keine hat. */
+  rowHasVariant?: boolean
   reports?: CommunityReport[]
   votes?: VoteTally
 }
 
-export function OfferCard({ offer, isBest, view = 'grid', reports, votes }: Props) {
+export function OfferCard({ offer, isBest, view = 'grid', rowHasVariant = false, reports, votes }: Props) {
   const { label: validLabel, ending, upcoming } = validity(offer)
   const saved = savings(offer)
   const insight = priceInsight(offer)
@@ -282,12 +284,19 @@ export function OfferCard({ offer, isBest, view = 'grid', reports, votes }: Prop
           </span>
           <h3 className="text-base leading-[1.25] tracking-[-0.01em]">{offer.title}</h3>
           {extraVariants > 0 && (
-            <span
-              className="self-start mt-[5px] text-[0.76rem] text-muted cursor-default"
-              title={offer.variantTitles.join(', ')}
-              aria-label={`${offer.variantCount} Sorten zum gleichen Preis: ${offer.variantTitles.join(', ')}`}
-            >
-              {offer.variantCount} Sorten · gleicher Preis
+          <span
+            className="self-start mt-[5px] text-[0.76rem] text-muted cursor-default"
+            title={offer.variantTitles.join(', ')}
+            aria-label={`${offer.variantCount} Sorten zum gleichen Preis: ${offer.variantTitles.join(', ')}`}
+          >
+            {offer.variantCount} Sorten · gleicher Preis
+          </span>
+          )}
+          {extraVariants <= 0 && rowHasVariant && (
+            // Platzhalter: fluchtet den Preisblock mit der Nachbarkarte, die
+            // eine Sorten-Zeile hat. Nur im Zweispalter (md+) sichtbar.
+            <span className="hidden md:block self-start mt-[5px] text-[0.76rem]" aria-hidden="true">
+              {' '}
             </span>
           )}
 

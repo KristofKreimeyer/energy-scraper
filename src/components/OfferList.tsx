@@ -70,16 +70,25 @@ export default function OfferList({
           }`}
           aria-label="Energy-Drink-Angebote"
         >
-          {offers.map((offer) => (
-            <OfferCard
-              key={offer.id}
-              offer={offer}
-              isBest={offer.id === bestId}
-              view={view}
-              reports={communityReports[productKey(offer)]}
-              votes={communityVotes[productKey(offer)]}
-            />
-          ))}
+          {offers.map((offer, i) => {
+            // Im Zweispalter (md+) bilden aufeinanderfolgende Karten ein Paar.
+            // Hat eine der beiden die „X Sorten"-Zeile, reserviert die andere
+            // deren Höhe, damit die Preisblöcke der Reihe fluchten.
+            const partner = offers[i % 2 === 0 ? i + 1 : i - 1];
+            const rowHasVariant =
+              offer.variantCount > 1 || (partner?.variantCount ?? 0) > 1;
+            return (
+              <OfferCard
+                key={offer.id}
+                offer={offer}
+                isBest={offer.id === bestId}
+                view={view}
+                rowHasVariant={rowHasVariant}
+                reports={communityReports[productKey(offer)]}
+                votes={communityVotes[productKey(offer)]}
+              />
+            );
+          })}
         </ul>
       ) : (
         <p className="mt-1.5 px-5 py-12 text-center text-muted border border-dashed border-border-strong rounded-card">

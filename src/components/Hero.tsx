@@ -116,7 +116,7 @@ export default function Hero({
 
       {stats ? (
         <ul className="list-none mt-8 p-0 grid gap-4 grid-cols-4 max-[780px]:grid-cols-2 max-[430px]:grid-cols-1">
-          <li className="bg-surface border border-[color-mix(in_srgb,var(--accent)_55%,var(--border))] rounded-card px-4 pt-4 pb-[15px] shadow-card flex flex-col gap-0.5">
+          <li className="glass-card border-[color-mix(in_srgb,var(--accent)_55%,var(--border))] rounded-card px-4 pt-4 pb-[15px] shadow-card flex flex-col gap-0.5">
             <span className={`${EYEBROW} !text-[0.68rem] !tracking-[0.1em]`}>
               Günstigste Dose
             </span>
@@ -130,7 +130,7 @@ export default function Hero({
                 : stats.cheapest.unitLabel}
             </span>
           </li>
-          <li className="bg-surface border border-border rounded-card px-4 pt-4 pb-[15px] shadow-card flex flex-col gap-0.5">
+          <li className="glass-card rounded-card px-4 pt-4 pb-[15px] shadow-card flex flex-col gap-0.5">
             <span className={`${EYEBROW} !text-[0.68rem] !tracking-[0.1em]`}>
               Bester Grundpreis
             </span>
@@ -155,7 +155,7 @@ export default function Hero({
               </>
             )}
           </li>
-          <li className="bg-surface border border-border rounded-card px-4 pt-4 pb-[15px] shadow-card flex flex-col gap-0.5">
+          <li className="glass-card rounded-card px-4 pt-4 pb-[15px] shadow-card flex flex-col gap-0.5">
             <span className={`${EYEBROW} !text-[0.68rem] !tracking-[0.1em]`}>
               Preisspanne pro Liter
             </span>
@@ -181,7 +181,7 @@ export default function Hero({
               </>
             )}
           </li>
-          <li className="bg-surface border border-border rounded-card px-4 pt-4 pb-[15px] shadow-card flex flex-col gap-0.5">
+          <li className="glass-card rounded-card px-4 pt-4 pb-[15px] shadow-card flex flex-col gap-0.5">
             <span className={`${EYEBROW} !text-[0.68rem] !tracking-[0.1em]`}>
               Typischer Grundpreis
             </span>

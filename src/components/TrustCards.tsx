@@ -16,7 +16,7 @@ export default function TrustCards() {
     <section className={`${WRAP} mt-9`} aria-label="Von der Community">
       <div className="grid gap-4 grid-cols-2 max-[560px]:grid-cols-1">
         {showFund && fund && (
-          <div className="rounded-card border border-border bg-surface p-5 shadow-card">
+          <div className="glass-card rounded-card p-5 shadow-card">
             <div className="text-[0.7rem] font-semibold uppercase tracking-[0.1em] text-accent-strong">
               🏷 Community-Fund
             </div>
@@ -30,7 +30,7 @@ export default function TrustCards() {
           </div>
         )}
         {showConfirmed && (
-          <div className="rounded-card border border-border bg-surface p-5 shadow-card">
+          <div className="glass-card rounded-card p-5 shadow-card">
             <div className="text-[0.7rem] font-semibold uppercase tracking-[0.1em] text-good">
               ✅ Von der Community bestätigt
             </div>

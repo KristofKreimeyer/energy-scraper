@@ -268,7 +268,7 @@ export function OfferCard({ offer, isBest, view = 'grid', reports, votes }: Prop
               loading="lazy"
               width="200"
               height="160"
-              className="w-full h-full object-contain p-3"
+              className="max-h-[176px] max-w-full w-auto h-auto object-contain p-2"
               onError={() => setImgFailed(true)}
             />
           ) : (
@@ -291,7 +291,7 @@ export function OfferCard({ offer, isBest, view = 'grid', reports, votes }: Prop
             </span>
           )}
 
-          <div className="flex items-baseline gap-3.5 mt-auto pt-3">
+          <div className="flex items-baseline gap-3.5 pt-3">
             <span className="flex flex-col gap-px flex-1 min-w-0">
               <span className="font-mono text-[1.45rem] font-bold tracking-[-0.02em] tabular-nums text-ink whitespace-nowrap">
                 {formatEuro(offer.perUnit)}

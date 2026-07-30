@@ -54,6 +54,7 @@ export function AccountButton() {
     <>
       <button
         type="button"
+        id="account-trigger"
         onClick={onOpen}
         aria-label={user ? "Konto" : "Anmelden"}
         className="flex-none h-10 px-3 min-w-[44px] justify-center bg-surface text-ink border border-border-strong rounded-[10px] text-[0.85rem] font-semibold cursor-pointer inline-flex items-center gap-[7px] hover:bg-surface-2 max-w-[160px]"

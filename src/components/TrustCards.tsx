@@ -18,7 +18,7 @@ export default function TrustCards() {
         {showFund && fund && (
           <div className="glass-card rounded-card p-5 shadow-card">
             <div className="text-[0.7rem] font-semibold uppercase tracking-[0.1em] text-accent-strong">
-              🏷 Community-Fund
+              🏷 Community-Fund der Woche
             </div>
             <p className="mt-2 font-semibold text-ink leading-snug">
               {fund.note ? `„${fund.note}"` : `${formatEuro(fund.price)} bei ${fund.market}`}
@@ -38,7 +38,14 @@ export default function TrustCards() {
               {confirmed.toLocaleString("de-DE")}×
             </div>
             <p className="text-[0.85rem] text-muted">
-              Preise diese Woche von Leuten vor Ort bestätigt.
+              Preise diese Woche von Leuten vor Ort bestätigt.{" "}
+              <button
+                type="button"
+                onClick={() => document.getElementById("account-trigger")?.click()}
+                className="font-semibold text-accent-strong underline underline-offset-2 hover:text-accent"
+              >
+                Deine Beiträge &amp; dein Sparfuchs-Level gibt es im Konto&nbsp;→
+              </button>
             </p>
           </div>
         )}

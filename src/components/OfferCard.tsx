@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import {
   formatEuro,
   validity,
@@ -40,12 +39,6 @@ const VALID_VARIANT = {
   ending: 'bg-warn-tint text-warn-ink border-[color-mix(in_srgb,var(--warn-ink)_30%,transparent)]',
   upcoming: 'bg-accent-tint text-accent-strong border-[color-mix(in_srgb,var(--accent-strong)_30%,transparent)]',
 }
-
-const CheckIcon = () => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" aria-hidden="true">
-    <path d="M5 12l4 4L19 6" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-)
 
 const ArrowIcon = () => (
   <svg
@@ -125,11 +118,23 @@ export function OfferCard({ offer, isBest, view = 'grid', rowHasVariant = false,
   const insight = priceInsight(offer)
   const extraVariants = offer.variantCount - 1
   const isMulti = offer.unitCount > 1
-  const [imgFailed, setImgFailed] = useState(false)
-  const showImage = offer.imageUrl && !imgFailed
   const alt = `${offer.brand} ${offer.title}, Angebot bei ${offer.supermarket}`
 
   const validVariant = ending ? VALID_VARIANT.ending : upcoming ? VALID_VARIANT.upcoming : VALID_VARIANT.base
+
+  // Kombinierte Kopfzeile „Marke · Markt" (Mockup-Stil: Akzent, klein, gesperrt).
+  const brandLine = (
+    <span className="font-mono text-[0.68rem] tracking-[0.14em] uppercase text-accent-strong font-bold">
+      {offer.brand} · {offer.market}
+    </span>
+  )
+
+  // Dezente Bestes-€/L-Auszeichnung (ersetzt die frühere Bild-Ecken-Plakette).
+  const bestTag = isBest && (
+    <span className="self-start text-[0.64rem] tracking-[0.1em] uppercase text-good font-semibold">
+      ◈ bestes €/L
+    </span>
+  )
 
   // Geteilte Bausteine für Kachel- und Listenansicht.
   const insightBlock = insight && (
@@ -181,24 +186,10 @@ export function OfferCard({ offer, isBest, view = 'grid', rowHasVariant = false,
           aria-label={alt}
         >
           <div className="flex items-center gap-3">
-            <div className="relative w-14 h-14 flex-none rounded-lg bg-surface-2 border border-border grid place-items-center overflow-hidden">
-              {showImage ? (
-                <img src={offer.imageUrl!} alt={alt} loading="lazy" width="56" height="56" className="w-full h-full object-contain p-1" onError={() => setImgFailed(true)} />
-              ) : (
-                <span className="w-6 h-9 rounded" style={{ background: offer.marketColor }} role="img" aria-label={alt} />
-              )}
-            </div>
-
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-mono text-[0.68rem] tracking-[0.08em] uppercase text-accent-strong font-bold">{offer.brand}</span>
-                <span className="text-[0.66rem] font-bold text-muted border border-border-strong rounded px-1.5 py-px">{offer.market}</span>
-                {isBest && (
-                  <span className="inline-flex items-center gap-[3px] bg-good text-ground text-[0.6rem] font-bold px-1.5 py-px rounded">
-                    <CheckIcon />
-                    Bester €/L
-                  </span>
-                )}
+                {brandLine}
+                {bestTag}
               </div>
               <h3 className="text-[0.95rem] leading-tight truncate mt-0.5">{offer.title}</h3>
               <div className="flex items-center gap-2 mt-1 flex-wrap">
@@ -250,38 +241,16 @@ export function OfferCard({ offer, isBest, view = 'grid', rowHasVariant = false,
   return (
     <li className="flex">
       <article
-        className="offer-card glass-card group relative flex flex-col h-full w-full rounded-card overflow-hidden shadow-card transition-[transform,border-color] duration-150 hover:-translate-y-[3px] hover:border-border-strong focus-within:border-focus"
+        className={`offer-card glass-card group relative flex flex-col h-full w-full rounded-card overflow-hidden shadow-card p-[18px] transition-[transform,border-color] duration-150 hover:-translate-y-[3px] hover:border-border-strong focus-within:border-focus ${
+          isBest ? 'border-[color-mix(in_srgb,var(--good)_45%,var(--border))]' : ''
+        }`}
         aria-label={alt}
       >
-        <div className="relative h-[200px] bg-[color-mix(in_srgb,var(--surface-2)_55%,transparent)] grid place-items-center border-b border-border overflow-hidden">
-          <span className="absolute left-2.5 top-2.5 text-[0.72rem] font-bold bg-surface text-ink border border-border-strong rounded-[7px] px-2 py-[3px]">
-            {offer.market}
-          </span>
-          {isBest && (
-            <span className="absolute right-2.5 top-2.5 inline-flex items-center gap-[5px] bg-good text-ground text-[0.7rem] font-bold tracking-[0.03em] px-[9px] py-1 rounded-[7px]">
-              <CheckIcon />
-              Bester €/L
-            </span>
-          )}
-          {showImage ? (
-            <img
-              src={offer.imageUrl!}
-              alt={alt}
-              loading="lazy"
-              width="200"
-              height="160"
-              className="max-h-[176px] max-w-full w-auto h-auto object-contain p-2"
-              onError={() => setImgFailed(true)}
-            />
-          ) : (
-            <span className="can" style={{ background: offer.marketColor }} role="img" aria-label={alt} />
-          )}
-        </div>
-
-        <div className="pt-4 px-[18px] pb-5 flex flex-col gap-1 flex-1">
-          <span className="font-mono text-[0.72rem] tracking-[0.08em] uppercase text-accent-strong font-bold">
-            {offer.brand}
-          </span>
+        <div className="flex flex-col gap-1 flex-1">
+          <div className="flex items-center gap-2 flex-wrap">
+            {brandLine}
+            {bestTag}
+          </div>
           <h3 className="text-base leading-[1.25] tracking-[-0.01em]">{offer.title}</h3>
           {extraVariants > 0 && (
           <span

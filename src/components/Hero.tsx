@@ -4,6 +4,7 @@ import {
   perLiterStats,
   savings,
   topDeal,
+  validity,
   type GroupedOffer,
   type Timeframe,
 } from "../lib/offers";
@@ -60,59 +61,92 @@ export default function Hero({
         Liter — das beste €/L steht oben.
       </p>
 
-      {deal && dealSaving && (
-        <section
-          className="mt-6 flex items-center gap-5 px-[22px] py-[18px] bg-good-tint border border-[color-mix(in_srgb,var(--good)_40%,transparent)] rounded-card shadow-card max-[560px]:flex-wrap max-[560px]:gap-x-4 max-[560px]:gap-y-3"
-          aria-labelledby="deal-title"
-        >
-          <p className="flex-none font-mono text-[clamp(2.1rem,5vw,3rem)] font-[750] tracking-[-0.03em] tabular-nums text-good leading-none">
-            −{dealSaving.percent}&nbsp;%
-          </p>
-          <div className="flex-1 min-w-0">
-            <p className={`${EYEBROW} !text-good mb-1.5`}>
-              {timeframe === "current"
-                ? "Top-Deal der Woche"
-                : "Top-Deal · nächste Woche"}
-            </p>
-            <h2
-              id="deal-title"
-              className="text-[1.3rem] tracking-[-0.02em] leading-[1.15] text-balance"
-            >
-              {deal.brand} {deal.title}
-            </h2>
-            <p className="mt-[3px] text-muted text-[0.9rem]">
-              {deal.market} · {deal.unitLabel}
-            </p>
+      {deal && dealSaving && (() => {
+        const dealValid = validity(deal);
+        return (
+          <section
+            className="glass-card mt-6 grid grid-cols-[1fr_auto] items-center gap-x-5 gap-y-4 rounded-card px-6 py-[22px] shadow-card max-[560px]:grid-cols-1 max-[560px]:gap-y-3"
+            aria-labelledby="deal-title"
+          >
+            <div className="min-w-0">
+              <p className="flex items-center gap-2 font-mono text-[0.68rem] tracking-[0.18em] uppercase text-accent-strong font-semibold">
+                <span className="pulse-dot" aria-hidden="true" />
+                {timeframe === "current"
+                  ? "Top-Deal der Woche"
+                  : "Top-Deal · nächste Woche"}
+              </p>
+              <h2
+                id="deal-title"
+                className="mt-2 text-[1.3rem] tracking-[-0.02em] leading-[1.15] text-balance"
+              >
+                {deal.brand} {deal.title}
+              </h2>
+              <p className="mt-[3px] font-mono text-muted text-[0.85rem]">
+                {deal.market} · {deal.unitLabel}
+              </p>
+              <p className="mt-2.5 inline-block rounded-[9px] border border-[color-mix(in_srgb,var(--good)_32%,transparent)] bg-good-tint px-[11px] py-[5px] text-[0.82rem] font-bold text-good">
+                <span className="visually-hidden">
+                  {dealSaving.percent} Prozent günstiger, Sie sparen{" "}
+                  {formatEuro(dealSaving.amount)} gegenüber vorher{" "}
+                  {formatEuro(deal.oldPrice!)}
+                </span>
+                <span aria-hidden="true">
+                  −{dealSaving.percent}&nbsp;% · {formatEuro(dealSaving.amount)}{" "}
+                  gespart · statt {formatEuro(deal.oldPrice!)}
+                </span>
+              </p>
+              <p
+                className={`mt-2.5 flex items-center gap-1.5 text-[0.78rem] ${
+                  dealValid.ending || dealValid.upcoming
+                    ? "text-accent-strong font-semibold"
+                    : "text-muted"
+                }`}
+              >
+                <svg
+                  width="13"
+                  height="13"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  aria-hidden="true"
+                  className="flex-none"
+                >
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="M12 7v5l3 2" strokeLinecap="round" />
+                </svg>
+                {dealValid.label}
+              </p>
+            </div>
+            <div className="text-right max-[560px]:text-left">
+              <div className="font-mono text-[clamp(1.9rem,4vw,2.3rem)] font-bold tracking-[-0.03em] tabular-nums text-ink leading-none">
+                {formatEuro(deal.price)}
+              </div>
+              {deal.perLiter != null && (
+                <div className="mt-1.5 font-mono text-[0.84rem] font-semibold tabular-nums text-accent-strong">
+                  {formatNumber(deal.perLiter)} €/L
+                </div>
+              )}
+            </div>
             {deal.url && (
               <a
                 href={deal.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group mt-2 inline-flex items-center gap-1.5 text-[0.85rem] font-[650] text-good"
+                className="group col-span-2 mt-1.5 inline-flex items-center gap-2 border-t border-border pt-[18px] text-[0.95rem] font-[700] text-accent-strong max-[560px]:col-span-1"
               >
                 Zum Angebot bei {deal.market}
-                <span aria-hidden="true" className="transition-transform duration-150 group-hover:translate-x-[3px]">→</span>
+                <span
+                  aria-hidden="true"
+                  className="transition-transform duration-150 group-hover:translate-x-[3px]"
+                >
+                  →
+                </span>
               </a>
             )}
-          </div>
-          <div className="flex-none text-right flex flex-col gap-0.5 max-[560px]:text-left max-[560px]:w-full max-[560px]:flex-row max-[560px]:items-baseline max-[560px]:gap-2.5 max-[560px]:pt-3 max-[560px]:border-t max-[560px]:border-[color-mix(in_srgb,var(--good)_25%,transparent)]">
-            <span className="font-mono text-[1.7rem] font-bold tracking-[-0.03em] tabular-nums text-ink">
-              {formatEuro(deal.price)}
-            </span>
-            <span className="font-mono text-[0.82rem] tabular-nums text-muted">
-              <span className="visually-hidden">
-                {dealSaving.percent} Prozent günstiger, Sie sparen{" "}
-                {formatEuro(dealSaving.amount)} gegenüber vorher{" "}
-                {formatEuro(deal.oldPrice!)}
-              </span>
-              <span aria-hidden="true">
-                <s className="text-muted">{formatEuro(deal.oldPrice!)}</s> ·{" "}
-                {formatEuro(dealSaving.amount)} gespart
-              </span>
-            </span>
-          </div>
-        </section>
-      )}
+          </section>
+        );
+      })()}
 
       {stats ? (
         <ul className="list-none mt-8 p-0 grid gap-4 grid-cols-4 max-[780px]:grid-cols-2 max-[430px]:grid-cols-1">

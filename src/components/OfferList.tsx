@@ -66,7 +66,7 @@ export default function OfferList({
           className={`list-none mt-1.5 p-0 ${
             view === "list"
               ? "flex flex-col gap-2.5"
-              : "grid gap-5 grid-cols-1 md:grid-cols-2"
+              : "grid gap-5 grid-cols-1 md:grid-cols-2 xl:grid-cols-3"
           }`}
           aria-label="Energy-Drink-Angebote"
         >
@@ -91,9 +91,18 @@ export default function OfferList({
           })}
         </ul>
       ) : (
-        <p className="mt-1.5 px-5 py-12 text-center text-muted border border-dashed border-border-strong rounded-card">
-          Keine Angebote gefunden. Filter oder Suche anpassen.
-        </p>
+        <div className="mt-1.5 px-5 py-12 flex flex-col items-center gap-3 text-center text-muted border border-dashed border-border-strong rounded-card">
+          <p>Keine Angebote gefunden. Filter oder Suche anpassen.</p>
+          {filtersActive && (
+            <button
+              type="button"
+              onClick={onReset}
+              className="h-9 px-4 inline-flex items-center gap-1.5 text-[0.85rem] font-semibold text-on-fill bg-fill border border-fill rounded-[10px] cursor-pointer hover:opacity-90"
+            >
+              Filter zurücksetzen
+            </button>
+          )}
+        </div>
       )}
     </div>
   );

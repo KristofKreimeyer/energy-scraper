@@ -40,12 +40,24 @@ export default function FilterBar({
         <input
           id="q"
           type="search"
-          className="border-0 bg-transparent text-ink w-full outline-none"
+          className="border-0 bg-transparent text-ink w-full outline-none [&::-webkit-search-cancel-button]:appearance-none"
           placeholder="Marke oder Produkt suchen …"
           aria-label="Angebote durchsuchen"
           value={query}
           onChange={(e) => onQueryChange(e.target.value)}
         />
+        {query && (
+          <button
+            type="button"
+            onClick={() => onQueryChange("")}
+            aria-label="Suche löschen"
+            className="flex-none grid place-items-center w-6 h-6 -mr-1 rounded-full text-muted hover:text-ink hover:bg-surface-2 transition-colors duration-150"
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true">
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+          </button>
+        )}
       </div>
       <button
         type="button"

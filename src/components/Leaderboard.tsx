@@ -1,6 +1,6 @@
 import { WRAP } from "../utils/helper";
 import { useLeaderboard } from "../hooks/useLeaderboard";
-import { COMMUNITY_URL, COMMUNITY_LABEL } from "../lib/community-config";
+import { COMMUNITY_URL, COMMUNITY_LABEL, DISCORD_URL, DISCORD_LABEL } from "../lib/community-config";
 
 // „Top-Hunter der Woche": öffentliches, spielerisches Ranking der aktivsten
 // Beitragenden + Einladung in den Community-Kanal. Sozialer Beweis (andere sind
@@ -59,14 +59,24 @@ export default function Leaderboard() {
           </button>
         </p>
 
-        <a
-          href={COMMUNITY_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-3 inline-flex items-center gap-2 h-9 px-4 rounded-lg bg-fill text-on-fill text-[0.85rem] font-semibold hover:opacity-90"
-        >
-          ⚡ Tritt der Jagd bei · {COMMUNITY_LABEL}
-        </a>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <a
+            href={COMMUNITY_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 h-9 px-4 rounded-lg bg-fill text-on-fill text-[0.85rem] font-semibold hover:opacity-90"
+          >
+            ⚡ Tritt der Jagd bei · {COMMUNITY_LABEL}
+          </a>
+          <a
+            href={DISCORD_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 h-9 px-4 rounded-lg bg-surface text-ink border border-border-strong text-[0.85rem] font-semibold hover:bg-surface-2"
+          >
+            💬 {DISCORD_LABEL}
+          </a>
+        </div>
       </div>
     </section>
   );

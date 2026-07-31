@@ -262,8 +262,9 @@ export function OfferCard({ offer, isBest, view = 'grid', rowHasVariant = false,
           </span>
           )}
           {extraVariants <= 0 && rowHasVariant && (
-            // Platzhalter: fluchtet den Preisblock mit der Nachbarkarte, die
-            // eine Sorten-Zeile hat. Nur im Zweispalter (md+) sichtbar.
+            // Platzhalter reserviert die Höhe der „X Sorten"-Zeile, wenn
+            // irgendein Angebot der Liste eine hat – so fluchten die Preisblöcke
+            // reihenweise (2- und 3-Spalter). Erst ab md, mobil (1 Spalte) unnötig.
             <span className="hidden md:block self-start mt-[5px] text-[0.76rem]" aria-hidden="true">
               {' '}
             </span>

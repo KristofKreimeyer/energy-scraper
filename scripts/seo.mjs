@@ -100,8 +100,11 @@ export function buildSitemap(offers, now = new Date()) {
   const lastmod = now.toISOString().slice(0, 10)
   const urls = [{ loc: `${SITE_ORIGIN}/`, priority: '1.0', changefreq: 'daily' }]
   for (const brand of byBrand(offers).keys()) {
+    // Cloudflare Pages serviert unter der cleanen URL (ohne .html) und leitet
+    // die .html-Variante per 308 dorthin – Sitemap/Canonical zeigen daher auf
+    // die cleane Ziel-URL, nie auf die weiterleitende.
     urls.push({
-      loc: `${SITE_ORIGIN}/marken/${brandSlug(brand)}.html`,
+      loc: `${SITE_ORIGIN}/marken/${brandSlug(brand)}`,
       priority: '0.8',
       changefreq: 'weekly',
     })
@@ -226,7 +229,8 @@ export function buildBrandPage(brand, brandOffers, now = new Date()) {
   const desc =
     `${brand} Energy-Drink-Angebote der Woche im Vergleich nach Preis pro Liter. ` +
     `Bester Preis: ${euro(best.price)} bei ${best.market}. Aldi, Kaufland, Lidl, Netto, Penny & Rewe.`
-  const canonical = `${SITE_ORIGIN}/marken/${slug}.html`
+  // Cleane Ziel-URL (ohne .html) – die .html-Datei leitet dorthin weiter.
+  const canonical = `${SITE_ORIGIN}/marken/${slug}`
 
   const rows = offers
     .map(

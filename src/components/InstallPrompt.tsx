@@ -15,6 +15,15 @@ const DISMISS_KEY = "energyhunt:pwa-dismissed";
 
 export default function InstallPrompt() {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
+  // Nur auf touch-primären Geräten (Handy/Tablet) zeigen – am Desktop bleibt
+  // der Streifen aus (der Browser bietet dort ohnehin sein eigenes Install-Symbol).
+  const [isTouch] = useState(() => {
+    try {
+      return window.matchMedia("(pointer: coarse)").matches;
+    } catch {
+      return false;
+    }
+  });
   const [dismissed, setDismissed] = useState(() => {
     try {
       return localStorage.getItem(DISMISS_KEY) === "1";
@@ -37,7 +46,7 @@ export default function InstallPrompt() {
     };
   }, []);
 
-  if (!deferred || dismissed) return null;
+  if (!isTouch || !deferred || dismissed) return null;
 
   async function install() {
     if (!deferred) return;

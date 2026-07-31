@@ -6,9 +6,14 @@ import { ReportPriceButton } from "./ReportPriceButton";
 import { ShareButton } from "./ShareButton";
 import type { VoteTally } from "../hooks/useCommunityVotes";
 
-// Aufgeräumte Aktionszone der OfferCard: der 🔥/👎-Vote plus eine kompakte
-// Icon-Leiste (Alarm · Günstiger? · Teilen). Alarm/Melden klappen ihr Formular
-// darunter auf – nur eines gleichzeitig, gesteuert von hier.
+// Aktionszone der OfferCard – bewusst reduziert (Karten-Dichte). Im Ruhezustand
+// nur eine schlanke Zeile: der soziale Beweis („🔥 von X bestätigt", wenn
+// vorhanden) plus ein „⋯ Mehr"-Toggle. Erst per Toggle erscheinen der 🔥/👎-Vote
+// und die Icon-Leiste (Alarm · Günstiger? · Teilen). Alarm/Melden klappen ihr
+// Formular darunter auf – nur eines gleichzeitig, gesteuert von hier.
+// Toggle statt Hover, damit es auf Touch-Geräten (kein Hover) funktioniert.
+
+const CONFIRM_THRESHOLD = 3;
 
 const BellIcon = () => (
   <svg
@@ -99,7 +104,10 @@ export function CardActions({
   offer: GroupedOffer;
   votes?: VoteTally;
 }) {
+  const [expanded, setExpanded] = useState(false);
   const [panel, setPanel] = useState<null | "alarm" | "report">(null);
+  // Sozialer Beweis aus der Server-Zählung – bleibt immer sichtbar.
+  const confirmedUp = votes?.up ?? 0;
   // Einmal geöffnete Panels bleiben gemountet, damit auch das Schließen animiert.
   const [mounted, setMounted] = useState({ alarm: false, report: false });
   const toggle = (p: "alarm" | "report") => {
@@ -132,54 +140,74 @@ export function CardActions({
 
   return (
     <div className="relative z-10" onClick={(e) => e.stopPropagation()}>
-      <div className="flex flex-col gap-2.5">
-        <AvailabilityVote offer={offer} tally={votes} />
-
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <button
-            type="button"
-            className={chip(panel === "alarm")}
-            aria-expanded={panel === "alarm"}
-            onClick={() => toggle("alarm")}
-          >
-            <BellIcon />
-            Alarm
-          </button>
-          <button
-            type="button"
-            className={chip(panel === "report")}
-            aria-expanded={panel === "report"}
-            onClick={() => toggle("report")}
-          >
-            <TagIcon />
-            Günstiger?
-          </button>
-          <ShareButton
-            text={shareText}
-            url={shareUrl}
-            ariaLabel={`${offer.brand} ${offer.title} teilen`}
-            className={chip(false)}
-          >
-            <ShareIcon />
-            Teilen
-          </ShareButton>
-        </div>
+      {/* Immer sichtbare Zeile: sozialer Beweis + „Mehr"-Toggle. */}
+      <div className="flex items-center gap-2 min-h-7">
+        {confirmedUp >= CONFIRM_THRESHOLD && (
+          <span className="text-[0.75rem] font-semibold text-good">
+            🔥 von {confirmedUp} {confirmedUp === 1 ? "Hunter" : "Huntern"} bestätigt
+          </span>
+        )}
+        <button
+          type="button"
+          className="ml-auto inline-flex items-center gap-1 h-7 px-2 rounded-lg text-[0.75rem] font-semibold text-muted hover:text-ink cursor-pointer transition-colors duration-150"
+          aria-expanded={expanded}
+          aria-label={expanded ? "Aktionen ausblenden" : "Weitere Aktionen: verfügbar melden, Alarm, Preis melden, teilen"}
+          onClick={() => setExpanded((v) => !v)}
+        >
+          {expanded ? "Weniger" : "⋯ Mehr"}
+        </button>
       </div>
 
-      {mounted.alarm && (
-        <Collapse open={panel === "alarm"}>
-          <AlarmButton offer={offer} embedded />
-        </Collapse>
-      )}
-      {mounted.report && (
-        <Collapse open={panel === "report"}>
-          <ReportPriceButton
-            offer={offer}
-            embedded
-            onClose={() => setPanel(null)}
-          />
-        </Collapse>
-      )}
+      <Collapse open={expanded}>
+        <div className="flex flex-col gap-2.5 pt-2">
+          <AvailabilityVote offer={offer} tally={votes} hideBadge />
+
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <button
+              type="button"
+              className={chip(panel === "alarm")}
+              aria-expanded={panel === "alarm"}
+              onClick={() => toggle("alarm")}
+            >
+              <BellIcon />
+              Alarm
+            </button>
+            <button
+              type="button"
+              className={chip(panel === "report")}
+              aria-expanded={panel === "report"}
+              onClick={() => toggle("report")}
+            >
+              <TagIcon />
+              Günstiger gesehen?
+            </button>
+            <ShareButton
+              text={shareText}
+              url={shareUrl}
+              ariaLabel={`${offer.brand} ${offer.title} teilen`}
+              className={chip(false)}
+            >
+              <ShareIcon />
+              Teilen
+            </ShareButton>
+          </div>
+
+          {mounted.alarm && (
+            <Collapse open={panel === "alarm"}>
+              <AlarmButton offer={offer} embedded />
+            </Collapse>
+          )}
+          {mounted.report && (
+            <Collapse open={panel === "report"}>
+              <ReportPriceButton
+                offer={offer}
+                embedded
+                onClose={() => setPanel(null)}
+              />
+            </Collapse>
+          )}
+        </div>
+      </Collapse>
     </div>
   );
 }

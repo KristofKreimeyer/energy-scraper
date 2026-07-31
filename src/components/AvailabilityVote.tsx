@@ -13,7 +13,9 @@ const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8787";
 // wäre „von 0 Huntern bestätigt" toter als gar nichts (Cold-Start).
 const CONFIRM_THRESHOLD = 3;
 
-export function AvailabilityVote({ offer, tally }: { offer: GroupedOffer; tally?: VoteTally }) {
+// hideBadge: der „bestätigt"-Beweis wird andernorts (CardActions) immer sichtbar
+// gezeigt – dann hier unterdrücken, damit er nicht doppelt erscheint.
+export function AvailabilityVote({ offer, tally, hideBadge = false }: { offer: GroupedOffer; tally?: VoteTally; hideBadge?: boolean }) {
   const pk = productKey(offer);
   const [counts, setCounts] = useState<VoteTally>({ up: tally?.up ?? 0, down: tally?.down ?? 0 });
   const [mine, setMine] = useState<VoteChoice | null>(() => getMyVote(pk));
@@ -48,7 +50,7 @@ export function AvailabilityVote({ offer, tally }: { offer: GroupedOffer; tally?
       className="relative z-10 flex flex-col gap-1"
       onClick={(e) => e.stopPropagation()}
     >
-      {counts.up >= CONFIRM_THRESHOLD && (
+      {!hideBadge && counts.up >= CONFIRM_THRESHOLD && (
         <span className="text-[0.75rem] font-semibold text-good">
           🔥 von {counts.up} {counts.up === 1 ? "Hunter" : "Huntern"} bestätigt
         </span>

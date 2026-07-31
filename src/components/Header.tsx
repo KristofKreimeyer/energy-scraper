@@ -32,14 +32,13 @@ export default function Header({
         </button>
         <AccountButton />
         <button
-          className="flex-none h-10 min-w-[44px] px-3 bg-surface text-ink border border-border-strong rounded-[10px] text-[0.85rem] font-semibold cursor-pointer inline-flex items-center gap-[7px] hover:bg-surface-2"
+          className="flex-none h-10 w-10 grid place-items-center text-muted rounded-[10px] text-[1.05rem] cursor-pointer hover:text-ink hover:bg-surface-2 transition-colors duration-150"
           type="button"
           aria-pressed={isDark}
           aria-label={isDark ? "Zu hellem Design wechseln" : "Zu dunklem Design wechseln"}
           onClick={toggle}
         >
           <span aria-hidden="true">{isDark ? "◑" : "◐"}</span>
-          <span className="hidden sm:inline">{isDark ? "Hell" : "Dunkel"}</span>
         </button>
       </div>
     </header>

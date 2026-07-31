@@ -1,4 +1,5 @@
-import { OfferCard } from "./OfferCard";
+import { OfferCardView } from "./OfferCardView";
+import { OfferListView } from "./OfferListView";
 import { productKey, type GroupedOffer } from "../lib/offers";
 import type { SortKey } from "../types";
 import { WRAP } from "../utils/helper";
@@ -75,17 +76,26 @@ export default function OfferList({
           }`}
           aria-label="Energy-Drink-Angebote"
         >
-          {offers.map((offer) => (
-            <OfferCard
-              key={offer.id}
-              offer={offer}
-              isBest={offer.id === bestId}
-              view={view}
-              rowHasVariant={anyVariant}
-              reports={communityReports[productKey(offer)]}
-              votes={communityVotes[productKey(offer)]}
-            />
-          ))}
+          {offers.map((offer) =>
+            view === "list" ? (
+              <OfferListView
+                key={offer.id}
+                offer={offer}
+                isBest={offer.id === bestId}
+                reports={communityReports[productKey(offer)]}
+                votes={communityVotes[productKey(offer)]}
+              />
+            ) : (
+              <OfferCardView
+                key={offer.id}
+                offer={offer}
+                isBest={offer.id === bestId}
+                rowHasVariant={anyVariant}
+                reports={communityReports[productKey(offer)]}
+                votes={communityVotes[productKey(offer)]}
+              />
+            ),
+          )}
         </ul>
       ) : (
         <div className="mt-1.5 px-5 py-12 flex flex-col items-center gap-3 text-center text-muted border border-dashed border-border-strong rounded-card">

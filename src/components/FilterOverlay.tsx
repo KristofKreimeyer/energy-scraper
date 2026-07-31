@@ -1,19 +1,12 @@
 import { Modal } from "./Modal";
 import type { SortKey } from "../types";
+import { SORT_OPTIONS } from "../lib/sortOptions";
 
 // Filter-Overlay-Inhalt (Sortieren / Markt / Marke) im barrierefreien Modal.
 // Reine Präsentations-Komponente: aller State kommt per Props aus App.
 
 const EYEBROW =
   "font-mono text-[0.72rem] tracking-[0.14em] uppercase text-muted";
-
-const SORT_OPTIONS: { value: SortKey; text: string }[] = [
-  { value: "liter", text: "Grundpreis €/L (günstigste zuerst)" },
-  { value: "price", text: "Dosenpreis (günstigste zuerst)" },
-  { value: "savings", text: "Größte Ersparnis" },
-  { value: "brand", text: "Marke A–Z" },
-  { value: "ending", text: "Läuft bald ab" },
-];
 
 // Chip-Grundstil (Markt- & Marken-Filter) – Zustände via aria-pressed/disabled
 const chip =

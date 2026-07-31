@@ -1,5 +1,7 @@
 import FilterBar from "./FilterBar";
 import type { Timeframe } from "../lib/offers";
+import type { SortKey } from "../types";
+import { SORT_OPTIONS } from "../lib/sortOptions";
 import { WRAP } from "../utils/helper";
 
 // Sticky Steuerleiste: Zeitraum-Umschalter (diese/nächste Woche) + FilterBar
@@ -16,6 +18,8 @@ interface ControlsBarProps {
   timeframeCounts: Record<Timeframe, number>;
   market: string;
   brand: string;
+  sort: SortKey;
+  onSortChange: (sort: SortKey) => void;
   query: string;
   onQueryChange: (value: string) => void;
   onOpenFilters: () => void;
@@ -29,6 +33,8 @@ export default function ControlsBar({
   timeframeCounts,
   market,
   brand,
+  sort,
+  onSortChange,
   query,
   onQueryChange,
   onOpenFilters,
@@ -58,6 +64,22 @@ export default function ControlsBar({
             </button>
           ))}
         </div>
+        <label className="hidden sm:flex flex-none items-center gap-2 text-[0.8rem] text-muted font-medium">
+          <span className="max-lg:sr-only">Sortieren</span>
+          <select
+            className="select-chevron h-10 pl-3 pr-[30px] text-[0.85rem] font-semibold text-ink bg-surface border border-border-strong rounded-[10px] cursor-pointer"
+            aria-label="Angebote sortieren"
+            value={sort}
+            onChange={(e) => onSortChange(e.target.value as SortKey)}
+          >
+            {SORT_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.short}
+              </option>
+            ))}
+          </select>
+        </label>
+
         <div className="flex-1 min-w-[260px]">
           <FilterBar
             market={market}

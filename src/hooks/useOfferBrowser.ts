@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import type { SortKey } from "../types";
+import { useFavorites } from "../lib/favorites";
 import {
   offers as allOffers,
   sortOffers,
@@ -25,6 +26,11 @@ export function useOfferBrowser() {
   const [sugar, setSugar] = useState<"all" | "zero" | "sugar">("all");
   const [sort, setSort] = useState<SortKey>("liter");
   const [query, setQuery] = useState("");
+  const [favoritesOnly, setFavoritesOnly] = useState(false);
+  const favorites = useFavorites();
+  // Ohne Favoriten greift der Filter nicht (abgeleitet statt State-Reset im
+  // Effect) – so bleibt keine leere Liste ohne sichtbaren Grund stehen.
+  const effectiveFavoritesOnly = favoritesOnly && favorites.length > 0;
   // Auf schmalen Viewports (Mobil) standardmäßig die Listenansicht – die wirkt
   // dort aufgeräumter als die Kacheln. Nur Startwert; der Umschalter bleibt aktiv.
   const [view, setView] = useState<"grid" | "list">(() =>
@@ -68,10 +74,15 @@ export function useOfferBrowser() {
   const deal = useMemo(() => topDeal(offers), [offers]);
   const dealSaving = deal ? savings(deal) : null;
 
-  const visible = useMemo(
-    () => sortOffers(filterOffers(offers, { market, brand, sugar, query }), sort),
-    [offers, market, brand, sugar, sort, query],
-  );
+  const visible = useMemo(() => {
+    const base = sortOffers(
+      filterOffers(offers, { market, brand, sugar, query }),
+      sort,
+    );
+    return effectiveFavoritesOnly
+      ? base.filter((o) => favorites.includes(o.brand))
+      : base;
+  }, [offers, market, brand, sugar, sort, query, effectiveFavoritesOnly, favorites]);
 
   // Kontextuelle Zähler: jede Facette zählt unter den JEWEILS anderen aktiven
   // Filtern (faceted search) – so zeigen die Chips, was ein Klick noch bringt.
@@ -103,13 +114,18 @@ export function useOfferBrowser() {
 
   const bestId = useMemo(() => bestPerLiterId(visible), [visible]);
   const filtersActive =
-    market !== "all" || brand !== "all" || sugar !== "all" || query.trim() !== "";
+    market !== "all" ||
+    brand !== "all" ||
+    sugar !== "all" ||
+    query.trim() !== "" ||
+    effectiveFavoritesOnly;
 
   function resetFilters() {
     setMarket("all");
     setBrand("all");
     setSugar("all");
     setQuery("");
+    setFavoritesOnly(false);
   }
 
   return {
@@ -126,6 +142,9 @@ export function useOfferBrowser() {
     setSort,
     query,
     setQuery,
+    favoritesOnly: effectiveFavoritesOnly,
+    setFavoritesOnly,
+    favoriteCount: favorites.length,
     view,
     setView,
     // abgeleitete Werte

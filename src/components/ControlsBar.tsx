@@ -19,6 +19,9 @@ interface ControlsBarProps {
   query: string;
   onQueryChange: (value: string) => void;
   onOpenFilters: () => void;
+  favoritesOnly: boolean;
+  onFavoritesOnlyChange: (value: boolean) => void;
+  favoriteCount: number;
   view: "grid" | "list";
   onViewChange: (view: "grid" | "list") => void;
 }
@@ -32,6 +35,9 @@ export default function ControlsBar({
   query,
   onQueryChange,
   onOpenFilters,
+  favoritesOnly,
+  onFavoritesOnlyChange,
+  favoriteCount,
   view,
   onViewChange,
 }: ControlsBarProps) {
@@ -58,6 +64,21 @@ export default function ControlsBar({
             </button>
           ))}
         </div>
+
+        {favoriteCount > 0 && (
+          <button
+            type="button"
+            className="group inline-flex flex-none items-center gap-1.5 min-h-10 px-3.5 rounded-[14px] border text-[0.85rem] font-semibold cursor-pointer transition-colors duration-150 aria-pressed:bg-fill aria-pressed:text-on-fill aria-pressed:border-fill bg-surface text-ink border-border-strong hover:bg-surface-2"
+            aria-pressed={favoritesOnly}
+            onClick={() => onFavoritesOnlyChange(!favoritesOnly)}
+          >
+            <span aria-hidden="true">{favoritesOnly ? "♥" : "♡"}</span>
+            Meine Marken
+            <span className="font-mono text-[0.74rem] tabular-nums text-muted bg-ground rounded-full px-[7px] py-px group-aria-pressed:text-on-fill group-aria-pressed:bg-[color-mix(in_srgb,var(--on-fill)_16%,transparent)]">
+              {favoriteCount}
+            </span>
+          </button>
+        )}
 
         <div className="flex-1 min-w-[260px]">
           <FilterBar

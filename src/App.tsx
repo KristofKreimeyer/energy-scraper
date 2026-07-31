@@ -38,6 +38,9 @@ function App() {
     setSort,
     query,
     setQuery,
+    favoritesOnly,
+    setFavoritesOnly,
+    favoriteCount,
     view,
     setView,
     offers,
@@ -108,6 +111,9 @@ function App() {
           query={query}
           onQueryChange={setQuery}
           onOpenFilters={() => setShowFilters(true)}
+          favoritesOnly={favoritesOnly}
+          onFavoritesOnlyChange={setFavoritesOnly}
+          favoriteCount={favoriteCount}
           view={view}
           onViewChange={setView}
         />

@@ -7,6 +7,7 @@ import {
   type PriceInsight,
 } from "../lib/offers";
 import { CardActions } from "./CardActions";
+import { useFavorites, toggleFavorite } from "../lib/favorites";
 import type { CommunityReport } from "../hooks/useCommunityReports";
 import type { VoteTally } from "../hooks/useCommunityVotes";
 
@@ -172,6 +173,8 @@ export function OfferCard({
   const { label: validLabel, ending, upcoming } = validity(offer);
   const saved = savings(offer);
   const insight = priceInsight(offer);
+  const favorites = useFavorites();
+  const isFav = favorites.includes(offer.brand);
   const extraVariants = offer.variantCount - 1;
   const isMulti = offer.unitCount > 1;
   const alt = `${offer.brand} ${offer.title}, Angebot bei ${offer.supermarket}`;
@@ -194,6 +197,44 @@ export function OfferCard({
     <span className="self-start text-[0.64rem] tracking-[0.1em] uppercase text-good font-semibold">
       ◈ bestes €/L
     </span>
+  );
+
+  // Marke merken (Favorit). Liegt über dem ganzflächigen Karten-Link.
+  const favButton = (
+    <button
+      type="button"
+      className={`relative z-10 ml-auto flex-none grid place-items-center w-7 h-7 rounded-full transition-colors duration-150 ${
+        isFav
+          ? "text-accent-strong hover:text-accent"
+          : "text-muted hover:text-ink hover:bg-surface-2"
+      }`}
+      aria-pressed={isFav}
+      aria-label={
+        isFav ? `${offer.brand} aus Favoriten entfernen` : `${offer.brand} merken`
+      }
+      title={isFav ? "Marke gemerkt" : "Marke merken"}
+      onClick={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        toggleFavorite(offer.brand);
+      }}
+    >
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill={isFav ? "currentColor" : "none"}
+        stroke="currentColor"
+        strokeWidth="2"
+        aria-hidden="true"
+      >
+        <path
+          d="M12 21s-7.5-4.9-10-9.2C.5 8.8 2 5.5 5.2 5.5c2 0 3.3 1.2 4 2.3.7-1.1 2-2.3 4-2.3 3.2 0 4.7 3.3 3.2 6.3C19.5 16.1 12 21 12 21z"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </button>
   );
 
   // Geteilte Bausteine für Kachel- und Listenansicht.
@@ -277,6 +318,7 @@ export function OfferCard({
               <div className="flex items-center gap-2 flex-wrap">
                 {brandLine}
                 {bestTag}
+                {favButton}
               </div>
               <h3 className="text-[0.95rem] leading-tight truncate mt-0.5">
                 {offer.title}

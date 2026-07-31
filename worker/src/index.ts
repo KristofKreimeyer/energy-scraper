@@ -535,6 +535,43 @@ app.post('/api/weekly/unsubscribe', async (c) => {
   return c.json({ status: 'ok' })
 })
 
+// --- Community-Roadmap: „Welchen Markt als Nächstes scrapen?" ---------------
+// Eine Stimme je Browser über die ganze Umfrage; Wechsel aktualisiert sie.
+// Serverseitige Whitelist, damit nur echte Kandidaten gezählt werden.
+const MARKET_CANDIDATES = ['Edeka', 'Norma', 'Trinkgut', 'Getränke Hoffmann', 'Marktkauf', 'Müller']
+
+app.post('/api/market-vote', async (c) => {
+  const body = (await c.req.json().catch(() => ({}))) as { market?: string; voterId?: string }
+  const market = clip(body.market, 60)
+  const voterId = clip(body.voterId, 64)
+  if (!market || !voterId || !MARKET_CANDIDATES.includes(market)) {
+    return c.json({ error: 'invalid_vote', message: 'Ungültige Stimme.' }, 400)
+  }
+  const db = c.env.DB
+  const ipHash = await sha256Hex('energyhunt-market-vote:' + (c.req.header('cf-connecting-ip') ?? 'unknown'))
+  const since = new Date(Date.now() - 3_600_000).toISOString()
+  const recent = await db.prepare('SELECT COUNT(*) AS n FROM market_votes WHERE ip_hash=? AND created_at>?').bind(ipHash, since).first<{ n: number }>()
+  if ((recent?.n ?? 0) >= VOTE_RATE_MAX) return c.json({ error: 'rate_limited', message: 'Zu viele Stimmen – bitte später.' }, 429)
+
+  await db
+    .prepare(
+      'INSERT INTO market_votes (id, created_at, market, voter_id, ip_hash) VALUES (?, ?, ?, ?, ?) ' +
+        'ON CONFLICT(voter_id) DO UPDATE SET market=excluded.market, created_at=excluded.created_at, ip_hash=excluded.ip_hash',
+    )
+    .bind(crypto.randomUUID(), now(), market, voterId, ipHash)
+    .run()
+  return c.json({ ok: true })
+})
+
+app.get('/api/market-votes', async (c) => {
+  const rows = (
+    await c.env.DB.prepare('SELECT market, COUNT(*) AS n FROM market_votes GROUP BY market').all<{ market: string; n: number }>()
+  ).results
+  const votes: Record<string, number> = {}
+  for (const r of rows) votes[r.market] = r.n
+  return c.json({ candidates: MARKET_CANDIDATES, votes }, 200, { 'cache-control': 'public, max-age=60' })
+})
+
 // --- Öffentliches Leaderboard („Top-Hunter") -------------------------------
 // Rangliste der aktivsten Beitragenden. Datenschutz: nie die Klartext-E-Mail –
 // nur ein maskiertes Handle (erste zwei Zeichen + Sterne). Score gewichtet

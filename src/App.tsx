@@ -15,6 +15,7 @@ import OfferList from "./components/OfferList";
 import Ticker from "./components/Ticker";
 import TrustCards from "./components/TrustCards";
 import Leaderboard from "./components/Leaderboard";
+import MarketVote from "./components/MarketVote";
 import ProTeaser from "./components/ProTeaser";
 import WeeklyReminder from "./components/WeeklyReminder";
 import SkipLink from "./components/SkipLink";
@@ -136,6 +137,8 @@ function App() {
         <TrustCards />
 
         <Leaderboard />
+
+        <MarketVote />
 
         <WeeklyReminder />
 

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { offers as allOffers, allBrands, allMarkets } from "../lib/offers";
 import { subscribeToPush, PushError } from "../lib/push";
 import { useAlarmMemo, rememberAlarm, markPro, clearAlarmMemo, normBrand } from "../lib/alarmState";
+import { useFavorites } from "../lib/favorites";
 import { Modal } from "./Modal";
 
 // Globaler Preiswecker-Dialog: markenbasiert, von überall aufrufbar.
@@ -22,9 +23,20 @@ const PLANS = [
 ] as const;
 
 export function AlarmCreator({ onClose }: { onClose: () => void }) {
+  // Free-Tarif = eine Marke. Läuft schon eine, sind alle anderen Chips gesperrt
+  // (siehe lib/alarmState – Geräte-Merker, das harte Limit setzt der Worker).
+  const memo = useAlarmMemo();
+  const lockedBrand = memo && !memo.pro && memo.brand ? memo.brand : null;
+  const isLocked = (b: string) => !!lockedBrand && normBrand(b) !== normBrand(lockedBrand);
+  // Gemerkte Marken (Favoriten), die es aktuell gibt und die nicht durch die
+  // Free-Sperre blockiert sind – damit im Alarm direkt nutzbar.
+  const favorites = useFavorites();
+  const favBrands = favorites.filter((b) => BRANDS.includes(b) && !isLocked(b));
+
   const [channel, setChannel] = useState<Channel>("email");
   const [email, setEmail] = useState("");
-  const [brands, setBrands] = useState<Set<string>>(new Set());
+  // Gemerkte Marken sind beim Öffnen vorausgewählt (Brücke Favoriten → Alarm).
+  const [brands, setBrands] = useState<Set<string>>(() => new Set(favBrands));
   const [storeMode, setStoreMode] = useState<StoreMode>("all");
   const [stores, setStores] = useState<Set<string>>(new Set());
   const [metric, setMetric] = useState<Metric>("unit");
@@ -35,12 +47,6 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
   const [showPro, setShowPro] = useState(false);
   const [codeOpen, setCodeOpen] = useState(false);
   const [code, setCode] = useState("");
-
-  // Free-Tarif = eine Marke. Läuft schon eine, sind alle anderen Chips gesperrt
-  // (siehe lib/alarmState – Geräte-Merker, das harte Limit setzt der Worker).
-  const memo = useAlarmMemo();
-  const lockedBrand = memo && !memo.pro && memo.brand ? memo.brand : null;
-  const isLocked = (b: string) => !!lockedBrand && normBrand(b) !== normBrand(lockedBrand);
 
   const toggleIn = (set: Set<string>, setSet: (s: Set<string>) => void, v: string) => {
     const n = new Set(set);
@@ -200,10 +206,20 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
                 title={isLocked(b) ? `Im kostenlosen Tarif ist eine Marke drin – du beobachtest bereits ${lockedBrand}.` : undefined}
                 onClick={() => toggleIn(brands, setBrands, b)}
               >
+                {favorites.includes(b) && <span aria-hidden="true">♥ </span>}
                 {b}
               </button>
             ))}
           </div>
+          {favBrands.some((b) => !brands.has(b)) && (
+            <button
+              type="button"
+              className="self-start text-[0.72rem] font-semibold text-accent-strong hover:text-accent underline underline-offset-2 cursor-pointer"
+              onClick={() => setBrands((prev) => new Set([...prev, ...favBrands]))}
+            >
+              ♥ Meine Marken übernehmen ({favBrands.length})
+            </button>
+          )}
           {lockedBrand && (
             <p className="text-[0.72rem] text-muted">
               Kostenlos ist <span className="font-semibold text-ink">eine</span> Marke drin – du beobachtest bereits{" "}

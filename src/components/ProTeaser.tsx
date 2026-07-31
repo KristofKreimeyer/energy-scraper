@@ -14,7 +14,7 @@ const BENEFITS = [
 export default function ProTeaser({ onOpenCreator }: { onOpenCreator: () => void }) {
   return (
     <section className={`${WRAP} mt-9`} aria-labelledby="pro-teaser-title">
-      <div className="glass-card rounded-card p-6 shadow-card flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div className="rounded-card p-6 border border-[color-mix(in_srgb,var(--accent-strong)_35%,transparent)] bg-accent-tint flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="flex-1">
           <div className="text-[0.7rem] font-semibold uppercase tracking-[0.1em] text-accent-strong">
             EnergyHunt Pro

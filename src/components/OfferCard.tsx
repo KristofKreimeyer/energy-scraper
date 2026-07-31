@@ -207,7 +207,7 @@ export function OfferCard({ offer, isBest, view = 'grid', rowHasVariant = false,
                 {formatEuro(offer.perUnit)}
                 <span className="text-[0.62rem] font-medium text-muted"> {isMulti ? '/ Dose' : ''}</span>
               </div>
-              <div className={`font-mono text-[0.82rem] font-bold tabular-nums whitespace-nowrap ${isBest ? 'text-good' : 'text-muted'}`}>
+              <div className={`font-mono text-[0.82rem] font-bold tabular-nums whitespace-nowrap ${isBest ? 'text-good' : 'text-accent-strong'}`}>
                 {offer.perLiter != null ? `${formatEuro(offer.perLiter)}/L` : '—'}
               </div>
             </div>
@@ -269,9 +269,11 @@ export function OfferCard({ offer, isBest, view = 'grid', rowHasVariant = false,
             </span>
           )}
 
+          {/* Preis-Hierarchie: €/L ist der Vergleichs-Held (groß + Akzent),
+              der Stückpreis („was du zahlst") steht bewusst sekundär daneben. */}
           <div className="flex items-baseline gap-3.5 pt-3">
-            <span className="flex flex-col gap-px flex-1 min-w-0">
-              <span className="font-mono text-[1.45rem] font-bold tracking-[-0.02em] tabular-nums text-ink whitespace-nowrap">
+            <span className="flex flex-col gap-px flex-none min-w-0">
+              <span className="font-mono text-[1.1rem] font-semibold tracking-[-0.02em] tabular-nums text-muted whitespace-nowrap">
                 {formatEuro(offer.perUnit)}
               </span>
               <span className="font-mono text-[0.66rem] tracking-[0.06em] uppercase text-muted whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
@@ -282,20 +284,20 @@ export function OfferCard({ offer, isBest, view = 'grid', rowHasVariant = false,
               {offer.perLiter != null ? (
                 <>
                   <span
-                    className={`font-mono text-[1.45rem] font-bold tracking-[-0.02em] tabular-nums whitespace-nowrap ${
-                      isBest ? 'text-good' : 'text-ink'
+                    className={`font-mono text-[1.7rem] font-bold tracking-[-0.02em] tabular-nums whitespace-nowrap ${
+                      isBest ? 'text-good' : 'text-accent-strong'
                     }`}
                   >
                     {formatEuro(offer.perLiter)}
-                    <span className="text-[0.9rem] text-muted font-bold">/L</span>
+                    <span className="text-[1rem] text-muted font-bold">/L</span>
                   </span>
                   <span className="font-mono text-[0.66rem] tracking-[0.06em] uppercase text-muted whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
-                    pro Liter
+                    Grundpreis · Vergleichswert
                   </span>
                 </>
               ) : (
                 <>
-                  <span className="font-mono text-[1.45rem] font-bold tabular-nums text-ink" aria-label="unbekannt">
+                  <span className="font-mono text-[1.7rem] font-bold tabular-nums text-ink" aria-label="unbekannt">
                     —
                   </span>
                   <span className="font-mono text-[0.66rem] tracking-[0.06em] uppercase text-muted">Grundpreis</span>

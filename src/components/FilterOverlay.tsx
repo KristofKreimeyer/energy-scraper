@@ -22,10 +22,10 @@ const chip =
   "aria-pressed:bg-fill aria-pressed:text-on-fill aria-pressed:border-fill " +
   "aria-pressed:hover:opacity-90 " +
   "disabled:opacity-40 disabled:cursor-not-allowed";
-// Zähler hochgestellt: oben ausgerichtet + kleiner, damit Name und Zahl
-// bewusst nicht auf einer Höhe sitzen.
+// Zähler: kleiner als der Name, aber vertikal bündig (Chip zentriert via
+// items-center) – nicht hochgestellt.
 const chipCount =
-  "self-start -mt-[3px] font-mono text-[0.62rem] opacity-75 tabular-nums group-aria-pressed:opacity-90";
+  "font-mono text-[0.62rem] opacity-75 tabular-nums group-aria-pressed:opacity-90";
 
 interface FilterOverlayProps {
   sort: SortKey;

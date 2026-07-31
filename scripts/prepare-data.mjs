@@ -10,11 +10,14 @@ import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from 
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { buildRobots, buildSitemap, byBrand, brandSlug, buildBrandPage } from './seo.mjs'
+
 const scriptDir = dirname(fileURLToPath(import.meta.url))
 const capturedDir = resolve(scriptDir, '../scrapers/captured')
 const outDir = resolve(scriptDir, '../src/data')
 const outFile = join(outDir, 'offers.json')
 const historyFile = join(outDir, 'price-history.json')
+const publicDir = resolve(scriptDir, '../public')
 
 /** Kurzlabel + Markenfarbe je Supermarkt (für Badge & Platzhalter-Dose). */
 const MARKET_META = {
@@ -390,4 +393,21 @@ console.log(
   `[prepare-data] Historie: ${Object.keys(history.products).length} Produkte` +
     (newPoints ? `, +${newPoints} neue Tagespunkte` : ', keine neuen Tagespunkte') +
     ` -> src/data/price-history.json`,
+)
+
+// --- SEO-Artefakte erzeugen (robots.txt, sitemap.xml, Marken-Landingpages) --
+// Statisch nach public/ – Vite kopiert das unverändert nach dist/. So sind die
+// Marken-Deals auch ohne JS crawlbar (Long-Tail), und Bots finden die Sitemap.
+mkdirSync(publicDir, { recursive: true })
+writeFileSync(join(publicDir, 'robots.txt'), buildRobots())
+writeFileSync(join(publicDir, 'sitemap.xml'), buildSitemap(list))
+
+const markenDir = join(publicDir, 'marken')
+mkdirSync(markenDir, { recursive: true })
+const brandMap = byBrand(list)
+for (const [brand, brandOffers] of brandMap) {
+  writeFileSync(join(markenDir, `${brandSlug(brand)}.html`), buildBrandPage(brand, brandOffers))
+}
+console.log(
+  `[prepare-data] SEO: robots.txt, sitemap.xml, ${brandMap.size} Marken-Seiten -> public/`,
 )

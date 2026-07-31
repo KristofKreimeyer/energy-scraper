@@ -495,6 +495,41 @@ app.get('/api/community/summary', async (c) => {
   )
 })
 
+// --- Öffentliches Leaderboard („Top-Hunter") -------------------------------
+// Rangliste der aktivsten Beitragenden. Datenschutz: nie die Klartext-E-Mail –
+// nur ein maskiertes Handle (erste zwei Zeichen + Sterne). Score gewichtet
+// freigegebene Preismeldungen höher als Verfügbarkeits-Votes.
+function maskHandle(email: string): string {
+  const local = email.split('@')[0] ?? 'hunter'
+  const head = local.slice(0, 2)
+  return `${head}${'*'.repeat(Math.max(3, Math.min(6, local.length - head.length)))}`
+}
+
+app.get('/api/leaderboard', async (c) => {
+  const rows = (
+    await c.env.DB
+      .prepare(
+        `SELECT u.email AS email,
+           (SELECT COUNT(*) FROM price_reports r WHERE r.user_id=u.id AND r.status='approved') AS approved,
+           (SELECT COUNT(*) FROM availability_votes v WHERE v.user_id=u.id) AS votes
+         FROM users u`,
+      )
+      .all<{ email: string; approved: number; votes: number }>()
+  ).results
+  const board = rows
+    .map((r) => ({
+      handle: maskHandle(r.email),
+      approved: r.approved,
+      votes: r.votes,
+      score: r.approved * 3 + r.votes,
+    }))
+    .filter((r) => r.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 10)
+    .map((r, i) => ({ rank: i + 1, ...r }))
+  return c.json({ board }, 200, { 'cache-control': 'public, max-age=300' })
+})
+
 // --- Moderation (tokengeschützt) -------------------------------------------
 const esc = (s: string) => s.replace(/[&<>"]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[m]!)
 

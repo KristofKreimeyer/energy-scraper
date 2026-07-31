@@ -13,6 +13,8 @@ import Hero from "./components/Hero";
 import OfferList from "./components/OfferList";
 import Ticker from "./components/Ticker";
 import TrustCards from "./components/TrustCards";
+import Leaderboard from "./components/Leaderboard";
+import ProTeaser from "./components/ProTeaser";
 import SkipLink from "./components/SkipLink";
 import { useOfferBrowser } from "./hooks/useOfferBrowser";
 import { useCommunityReports } from "./hooks/useCommunityReports";
@@ -122,6 +124,10 @@ function App() {
         />
 
         <TrustCards />
+
+        <Leaderboard />
+
+        <ProTeaser onOpenCreator={() => setShowCreator(true)} />
       </main>
 
       <Footer />

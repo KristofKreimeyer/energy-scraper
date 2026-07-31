@@ -1,5 +1,6 @@
 import { generatedAt } from "../lib/offers";
 import { WRAP } from "../utils/helper";
+import { COMMUNITY_URL, COMMUNITY_LABEL } from "../lib/community-config";
 
 export default function Footer() {
   const generatedLabel = new Date(generatedAt).toLocaleDateString("de-DE", {
@@ -40,6 +41,14 @@ export default function Footer() {
           href="#/widerruf"
         >
           Widerruf
+        </a>
+        <a
+          className="font-semibold text-accent-strong hover:text-accent underline underline-offset-2"
+          href={COMMUNITY_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          ⚡ Community · {COMMUNITY_LABEL}
         </a>
         <span className="font-mono text-[0.76rem] basis-full">
           Datenquelle: Wochenprospekte · Stand {generatedLabel} · unabhängig,

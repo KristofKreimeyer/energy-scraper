@@ -6,7 +6,8 @@ name: Seite deployen
 #
 # Voraussetzungen:
 #   Repo-Secrets: CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID
-#   Repo-Variablen: VITE_API_BASE (Worker-URL), VITE_VAPID_PUBLIC_KEY
+#   Repo-Variablen: VITE_API_BASE (Worker-URL), VITE_VAPID_PUBLIC_KEY,
+#     VITE_COMMUNITY_URL (Telegram-Kanal, optional – Default im Code)
 #   Cloudflare-Pages-Projekt "energyhunt" muss existieren. Siehe DEPLOY.md.
 
 on:
@@ -43,6 +44,7 @@ jobs:
         env:
           VITE_API_BASE: ${{ vars.VITE_API_BASE }}
           VITE_VAPID_PUBLIC_KEY: ${{ vars.VITE_VAPID_PUBLIC_KEY }}
+          VITE_COMMUNITY_URL: ${{ vars.VITE_COMMUNITY_URL }}
         run: npm run build
 
       - name: Zu Cloudflare Pages deployen

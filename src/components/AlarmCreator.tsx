@@ -3,6 +3,7 @@ import { offers as allOffers, allBrands, allMarkets } from "../lib/offers";
 import { subscribeToPush, PushError } from "../lib/push";
 import { useAlarmMemo, rememberAlarm, markPro, clearAlarmMemo, normBrand } from "../lib/alarmState";
 import { useFavorites } from "../lib/favorites";
+import { getRef } from "../lib/referral";
 import { Modal } from "./Modal";
 
 // Globaler Preiswecker-Dialog: markenbasiert, von überall aufrufbar.
@@ -86,7 +87,7 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
       const res = await fetch(`${API_BASE}/api/subscribe`, {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ channel, ...extra, scope: "brand", storeMode, stores: [...stores], brands: brandsPayload }),
+        body: JSON.stringify({ channel, ...extra, scope: "brand", storeMode, stores: [...stores], brands: brandsPayload, ref: getRef() ?? undefined }),
       });
       const data = (await res.json()) as { message?: string; error?: string; telegramLink?: string };
       if (!res.ok) {

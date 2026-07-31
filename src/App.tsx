@@ -18,6 +18,7 @@ import Leaderboard from "./components/Leaderboard";
 import MarketVote from "./components/MarketVote";
 import ProTeaser from "./components/ProTeaser";
 import WeeklyReminder from "./components/WeeklyReminder";
+import ReferralCard from "./components/ReferralCard";
 import SkipLink from "./components/SkipLink";
 import { useOfferBrowser } from "./hooks/useOfferBrowser";
 import { useCommunityReports } from "./hooks/useCommunityReports";
@@ -141,6 +142,8 @@ function App() {
         <MarketVote />
 
         <WeeklyReminder />
+
+        <ReferralCard />
 
         <ProTeaser onOpenCreator={() => setShowCreator(true)} />
       </main>

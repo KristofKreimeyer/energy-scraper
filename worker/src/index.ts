@@ -70,6 +70,68 @@ async function grantEntitlement(db: D1Database, channel: string, destination: st
   }
 }
 
+// --- Referral-Helfer --------------------------------------------------------
+
+/** Schreibt dem Referrer/Freund einen Monat Pro gut – STAPELT (+30 Tage auf ein
+ *  bestehendes, noch laufendes Ende). Unbegrenztes Pro bleibt unbegrenzt. */
+async function grantReferralMonth(db: D1Database, email: string, source: string): Promise<void> {
+  const row = await db
+    .prepare("SELECT valid_until FROM entitlements WHERE channel='email' AND destination=? AND tier='pro'")
+    .bind(email)
+    .first<{ valid_until: string | null }>()
+  if (row && row.valid_until === null) return // schon unbegrenzt Pro
+  const base = row?.valid_until && row.valid_until > now() ? row.valid_until : now()
+  const until = new Date(Date.parse(base) + 30 * 86_400_000).toISOString()
+  await grantEntitlement(db, 'email', email, 'pro', source, until)
+}
+
+/** Get-or-create: ein stabiler Referral-Code je Referrer-E-Mail. */
+async function getOrCreateReferralCode(db: D1Database, email: string): Promise<string> {
+  const existing = await db.prepare('SELECT code FROM referral_codes WHERE email=?').bind(email).first<{ code: string }>()
+  if (existing) return existing.code
+  const code = crypto.randomUUID().replace(/-/g, '').slice(0, 8)
+  await db
+    .prepare('INSERT INTO referral_codes (code, email, created_at) VALUES (?, ?, ?) ON CONFLICT(email) DO NOTHING')
+    .bind(code, email, now())
+    .run()
+  const row = await db.prepare('SELECT code FROM referral_codes WHERE email=?').bind(email).first<{ code: string }>()
+  return row?.code ?? code
+}
+
+/** Merkt eine ausstehende Werbung vor (Reward folgt erst bei E-Mail-Bestätigung
+ *  des Eingeladenen). Selbst-Werbung und Doppel-Claims werden hier gefiltert. */
+async function recordPendingReferral(db: D1Database, code: string, inviteeEmail: string): Promise<void> {
+  const c = String(code ?? '').trim()
+  const invitee = String(inviteeEmail ?? '').trim().toLowerCase()
+  if (!c || !EMAIL_RE.test(invitee)) return
+  const ref = await db.prepare('SELECT email FROM referral_codes WHERE code=?').bind(c).first<{ email: string }>()
+  if (!ref) return
+  if (ref.email === invitee) return // keine Selbst-Werbung
+  await db
+    .prepare(
+      "INSERT INTO referrals (id, code, referrer_email, invitee_email, status, created_at) VALUES (?, ?, ?, ?, 'pending', ?) " +
+        'ON CONFLICT(invitee_email) DO NOTHING',
+    )
+    .bind(crypto.randomUUID(), c, ref.email, invitee, now())
+    .run()
+}
+
+/** Löst die zweiseitige Belohnung aus, sobald der Eingeladene bestätigt. Gibt
+ *  true zurück, wenn gerade jetzt eine Werbung eingelöst wurde. */
+async function rewardReferralOnConfirm(db: D1Database, inviteeEmail: string): Promise<boolean> {
+  const invitee = String(inviteeEmail ?? '').trim().toLowerCase()
+  if (!EMAIL_RE.test(invitee)) return false
+  const ref = await db
+    .prepare("SELECT id, referrer_email FROM referrals WHERE invitee_email=? AND status='pending'")
+    .bind(invitee)
+    .first<{ id: string; referrer_email: string }>()
+  if (!ref) return false
+  await grantReferralMonth(db, ref.referrer_email, 'referral:invitee-confirmed')
+  await grantReferralMonth(db, invitee, 'referral:welcome')
+  await db.prepare("UPDATE referrals SET status='rewarded', rewarded_at=? WHERE id=?").bind(now(), ref.id).run()
+  return true
+}
+
 /** Entzieht ein Entitlement (läuft ab jetzt aus). */
 async function revokeEntitlement(db: D1Database, channel: string, destination: string, tier: string): Promise<void> {
   await db.prepare('UPDATE entitlements SET valid_until=? WHERE channel=? AND destination=? AND tier=?').bind(now(), channel, destination, tier).run()
@@ -109,6 +171,7 @@ async function handleBrandSubscribe(
     brands?: { brand?: string; targetPrice?: number | string | null; targetMetric?: string }[]
     storeMode?: string
     stores?: string[]
+    ref?: string
   },
   channel: string,
   db: D1Database,
@@ -177,6 +240,8 @@ async function handleBrandSubscribe(
     const apiOrigin = new URL(c.req.url).origin
     const list = brands.map((b) => b.display).join(', ')
     await sendEmail(c.env, { to: destination, ...confirmEmail(list, `${apiOrigin}/api/confirm?token=${token}`) })
+    // Werbung vormerken – belohnt wird zweiseitig erst bei Bestätigung (Confirm).
+    if (body.ref) await recordPendingReferral(db, body.ref, destination)
     return c.json({ status: 'pending', message: 'Fast geschafft! Bitte bestätige den Link in deiner E-Mail.' })
   }
   if (channel === 'push') {
@@ -203,6 +268,7 @@ app.post('/api/subscribe', async (c) => {
     brands?: { brand?: string; targetPrice?: number | string | null; targetMetric?: string }[]
     storeMode?: string
     stores?: string[]
+    ref?: string
   }
   try {
     body = await c.req.json()
@@ -740,6 +806,25 @@ app.get('/api/me/contributions', async (c) => {
   return c.json({ reports: reports?.n ?? 0, reportsApproved: approved?.n ?? 0, votes: votes?.n ?? 0 })
 })
 
+// Referral-Link + Stand für das eingeloggte Konto. Zweiseitig: geworbene
+// Freunde und Referrer bekommen je 1 Monat Pro (Reward bei E-Mail-Bestätigung).
+app.get('/api/referral/link', async (c) => {
+  const userId = await sessionUserId(c)
+  if (!userId) return c.json({ error: 'unauthorized' }, 401)
+  const db = c.env.DB
+  const u = await db.prepare('SELECT email FROM users WHERE id=?').bind(userId).first<{ email: string }>()
+  if (!u) return c.json({ error: 'unauthorized' }, 401)
+  const code = await getOrCreateReferralCode(db, u.email)
+  const rewarded = await db.prepare("SELECT COUNT(*) AS n FROM referrals WHERE code=? AND status='rewarded'").bind(code).first<{ n: number }>()
+  const pending = await db.prepare("SELECT COUNT(*) AS n FROM referrals WHERE code=? AND status='pending'").bind(code).first<{ n: number }>()
+  return c.json({
+    code,
+    url: `${c.env.PUBLIC_SITE_URL}/?ref=${code}`,
+    rewarded: rewarded?.n ?? 0,
+    pending: pending?.n ?? 0,
+  })
+})
+
 // --- Pro-Status abfragen (für die UI; E-Mail & Push) ----------------------
 app.get('/api/entitlement', async (c) => {
   const email = (c.req.query('email') ?? '').trim().toLowerCase()
@@ -890,6 +975,19 @@ app.get('/api/confirm', async (c) => {
     .bind(now(), token)
     .run()
   if (res.meta.changes > 0) {
+    // Wurde dieser Nutzer geworben? Dann zweiseitige Belohnung auslösen.
+    const row = await c.env.DB
+      .prepare("SELECT destination FROM subscriptions WHERE token=? AND channel='email'")
+      .bind(token)
+      .first<{ destination: string }>()
+    const rewarded = row ? await rewardReferralOnConfirm(c.env.DB, row.destination) : false
+    if (rewarded) {
+      return statusPage(
+        c.env,
+        'Alarm aktiv – und 1 Monat Pro geschenkt 🎉',
+        'Dein Bestpreis-Alarm ist bestätigt. Weil dich jemand eingeladen hat, haben wir dir (und deinem Einlader) je einen Monat Pro gutgeschrieben.',
+      )
+    }
     return statusPage(c.env, 'Alarm aktiv ✅', 'Dein Bestpreis-Alarm ist bestätigt. Wir melden uns, sobald dein Produkt ein neues Preistief erreicht.')
   }
   const sub = await c.env.DB.prepare('SELECT status FROM subscriptions WHERE token=?').bind(token).first<{ status: string }>()

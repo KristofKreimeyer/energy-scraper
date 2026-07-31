@@ -1,3 +1,5 @@
+import { Search, X, Filter, LayoutGrid, List } from "lucide-react";
+
 type View = "grid" | "list";
 
 interface FilterBarProps {
@@ -24,19 +26,7 @@ export default function FilterBar({
   return (
     <div className="flex flex-wrap items-center gap-3">
       <div className="flex items-center gap-2 flex-1 basis-[220px] min-w-[180px] bg-surface border border-border-strong rounded-[14px] px-3 h-11">
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.2"
-          aria-hidden="true"
-          className="flex-none text-muted"
-        >
-          <circle cx="11" cy="11" r="7" />
-          <path d="M20 20l-3.5-3.5" strokeLinecap="round" />
-        </svg>
+        <Search size={18} strokeWidth={2.2} aria-hidden className="flex-none text-muted" />
         <input
           id="q"
           type="search"
@@ -53,18 +43,7 @@ export default function FilterBar({
             aria-label="Suche löschen"
             className="flex-none grid place-items-center w-6 h-6 -mr-1 rounded-full text-muted hover:text-ink hover:bg-surface-2 transition-colors duration-150"
           >
-            <svg
-              width="15"
-              height="15"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.4"
-              strokeLinecap="round"
-              aria-hidden="true"
-            >
-              <path d="M6 6l12 12M18 6L6 18" />
-            </svg>
+            <X size={15} strokeWidth={2.4} aria-hidden />
           </button>
         )}
       </div>
@@ -74,19 +53,7 @@ export default function FilterBar({
         aria-haspopup="dialog"
         className="flex-none h-11 px-3.5 inline-flex items-center gap-1.5 text-[0.85rem] font-semibold rounded-[14px] border bg-surface text-ink border-border-strong hover:bg-surface-2"
       >
-        <svg
-          width="17"
-          height="17"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
-        >
-          <path d="M3 5h18l-7 8v6l-4-2v-4z" />
-        </svg>
+        <Filter size={17} strokeWidth={2.2} aria-hidden />
         Filtern & Sortieren
         {activeFilterCount > 0 && (
           <span className="ml-0.5 text-[0.7rem] font-mono font-bold text-on-fill bg-fill rounded-full min-w-[18px] text-center px-1">
@@ -106,20 +73,7 @@ export default function FilterBar({
           onClick={() => onViewChange("grid")}
           className={`h-9 w-9 grid place-items-center rounded-[11px] transition-colors duration-150 ${view === "grid" ? "bg-fill text-on-fill" : "bg-transparent text-muted hover:text-ink"}`}
         >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.2"
-            aria-hidden="true"
-          >
-            <rect x="3" y="3" width="7" height="7" rx="1.5" />
-            <rect x="14" y="3" width="7" height="7" rx="1.5" />
-            <rect x="3" y="14" width="7" height="7" rx="1.5" />
-            <rect x="14" y="14" width="7" height="7" rx="1.5" />
-          </svg>
+          <LayoutGrid size={18} strokeWidth={2.2} aria-hidden />
         </button>
         <button
           type="button"
@@ -128,18 +82,7 @@ export default function FilterBar({
           onClick={() => onViewChange("list")}
           className={`h-9 w-9 grid place-items-center rounded-[11px] transition-colors duration-150 ${view === "list" ? "bg-fill text-on-fill" : "bg-transparent text-muted hover:text-ink"}`}
         >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.2"
-            strokeLinecap="round"
-            aria-hidden="true"
-          >
-            <path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01" />
-          </svg>
+          <List size={18} strokeWidth={2.2} aria-hidden />
         </button>
       </div>
     </div>

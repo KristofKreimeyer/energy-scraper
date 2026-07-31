@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAuth } from "../auth/AuthContext";
 import { authHeader } from "../auth/session";
 import { Modal } from "./Modal";
+import { User } from "lucide-react";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8787";
 
@@ -10,13 +11,6 @@ interface Contributions {
   reportsApproved: number;
   votes: number;
 }
-
-const UserIcon = () => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
-    <circle cx="12" cy="8" r="4" />
-    <path d="M4 20c0-3.5 3.6-6 8-6s8 2.5 8 6" strokeLinecap="round" />
-  </svg>
-);
 
 export function AccountButton() {
   const { user, ready, requestLogin, logout } = useAuth();
@@ -59,7 +53,7 @@ export function AccountButton() {
         aria-label={user ? "Konto" : "Anmelden"}
         className="flex-none h-10 px-3 min-w-[44px] justify-center bg-surface text-ink border border-border-strong rounded-[10px] text-[0.85rem] font-semibold cursor-pointer inline-flex items-center gap-[7px] hover:bg-surface-2 max-w-[160px]"
       >
-        <UserIcon />
+        <User size={16} strokeWidth={2.2} aria-hidden />
         <span className="hidden sm:inline truncate">{user ? user.email : "Anmelden"}</span>
       </button>
 

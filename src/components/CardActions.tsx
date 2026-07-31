@@ -4,6 +4,7 @@ import { AvailabilityVote } from "./AvailabilityVote";
 import { AlarmButton } from "./AlarmButton";
 import { ReportPriceButton } from "./ReportPriceButton";
 import { ShareButton } from "./ShareButton";
+import { Bell, Tag, Share2 } from "lucide-react";
 import type { VoteTally } from "../hooks/useCommunityVotes";
 
 // Aktionszone der OfferCard – bewusst leises Gewicht (Karten-Dichte), aber
@@ -13,62 +14,6 @@ import type { VoteTally } from "../hooks/useCommunityVotes";
 // darunter auf – nur eines gleichzeitig, gesteuert von hier. Kein Hover-Gate,
 // damit alles auf Touch-Geräten erreichbar bleibt.
 
-const BellIcon = () => (
-  <svg
-    width="13"
-    height="13"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    aria-hidden="true"
-  >
-    <path
-      d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M13.7 21a2 2 0 01-3.4 0"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-const TagIcon = () => (
-  <svg
-    width="13"
-    height="13"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    aria-hidden="true"
-  >
-    <path
-      d="M20.6 13.4l-7.2 7.2a2 2 0 01-2.8 0l-7.2-7.2a2 2 0 01-.6-1.4V4a1 1 0 011-1h8a2 2 0 011.4.6l7.4 7.4a2 2 0 010 2.8z"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <circle cx="7.5" cy="7.5" r="1.5" fill="currentColor" stroke="none" />
-  </svg>
-);
-const ShareIcon = () => (
-  <svg
-    width="13"
-    height="13"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.2"
-    aria-hidden="true"
-  >
-    <circle cx="18" cy="5" r="3" />
-    <circle cx="6" cy="12" r="3" />
-    <circle cx="18" cy="19" r="3" />
-    <path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4" strokeLinecap="round" />
-  </svg>
-);
 
 // Sanftes Auf-/Zuklappen ohne Animations-Lib: grid-template-rows 0fr↔1fr
 // animiert die Höhe, der Inhalt bleibt für die Schließ-Animation gemountet.
@@ -148,7 +93,7 @@ export function CardActions({
             aria-expanded={panel === "alarm"}
             onClick={() => toggle("alarm")}
           >
-            <BellIcon />
+            <Bell size={13} strokeWidth={2} aria-hidden />
             Alarm
           </button>
           <button
@@ -157,7 +102,7 @@ export function CardActions({
             aria-expanded={panel === "report"}
             onClick={() => toggle("report")}
           >
-            <TagIcon />
+            <Tag size={13} strokeWidth={2} aria-hidden />
             Günstiger gesehen?
           </button>
           <ShareButton
@@ -166,7 +111,7 @@ export function CardActions({
             ariaLabel={`${offer.brand} ${offer.title} teilen`}
             className={chip(false)}
           >
-            <ShareIcon />
+            <Share2 size={13} strokeWidth={2.2} aria-hidden />
             Teilen
           </ShareButton>
         </div>

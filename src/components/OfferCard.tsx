@@ -8,6 +8,7 @@ import {
 } from "../lib/offers";
 import { CardActions } from "./CardActions";
 import { useFavorites, toggleFavorite } from "../lib/favorites";
+import { ArrowRight, Clock, Zap, TrendingUp, Heart } from "lucide-react";
 import type { CommunityReport } from "../hooks/useCommunityReports";
 import type { VoteTally } from "../hooks/useCommunityVotes";
 
@@ -45,66 +46,6 @@ const VALID_VARIANT = {
   upcoming:
     "bg-accent-tint text-accent-strong border-[color-mix(in_srgb,var(--accent-strong)_30%,transparent)]",
 };
-
-const ArrowIcon = () => (
-  <svg
-    className="transition-transform duration-150 group-hover:translate-x-[3px]"
-    width="15"
-    height="15"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.4"
-    aria-hidden="true"
-  >
-    <path
-      d="M5 12h14M13 6l6 6-6 6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
-const ClockIcon = () => (
-  <svg
-    width="13"
-    height="13"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.2"
-    aria-hidden="true"
-  >
-    <circle cx="12" cy="12" r="9" />
-    <path d="M12 7v5l3 2" strokeLinecap="round" />
-  </svg>
-);
-
-const BoltIcon = () => (
-  <svg
-    width="12"
-    height="12"
-    viewBox="0 0 24 24"
-    fill="currentColor"
-    aria-hidden="true"
-  >
-    <path d="M13 2L4 14h6l-1 8 9-12h-6l1-8z" />
-  </svg>
-);
-
-const TrendIcon = () => (
-  <svg
-    width="12"
-    height="12"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.4"
-    aria-hidden="true"
-  >
-    <path d="M3 17l6-6 4 4 8-8" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
 
 /** Winzige €/L-Verlaufslinie; der jüngste (aktuelle) Punkt ist hervorgehoben. */
 function Sparkline({
@@ -219,21 +160,7 @@ export function OfferCard({
         toggleFavorite(offer.brand);
       }}
     >
-      <svg
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill={isFav ? "currentColor" : "none"}
-        stroke="currentColor"
-        strokeWidth="2"
-        aria-hidden="true"
-      >
-        <path
-          d="M12 21s-7.5-4.9-10-9.2C.5 8.8 2 5.5 5.2 5.5c2 0 3.3 1.2 4 2.3.7-1.1 2-2.3 4-2.3 3.2 0 4.7 3.3 3.2 6.3C19.5 16.1 12 21 12 21z"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
+<Heart size={16} strokeWidth={2} fill={isFav ? "currentColor" : "none"} aria-hidden />
     </button>
   );
 
@@ -248,9 +175,9 @@ export function OfferCard({
           className={`flex-none inline-flex items-center gap-[5px] font-bold rounded-[7px] px-2 py-[3px] border ${INSIGHT_BADGE[insight.level]}`}
         >
           {INSIGHT_COPY[insight.level].icon === "bolt" ? (
-            <BoltIcon />
+            <Zap size={12} fill="currentColor" stroke="none" aria-hidden />
           ) : (
-            <TrendIcon />
+            <TrendingUp size={12} strokeWidth={2.4} aria-hidden />
           )}
           {INSIGHT_COPY[insight.level].label}
         </span>
@@ -274,7 +201,7 @@ export function OfferCard({
     <span
       className={`inline-flex items-center gap-1.5 self-start text-[0.76rem] font-semibold rounded-[7px] px-[9px] py-1 border ${validVariant}`}
     >
-      <ClockIcon />
+      <Clock size={13} strokeWidth={2.2} aria-hidden />
       {validLabel}
     </span>
   );
@@ -360,7 +287,7 @@ export function OfferCard({
                 aria-label={`Angebot ansehen: ${alt} (öffnet in neuem Tab)`}
               >
                 <span className="hidden sm:inline">Sichern</span>
-                <ArrowIcon />
+                <ArrowRight size={15} strokeWidth={2.4} aria-hidden className="transition-transform duration-150 group-hover:translate-x-[3px]" />
               </a>
             )}
           </div>
@@ -531,7 +458,7 @@ export function OfferCard({
               aria-label={`Angebot ansehen: ${alt} (öffnet in neuem Tab)`}
             >
               Deal sichern bei {offer.market}
-              <ArrowIcon />
+              <ArrowRight size={15} strokeWidth={2.4} aria-hidden className="transition-transform duration-150 group-hover:translate-x-[3px]" />
             </a>
           )}
         </div>

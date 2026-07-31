@@ -2,6 +2,7 @@ import { useState } from "react";
 import { productKey, type GroupedOffer } from "../lib/offers";
 import { subscribeToPush, PushError } from "../lib/push";
 import { useAlarmMemo, rememberAlarm, markPro, clearAlarmMemo, isBrandBlocked } from "../lib/alarmState";
+import { Bell } from "lucide-react";
 
 // Basis-URL der Alarm-API (Cloudflare Worker). Lokal: wrangler dev auf :8787.
 // Produktion: via VITE_API_BASE auf die deployte Worker-URL setzen.
@@ -32,13 +33,6 @@ const PLANS = [
   { plan: "yearly", price: "9,99 €", period: "pro Jahr", badge: "spart 58 %", highlight: true },
   { plan: "lifetime", price: "24,99 €", period: "einmalig, für immer" },
 ] as const;
-
-const BellIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-    <path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M13.7 21a2 2 0 01-3.4 0" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
 
 export function AlarmButton({ offer, embedded = false }: { offer: GroupedOffer; embedded?: boolean }) {
   // Eingebettet (in der Karten-Aktionsleiste) startet das Formular direkt –
@@ -186,7 +180,7 @@ export function AlarmButton({ offer, embedded = false }: { offer: GroupedOffer; 
           setState({ kind: "open", channel: "email" });
         }}
       >
-        <BellIcon />
+        <Bell size={14} strokeWidth={2} aria-hidden />
         Bei Bestpreis benachrichtigen
       </button>
     );
@@ -229,7 +223,7 @@ export function AlarmButton({ offer, embedded = false }: { offer: GroupedOffer; 
       }}
     >
       <span className="flex items-center gap-1.5 text-[0.8rem] font-semibold text-ink">
-        <BellIcon />
+        <Bell size={14} strokeWidth={2} aria-hidden />
         Bestpreis-Alarm für {offer.brand}
       </span>
 

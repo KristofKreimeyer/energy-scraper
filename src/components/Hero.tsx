@@ -9,6 +9,7 @@ import {
   type Timeframe,
 } from "../lib/offers";
 import { WRAP } from "../utils/helper";
+import { Clock } from "lucide-react";
 
 // Hero-Kopf + Top-Deal-Banner + Kennzahlen-Grid des gewählten Zeitraums.
 // Reine Präsentations-Komponente: Zahlen kommen fertig berechnet aus App.
@@ -113,19 +114,7 @@ export default function Hero({
                     </span>
                   </p>
                   <p className="mt-2.5 inline-flex items-center gap-1.5 rounded-[9px] border border-[color-mix(in_srgb,var(--accent-strong)_32%,transparent)] px-[11px] py-[5px] text-[0.82rem] font-semibold text-accent-strong">
-                    <svg
-                      width="13"
-                      height="13"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.2"
-                      aria-hidden="true"
-                      className="flex-none"
-                    >
-                      <circle cx="12" cy="12" r="9" />
-                      <path d="M12 7v5l3 2" strokeLinecap="round" />
-                    </svg>
+                    <Clock size={13} strokeWidth={2.2} aria-hidden className="flex-none" />
                     {dealValid.label}
                     {endWeekday ? ` · bis ${endWeekday}` : ""}
                   </p>

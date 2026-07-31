@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { productKey, type GroupedOffer } from "../lib/offers";
 import { authHeader } from "../auth/session";
+import { Tag } from "lucide-react";
 
 // „Günstiger gesehen?" – anonyme Community-Preismeldung für ein bestehendes
 // Angebot. Meldung geht als 'pending' an den Worker und wird erst nach
@@ -14,13 +15,6 @@ type State =
   | { kind: "submitting" }
   | { kind: "done"; message: string }
   | { kind: "error"; message: string };
-
-const TagIcon = () => (
-  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-    <path d="M20.6 13.4l-7.2 7.2a2 2 0 01-2.8 0l-7.2-7.2a2 2 0 01-.6-1.4V4a1 1 0 011-1h8a2 2 0 011.4.6l7.4 7.4a2 2 0 010 2.8z" strokeLinecap="round" strokeLinejoin="round" />
-    <circle cx="7.5" cy="7.5" r="1.5" fill="currentColor" stroke="none" />
-  </svg>
-);
 
 export function ReportPriceButton({ offer, embedded = false, onClose }: { offer: GroupedOffer; embedded?: boolean; onClose?: () => void }) {
   // Eingebettet startet das Formular direkt; „Abbrechen“ schließt das Panel.
@@ -75,7 +69,7 @@ export function ReportPriceButton({ offer, embedded = false, onClose }: { offer:
           setState({ kind: "open" });
         }}
       >
-        <TagIcon />
+        <Tag size={13} strokeWidth={2} aria-hidden />
         Günstiger gesehen?
       </button>
     );
@@ -93,7 +87,7 @@ export function ReportPriceButton({ offer, embedded = false, onClose }: { offer:
       }}
     >
       <span className="flex items-center gap-1.5 text-[0.8rem] font-semibold text-ink">
-        <TagIcon />
+        <Tag size={13} strokeWidth={2} aria-hidden />
         Günstiger gesehen bei {offer.market}?
       </span>
 

@@ -1,4 +1,5 @@
-import { Search, X, Filter, LayoutGrid, List } from "lucide-react";
+import { Search, X, Filter } from "lucide-react";
+import ViewToggle from "./ViewToggle";
 
 type View = "grid" | "list";
 
@@ -61,30 +62,13 @@ export default function FilterBar({
           </span>
         )}
       </button>
-      <div
-        className="flex items-center gap-1 ml-auto p-1 bg-surface-2 border border-border rounded-[14px]"
-        role="group"
-        aria-label="Ansicht wählen"
-      >
-        <button
-          type="button"
-          aria-pressed={view === "grid"}
-          aria-label="Kachelansicht"
-          onClick={() => onViewChange("grid")}
-          className={`h-9 w-9 grid place-items-center rounded-[11px] transition-colors duration-150 ${view === "grid" ? "bg-fill text-on-fill" : "bg-transparent text-muted hover:text-ink"}`}
-        >
-          <LayoutGrid size={18} strokeWidth={2.2} aria-hidden />
-        </button>
-        <button
-          type="button"
-          aria-pressed={view === "list"}
-          aria-label="Listenansicht"
-          onClick={() => onViewChange("list")}
-          className={`h-9 w-9 grid place-items-center rounded-[11px] transition-colors duration-150 ${view === "list" ? "bg-fill text-on-fill" : "bg-transparent text-muted hover:text-ink"}`}
-        >
-          <List size={18} strokeWidth={2.2} aria-hidden />
-        </button>
-      </div>
+      {/* Ansicht-Umschalter: ab md hier rechts; auf Mobile in der ersten Reihe
+          der ControlsBar (siehe ControlsBar). */}
+      <ViewToggle
+        view={view}
+        onViewChange={onViewChange}
+        className="ml-auto hidden md:flex"
+      />
     </div>
   );
 }

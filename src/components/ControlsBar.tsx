@@ -1,4 +1,5 @@
 import FilterBar from "./FilterBar";
+import ViewToggle from "./ViewToggle";
 import type { Timeframe } from "../lib/offers";
 import { WRAP } from "../utils/helper";
 
@@ -64,6 +65,14 @@ export default function ControlsBar({
             </button>
           ))}
         </div>
+
+        {/* Nur mobil: Ansicht-Umschalter in die erste Reihe (rechts). Ab md
+            steckt er in der FilterBar. */}
+        <ViewToggle
+          view={view}
+          onViewChange={onViewChange}
+          className="ml-auto md:hidden"
+        />
 
         {favoriteCount > 0 && (
           <button

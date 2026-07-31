@@ -105,8 +105,6 @@ function App() {
           timeframeCounts={timeframeCounts}
           market={market}
           brand={brand}
-          sort={sort}
-          onSortChange={setSort}
           query={query}
           onQueryChange={setQuery}
           onOpenFilters={() => setShowFilters(true)}

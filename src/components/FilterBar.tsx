@@ -53,7 +53,16 @@ export default function FilterBar({
             aria-label="Suche löschen"
             className="flex-none grid place-items-center w-6 h-6 -mr-1 rounded-full text-muted hover:text-ink hover:bg-surface-2 transition-colors duration-150"
           >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true">
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+              aria-hidden="true"
+            >
               <path d="M6 6l12 12M18 6L6 18" />
             </svg>
           </button>
@@ -78,7 +87,7 @@ export default function FilterBar({
         >
           <path d="M3 5h18l-7 8v6l-4-2v-4z" />
         </svg>
-        Filtern
+        Filtern & Sortieren
         {activeFilterCount > 0 && (
           <span className="ml-0.5 text-[0.7rem] font-mono font-bold text-on-fill bg-fill rounded-full min-w-[18px] text-center px-1">
             {activeFilterCount}

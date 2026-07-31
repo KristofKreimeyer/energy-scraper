@@ -6,14 +6,12 @@ import { ReportPriceButton } from "./ReportPriceButton";
 import { ShareButton } from "./ShareButton";
 import type { VoteTally } from "../hooks/useCommunityVotes";
 
-// Aktionszone der OfferCard – bewusst reduziert (Karten-Dichte). Im Ruhezustand
-// nur eine schlanke Zeile: der soziale Beweis („🔥 von X bestätigt", wenn
-// vorhanden) plus ein „⋯ Mehr"-Toggle. Erst per Toggle erscheinen der 🔥/👎-Vote
-// und die Icon-Leiste (Alarm · Günstiger? · Teilen). Alarm/Melden klappen ihr
-// Formular darunter auf – nur eines gleichzeitig, gesteuert von hier.
-// Toggle statt Hover, damit es auf Touch-Geräten (kein Hover) funktioniert.
-
-const CONFIRM_THRESHOLD = 3;
+// Aktionszone der OfferCard – bewusst leises Gewicht (Karten-Dichte), aber
+// alles immer sichtbar (kein Mystery-Toggle): der 🔥/👎-Vote inkl. „bestätigt"-
+// Beweis, darunter eine Leiste randloser Ghost-Chips (Alarm · Günstiger
+// gesehen? · Teilen) mit Klartext-Labels. Alarm/Melden klappen ihr Formular
+// darunter auf – nur eines gleichzeitig, gesteuert von hier. Kein Hover-Gate,
+// damit alles auf Touch-Geräten erreichbar bleibt.
 
 const BellIcon = () => (
   <svg
@@ -104,10 +102,7 @@ export function CardActions({
   offer: GroupedOffer;
   votes?: VoteTally;
 }) {
-  const [expanded, setExpanded] = useState(false);
   const [panel, setPanel] = useState<null | "alarm" | "report">(null);
-  // Sozialer Beweis aus der Server-Zählung – bleibt immer sichtbar.
-  const confirmedUp = votes?.up ?? 0;
   // Einmal geöffnete Panels bleiben gemountet, damit auch das Schließen animiert.
   const [mounted, setMounted] = useState({ alarm: false, report: false });
   const toggle = (p: "alarm" | "report") => {
@@ -131,83 +126,66 @@ export function CardActions({
     offer.perLiter != null ? ` (${formatEuro(offer.perLiter)}/L)` : "";
   const shareText = `${offer.brand} ${offer.title} bei ${offer.market} für ${formatEuro(offer.perUnit)}${perLiter} – gefunden auf EnergyHunt`;
 
+  // Leise Ghost-Chips: randlos, gedämpft, klare Klartext-Labels. Aktiv oder
+  // per Hover bekommen sie die Akzentfarbe. Bewusst leichter als der CTA –
+  // das senkt das Gewicht (Dichte), ohne die Entdeckbarkeit zu opfern.
   const chip = (active: boolean) =>
-    `inline-flex items-center gap-1 h-8 px-2 rounded-lg border text-[0.75rem] font-semibold cursor-pointer transition-colors duration-150 ${
-      active
-        ? "bg-fill text-on-fill border-fill"
-        : "bg-surface text-muted border-border-strong hover:text-ink"
+    `inline-flex items-center gap-1 h-7 px-1.5 rounded-md text-[0.74rem] font-medium cursor-pointer transition-colors duration-150 ${
+      active ? "text-accent-strong" : "text-muted hover:text-ink"
     }`;
 
   return (
     <div className="relative z-10" onClick={(e) => e.stopPropagation()}>
-      {/* Immer sichtbare Zeile: sozialer Beweis + „Mehr"-Toggle. */}
-      <div className="flex items-center gap-2 min-h-7">
-        {confirmedUp >= CONFIRM_THRESHOLD && (
-          <span className="text-[0.75rem] font-semibold text-good">
-            🔥 von {confirmedUp} {confirmedUp === 1 ? "Hunter" : "Huntern"} bestätigt
-          </span>
-        )}
-        <button
-          type="button"
-          className="ml-auto inline-flex items-center gap-1 h-7 px-2 rounded-lg text-[0.75rem] font-semibold text-muted hover:text-ink cursor-pointer transition-colors duration-150"
-          aria-expanded={expanded}
-          aria-label={expanded ? "Aktionen ausblenden" : "Weitere Aktionen: verfügbar melden, Alarm, Preis melden, teilen"}
-          onClick={() => setExpanded((v) => !v)}
-        >
-          {expanded ? "Weniger" : "⋯ Mehr"}
-        </button>
+      <div className="flex flex-col gap-2">
+        {/* Vote inkl. „bestätigt"-Beweis – bleibt immer sichtbar. */}
+        <AvailabilityVote offer={offer} tally={votes} />
+
+        {/* Immer sichtbare, leise Aktions-Leiste. */}
+        <div className="flex items-center gap-0.5 flex-wrap -ml-0.5">
+          <button
+            type="button"
+            className={chip(panel === "alarm")}
+            aria-expanded={panel === "alarm"}
+            onClick={() => toggle("alarm")}
+          >
+            <BellIcon />
+            Alarm
+          </button>
+          <button
+            type="button"
+            className={chip(panel === "report")}
+            aria-expanded={panel === "report"}
+            onClick={() => toggle("report")}
+          >
+            <TagIcon />
+            Günstiger gesehen?
+          </button>
+          <ShareButton
+            text={shareText}
+            url={shareUrl}
+            ariaLabel={`${offer.brand} ${offer.title} teilen`}
+            className={chip(false)}
+          >
+            <ShareIcon />
+            Teilen
+          </ShareButton>
+        </div>
       </div>
 
-      <Collapse open={expanded}>
-        <div className="flex flex-col gap-2.5 pt-2">
-          <AvailabilityVote offer={offer} tally={votes} hideBadge />
-
-          <div className="flex items-center gap-1.5 flex-wrap">
-            <button
-              type="button"
-              className={chip(panel === "alarm")}
-              aria-expanded={panel === "alarm"}
-              onClick={() => toggle("alarm")}
-            >
-              <BellIcon />
-              Alarm
-            </button>
-            <button
-              type="button"
-              className={chip(panel === "report")}
-              aria-expanded={panel === "report"}
-              onClick={() => toggle("report")}
-            >
-              <TagIcon />
-              Günstiger gesehen?
-            </button>
-            <ShareButton
-              text={shareText}
-              url={shareUrl}
-              ariaLabel={`${offer.brand} ${offer.title} teilen`}
-              className={chip(false)}
-            >
-              <ShareIcon />
-              Teilen
-            </ShareButton>
-          </div>
-
-          {mounted.alarm && (
-            <Collapse open={panel === "alarm"}>
-              <AlarmButton offer={offer} embedded />
-            </Collapse>
-          )}
-          {mounted.report && (
-            <Collapse open={panel === "report"}>
-              <ReportPriceButton
-                offer={offer}
-                embedded
-                onClose={() => setPanel(null)}
-              />
-            </Collapse>
-          )}
-        </div>
-      </Collapse>
+      {mounted.alarm && (
+        <Collapse open={panel === "alarm"}>
+          <AlarmButton offer={offer} embedded />
+        </Collapse>
+      )}
+      {mounted.report && (
+        <Collapse open={panel === "report"}>
+          <ReportPriceButton
+            offer={offer}
+            embedded
+            onClose={() => setPanel(null)}
+          />
+        </Collapse>
+      )}
     </div>
   );
 }

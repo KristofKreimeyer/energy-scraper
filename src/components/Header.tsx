@@ -1,5 +1,6 @@
 import { WRAP, useTheme } from "../utils/helper";
 import { AccountButton } from "./AccountButton";
+import { Moon, Sun } from "lucide-react";
 
 export default function Header({
   onOpenCreator,
@@ -35,10 +36,16 @@ export default function Header({
           className="flex-none h-10 w-10 grid place-items-center text-muted rounded-[10px] text-[1.05rem] cursor-pointer hover:text-ink hover:bg-surface-2 transition-colors duration-150"
           type="button"
           aria-pressed={isDark}
-          aria-label={isDark ? "Zu hellem Design wechseln" : "Zu dunklem Design wechseln"}
+          aria-label={
+            isDark ? "Zu hellem Design wechseln" : "Zu dunklem Design wechseln"
+          }
           onClick={toggle}
         >
-          <span aria-hidden="true">{isDark ? "◑" : "◐"}</span>
+          {isDark ? (
+            <Sun size={18} aria-hidden />
+          ) : (
+            <Moon size={18} aria-hidden />
+          )}
         </button>
       </div>
     </header>

@@ -495,6 +495,46 @@ app.get('/api/community/summary', async (c) => {
   )
 })
 
+// --- Wöchentliche Deal-Erinnerung (Broadcast-Push, scope='weekly') ----------
+// Eigener Opt-in, getrennt von Marken-Alarmen. Speichert die Push-Subscription
+// als scope='weekly'. Der Versand läuft im refresh-data-Workflow
+// (scripts/send-weekly-push.mjs), sobald frische Wochendaten committet wurden.
+app.post('/api/weekly/subscribe', async (c) => {
+  const body = (await c.req.json().catch(() => ({}))) as {
+    subscription?: { endpoint?: string; keys?: { p256dh?: string; auth?: string } }
+  }
+  const sub = body.subscription
+  if (!sub?.endpoint || !sub.keys?.p256dh || !sub.keys?.auth) {
+    return c.json({ error: 'invalid_subscription', message: 'Push-Anmeldung unvollständig.' }, 400)
+  }
+  const db = c.env.DB
+  const existing = await db
+    .prepare("SELECT id FROM subscriptions WHERE channel='push' AND scope='weekly' AND json_extract(destination,'$.endpoint')=?")
+    .bind(sub.endpoint)
+    .first<{ id: string }>()
+  if (!existing) {
+    await db
+      .prepare(
+        "INSERT INTO subscriptions (id, channel, destination, product_key, product_label, status, token, created_at, confirmed_at, scope) " +
+          "VALUES (?, 'push', ?, '__weekly__', 'Wöchentliche Deal-Erinnerung', 'confirmed', ?, ?, ?, 'weekly')",
+      )
+      .bind(crypto.randomUUID(), JSON.stringify(sub), randomToken(), now(), now())
+      .run()
+  }
+  return c.json({ status: 'ok', message: 'Du bekommst ab jetzt die wöchentliche Deal-Erinnerung.' })
+})
+
+app.post('/api/weekly/unsubscribe', async (c) => {
+  const body = (await c.req.json().catch(() => ({}))) as { subscription?: { endpoint?: string } }
+  const endpoint = body.subscription?.endpoint
+  if (!endpoint) return c.json({ error: 'invalid_subscription' }, 400)
+  await c.env.DB
+    .prepare("DELETE FROM subscriptions WHERE channel='push' AND scope='weekly' AND json_extract(destination,'$.endpoint')=?")
+    .bind(endpoint)
+    .run()
+  return c.json({ status: 'ok' })
+})
+
 // --- Öffentliches Leaderboard („Top-Hunter") -------------------------------
 // Rangliste der aktivsten Beitragenden. Datenschutz: nie die Klartext-E-Mail –
 // nur ein maskiertes Handle (erste zwei Zeichen + Sterne). Score gewichtet

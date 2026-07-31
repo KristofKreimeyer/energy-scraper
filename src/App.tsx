@@ -4,6 +4,7 @@ import { LegalPage } from "./components/Legal";
 import LegalHeader from "./components/LegalHeader";
 import LegalFooter from "./components/LegalFooter";
 import { PayBanner } from "./components/PayBanner";
+import InstallPrompt from "./components/InstallPrompt";
 import { useHashRoute, isLegalRoute } from "./lib/legalRoutes";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
@@ -15,6 +16,7 @@ import Ticker from "./components/Ticker";
 import TrustCards from "./components/TrustCards";
 import Leaderboard from "./components/Leaderboard";
 import ProTeaser from "./components/ProTeaser";
+import WeeklyReminder from "./components/WeeklyReminder";
 import SkipLink from "./components/SkipLink";
 import { useOfferBrowser } from "./hooks/useOfferBrowser";
 import { useCommunityReports } from "./hooks/useCommunityReports";
@@ -90,6 +92,8 @@ function App() {
 
       <PayBanner />
 
+      <InstallPrompt />
+
       <Header onOpenCreator={() => setShowCreator(true)} />
 
       <Ticker offers={offers} />
@@ -132,6 +136,8 @@ function App() {
         <TrustCards />
 
         <Leaderboard />
+
+        <WeeklyReminder />
 
         <ProTeaser onOpenCreator={() => setShowCreator(true)} />
       </main>

@@ -1,0 +1,26 @@
+{
+  "name": "EnergyHunt — Energy-Drink-Angebote",
+  "short_name": "EnergyHunt",
+  "description": "Alle Energy-Drink-Deals der Woche, verglichen nach Preis pro Liter.",
+  "lang": "de",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#e24a08",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}

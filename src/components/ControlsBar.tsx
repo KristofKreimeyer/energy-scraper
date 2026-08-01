@@ -90,7 +90,9 @@ export default function ControlsBar({
           </button>
         )}
 
-        <div className="flex-1 min-w-[260px]">
+        {/* Mobil + Tablet: volle Breite -> FilterBar bricht in eine eigene
+            Reihe um (gestapeltes Layout). Erst ab lg teilt sie sich die Reihe. */}
+        <div className="w-full lg:w-auto lg:flex-1 min-w-[260px]">
           <FilterBar
             market={market}
             brand={brand}

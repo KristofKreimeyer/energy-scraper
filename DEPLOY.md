@@ -165,3 +165,5 @@ deployte Files nur anhängen, nie ändern.
 - Push: Berechtigung + Testzustellung (nur über HTTPS).
 - Stripe: Checkout im Testmodus → Webhook schreibt Entitlement → Preiswecker
   wird buchbar.
+
+<!-- deploy-topology-test 20260801T184134Z -->

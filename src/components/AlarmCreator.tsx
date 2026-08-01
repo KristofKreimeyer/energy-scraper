@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { offers as allOffers, allBrands, allMarkets } from "../lib/offers";
 import { subscribeToPush, PushError } from "../lib/push";
-import { useAlarmMemo, rememberAlarm, markPro, clearAlarmMemo, normBrand } from "../lib/alarmState";
+import { useAlarmMemo, rememberAlarm, clearAlarmMemo, normBrand } from "../lib/alarmState";
 import { useFavorites } from "../lib/favorites";
 import { getRef } from "../lib/referral";
+import { startCheckout, redeemProCode, type Plan } from "../lib/alarmApi";
+import ProPlans from "./ProPlans";
 import { Modal } from "./Modal";
 
 // Globaler Preiswecker-Dialog: markenbasiert, von überall aufrufbar.
@@ -15,13 +17,6 @@ type StoreMode = "all" | "only" | "except";
 
 const BRANDS = allBrands(allOffers);
 const MARKETS = allMarkets(allOffers);
-
-// Pro-Pläne (Anzeige-Copy; echter Betrag via Stripe-Price-ID).
-const PLANS = [
-  { plan: "monthly", price: "1,99 €", period: "pro Monat" },
-  { plan: "yearly", price: "9,99 €", period: "pro Jahr", badge: "spart 58 %", highlight: true },
-  { plan: "lifetime", price: "24,99 €", period: "einmalig, für immer" },
-] as const;
 
 export function AlarmCreator({ onClose }: { onClose: () => void }) {
   // Free-Tarif = eine Marke. Läuft schon eine, sind alle anderen Chips gesperrt
@@ -46,7 +41,6 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   // Pro
   const [showPro, setShowPro] = useState(false);
-  const [codeOpen, setCodeOpen] = useState(false);
   const [code, setCode] = useState("");
 
   const toggleIn = (set: Set<string>, setSet: (s: Set<string>) => void, v: string) => {
@@ -110,48 +104,23 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
     setSubmitting(false);
   }
 
-  async function checkout(plan: "monthly" | "yearly" | "lifetime") {
+  async function checkout(plan: Plan) {
     if (!email) {
       setMsg({ ok: false, text: "Bitte trage oben deine E-Mail ein." });
       return;
     }
-    try {
-      const res = await fetch(`${API_BASE}/api/checkout`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email, plan }) });
-      const data = (await res.json()) as { url?: string; message?: string };
-      if (res.ok && data.url) window.location.assign(data.url);
-      else setMsg({ ok: false, text: data.message ?? "Kauf konnte nicht gestartet werden." });
-    } catch {
-      setMsg({ ok: false, text: "Keine Verbindung zum Alarm-Dienst." });
-    }
+    const err = await startCheckout(email, plan);
+    if (err) setMsg({ ok: false, text: err });
   }
 
   async function redeem() {
-    try {
-      let payload: Record<string, unknown>;
-      if (channel === "push") {
-        try {
-          payload = { code, channel: "push", subscription: await subscribeToPush() };
-        } catch (err) {
-          setMsg({ ok: false, text: err instanceof PushError ? err.message : "Push-Anmeldung fehlgeschlagen." });
-          return;
-        }
-      } else {
-        if (!email) {
-          setMsg({ ok: false, text: "Bitte trage oben deine E-Mail ein." });
-          return;
-        }
-        payload = { code, channel: "email", email };
-      }
-      const res = await fetch(`${API_BASE}/api/redeem`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(payload) });
-      const data = (await res.json()) as { message?: string };
-      setMsg({ ok: res.ok, text: (res.ok ? "✅ " : "") + (data.message ?? (res.ok ? "Pro freigeschaltet." : "Code ungültig.")) });
-      if (res.ok) {
-        markPro(); // Sperre „nur eine Marke“ aufheben
-        setShowPro(false);
-      }
-    } catch {
-      setMsg({ ok: false, text: "Keine Verbindung zum Alarm-Dienst." });
+    if (channel !== "push" && !email) {
+      setMsg({ ok: false, text: "Bitte trage oben deine E-Mail ein." });
+      return;
     }
+    const r = await redeemProCode({ code, channel, email });
+    setMsg({ ok: r.ok, text: (r.ok ? "✅ " : "") + r.message });
+    if (r.ok) setShowPro(false);
   }
 
   const unitLabel = metric === "liter" ? "€/L" : "€ / Dose";
@@ -292,40 +261,13 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
 
         {/* Pro freischalten (Kauf primär) */}
         {showPro && (
-          <div className="flex flex-col gap-1.5 rounded-lg border border-border bg-surface-2 p-2.5">
-            <span className="text-[0.74rem] font-semibold text-ink">Pro – mehrere Marken + Wunschpreis</span>
-            {channel === "email" ? (
-              <>
-                {PLANS.map((p) => (
-                  <button
-                    key={p.plan}
-                    type="button"
-                    onClick={() => checkout(p.plan)}
-                    className={`flex items-center justify-between gap-2 w-full h-11 px-3 rounded-lg border bg-surface text-left cursor-pointer hover:border-accent ${"highlight" in p ? "border-accent" : "border-border-strong"}`}
-                  >
-                    <span className="text-[0.9rem] font-bold text-ink">
-                      {p.price} <span className="text-[0.72rem] font-medium text-muted">{p.period}</span>
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      {"badge" in p && p.badge && <span className="text-[0.62rem] font-bold uppercase tracking-wide text-accent-strong bg-accent-tint rounded px-1.5 py-0.5">{p.badge}</span>}
-                      <span aria-hidden="true" className="text-muted">›</span>
-                    </span>
-                  </button>
-                ))}
-                <button type="button" className="self-start text-[0.7rem] text-muted underline underline-offset-2 hover:text-accent-strong cursor-pointer" onClick={() => setCodeOpen((v) => !v)}>
-                  Schon Supporter? Code einlösen
-                </button>
-              </>
-            ) : channel === "telegram" ? (
-              <p className="text-[0.74rem] text-muted">Im Telegram-Bot freischalten: sende <span className="text-ink font-semibold">/redeem DEIN-CODE</span> an den Bot.</p>
-            ) : null}
-            {(codeOpen || channel === "push") && (
-              <div className="flex gap-1.5">
-                <input type="text" value={code} onChange={(e) => setCode(e.target.value)} placeholder="Pro-Code" className="flex-1 min-w-0 h-9 px-2.5 text-[0.82rem] bg-surface text-ink border border-border-strong rounded-lg outline-none" />
-                <button type="button" onClick={redeem} className="flex-none h-9 px-3 text-[0.82rem] font-semibold text-good border border-[color-mix(in_srgb,var(--good)_40%,transparent)] rounded-lg cursor-pointer hover:bg-good-tint">Einlösen</button>
-              </div>
-            )}
-          </div>
+          <ProPlans
+            channel={channel}
+            onCheckout={checkout}
+            code={code}
+            onCodeChange={setCode}
+            onRedeem={redeem}
+          />
         )}
 
         {/* Speichern – ganz unten */}

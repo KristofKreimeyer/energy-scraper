@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { productKey, type GroupedOffer } from "../lib/offers";
 import { subscribeToPush, PushError } from "../lib/push";
-import { useAlarmMemo, rememberAlarm, markPro, clearAlarmMemo, isBrandBlocked } from "../lib/alarmState";
+import { useAlarmMemo, rememberAlarm, clearAlarmMemo, isBrandBlocked } from "../lib/alarmState";
+import { startCheckout, redeemProCode, type Plan } from "../lib/alarmApi";
+import ProPlans from "./ProPlans";
 import { Bell } from "lucide-react";
 
 // Basis-URL der Alarm-API (Cloudflare Worker). Lokal: wrangler dev auf :8787.
@@ -26,14 +28,6 @@ interface SubscribeResponse {
   error?: string;
 }
 
-// Pro-Pläne (Anzeige-Preise = Marketing-Copy; echter Betrag kommt aus der
-// jeweiligen Stripe-Price-ID). „yearly" ist hervorgehoben.
-const PLANS = [
-  { plan: "monthly", price: "1,99 €", period: "pro Monat" },
-  { plan: "yearly", price: "9,99 €", period: "pro Jahr", badge: "spart 58 %", highlight: true },
-  { plan: "lifetime", price: "24,99 €", period: "einmalig, für immer" },
-] as const;
-
 export function AlarmButton({ offer, embedded = false }: { offer: GroupedOffer; embedded?: boolean }) {
   // Eingebettet (in der Karten-Aktionsleiste) startet das Formular direkt –
   // der eigene „idle“-Trigger entfällt, das Öffnen steuert die Leiste.
@@ -45,7 +39,6 @@ export function AlarmButton({ offer, embedded = false }: { offer: GroupedOffer; 
   const [targetMetric, setTargetMetric] = useState<Metric>("unit");
   // Pro freischalten (Kauf primär) + Code einlösen (sekundär)
   const [showRedeem, setShowRedeem] = useState(false);
-  const [codeOpen, setCodeOpen] = useState(false);
   const [redeemCode, setRedeemCode] = useState("");
   const [redeemMsg, setRedeemMsg] = useState<string | null>(null);
 
@@ -98,60 +91,25 @@ export function AlarmButton({ offer, embedded = false }: { offer: GroupedOffer; 
     }
   }
 
-  async function checkout(plan: "monthly" | "yearly" | "lifetime") {
+  async function checkout(plan: Plan) {
     if (!email) {
       setRedeemMsg("Bitte trage oben zuerst deine E-Mail ein.");
       return;
     }
     setRedeemMsg("Weiterleitung zu Stripe …");
-    try {
-      const res = await fetch(`${API_BASE}/api/checkout`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ email, plan }),
-      });
-      const data = (await res.json()) as { url?: string; message?: string };
-      if (res.ok && data.url) window.location.assign(data.url);
-      else setRedeemMsg(data.message ?? "Kauf konnte nicht gestartet werden.");
-    } catch {
-      setRedeemMsg("Keine Verbindung zum Alarm-Dienst.");
-    }
+    const err = await startCheckout(email, plan);
+    if (err) setRedeemMsg(err);
   }
 
   async function redeem() {
-    setRedeemMsg("…");
-    try {
-      let payload: Record<string, unknown>;
-      if (channel === "push") {
-        try {
-          payload = { code: redeemCode, channel: "push", subscription: await subscribeToPush() };
-        } catch (err) {
-          setRedeemMsg(err instanceof PushError ? err.message : "Push-Anmeldung fehlgeschlagen.");
-          return;
-        }
-      } else {
-        if (!email) {
-          setRedeemMsg("Bitte trage oben zuerst deine E-Mail ein.");
-          return;
-        }
-        payload = { code: redeemCode, channel: "email", email };
-      }
-      const res = await fetch(`${API_BASE}/api/redeem`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      const data = (await res.json()) as { message?: string };
-      if (res.ok) {
-        markPro(); // Sperre „nur eine Marke“ aufheben
-        setRedeemMsg("✅ " + (data.message ?? "Pro freigeschaltet."));
-        setShowRedeem(false);
-      } else {
-        setRedeemMsg(data.message ?? "Code ungültig.");
-      }
-    } catch {
-      setRedeemMsg("Keine Verbindung zum Alarm-Dienst.");
+    if (channel !== "push" && !email) {
+      setRedeemMsg("Bitte trage oben zuerst deine E-Mail ein.");
+      return;
     }
+    setRedeemMsg("…");
+    const r = await redeemProCode({ code: redeemCode, channel, email });
+    setRedeemMsg((r.ok ? "✅ " : "") + r.message);
+    if (r.ok) setShowRedeem(false);
   }
 
   // Abgeschlossene Zustände: nur noch eine Statuszeile.
@@ -193,25 +151,6 @@ export function AlarmButton({ offer, embedded = false }: { offer: GroupedOffer; 
     }`;
   const unit = targetMetric === "liter" ? "€/L" : "€/Dose";
   const primaryLabel = channel === "telegram" ? "In Telegram öffnen" : channel === "push" ? "Push aktivieren" : "Preis-Alarm speichern";
-
-  const codeRow = (
-    <div className="flex gap-1.5">
-      <input
-        type="text"
-        value={redeemCode}
-        onChange={(e) => setRedeemCode(e.target.value)}
-        placeholder="Pro-Code"
-        className="flex-1 min-w-0 h-9 px-2.5 text-[0.82rem] bg-surface text-ink border border-border-strong rounded-lg outline-none"
-      />
-      <button
-        type="button"
-        onClick={redeem}
-        className="flex-none h-9 px-3 text-[0.82rem] font-semibold text-good border border-[color-mix(in_srgb,var(--good)_40%,transparent)] rounded-lg cursor-pointer hover:bg-good-tint"
-      >
-        Einlösen
-      </button>
-    </div>
-  );
 
   return (
     <form
@@ -362,53 +301,14 @@ export function AlarmButton({ offer, embedded = false }: { offer: GroupedOffer; 
       {/* Pro freischalten – Kauf primär (E-Mail-Kanal), Code sekundär.
           Bei gesperrter Marke ist Pro der einzige Weg, also direkt zeigen. */}
       {(showRedeem || blocked) && (
-        <div className="flex flex-col gap-2 rounded-lg border border-border bg-surface-2 p-2.5">
-          <span className="text-[0.74rem] font-semibold text-ink">Pro – unbegrenzt Marken + Wunschpreis</span>
-
-          {channel === "telegram" ? (
-            <p className="text-[0.74rem] text-muted">
-              Im Telegram-Bot freischalten: sende <span className="text-ink font-semibold">/redeem DEIN-CODE</span> an den Bot.
-            </p>
-          ) : channel === "push" ? (
-            <>
-              {codeRow}
-              <span className="text-[0.68rem] text-muted">Pro wird an dieses Gerät gebunden.</span>
-            </>
-          ) : (
-            <>
-              {PLANS.map((p) => (
-                <button
-                  key={p.plan}
-                  type="button"
-                  onClick={() => checkout(p.plan)}
-                  className={`flex items-center justify-between gap-2 w-full h-11 px-3 rounded-lg border bg-surface text-left cursor-pointer hover:border-accent ${
-                    "highlight" in p ? "border-accent" : "border-border-strong"
-                  }`}
-                >
-                  <span className="text-[0.9rem] font-bold text-ink">
-                    {p.price} <span className="text-[0.72rem] font-medium text-muted">{p.period}</span>
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    {"badge" in p && p.badge && (
-                      <span className="text-[0.62rem] font-bold uppercase tracking-wide text-accent-strong bg-accent-tint rounded px-1.5 py-0.5">{p.badge}</span>
-                    )}
-                    <span aria-hidden="true" className="text-muted">
-                      ›
-                    </span>
-                  </span>
-                </button>
-              ))}
-              <button
-                type="button"
-                className="self-start text-[0.7rem] text-muted underline underline-offset-2 hover:text-accent-strong cursor-pointer"
-                onClick={() => setCodeOpen((v) => !v)}
-              >
-                Schon Supporter? Code einlösen
-              </button>
-              {codeOpen && codeRow}
-            </>
-          )}
-        </div>
+        <ProPlans
+          channel={channel}
+          title="Pro – unbegrenzt Marken + Wunschpreis"
+          onCheckout={checkout}
+          code={redeemCode}
+          onCodeChange={setRedeemCode}
+          onRedeem={redeem}
+        />
       )}
       {redeemMsg && (
         <p className="text-[0.74rem] text-muted" role="status">

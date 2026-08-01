@@ -66,12 +66,13 @@ export default function ControlsBar({
           ))}
         </div>
 
-        {/* Nur mobil: Ansicht-Umschalter in die erste Reihe (rechts). Ab md
-            steckt er in der FilterBar. */}
+        {/* Mobil + Tablet: Ansicht-Umschalter in die erste Reihe (rechts) –
+            so bleibt die FilterBar einzeilig. Erst ab lg (Desktop) steckt er
+            in der FilterBar. */}
         <ViewToggle
           view={view}
           onViewChange={onViewChange}
-          className="ml-auto md:hidden"
+          className="ml-auto lg:hidden"
         />
 
         {favoriteCount > 0 && (

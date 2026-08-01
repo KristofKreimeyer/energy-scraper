@@ -62,12 +62,12 @@ export default function FilterBar({
           </span>
         )}
       </button>
-      {/* Ansicht-Umschalter: ab md hier rechts; auf Mobile in der ersten Reihe
+      {/* Ansicht-Umschalter: ab lg hier rechts; auf Mobil/Tablet in der ersten Reihe
           der ControlsBar (siehe ControlsBar). */}
       <ViewToggle
         view={view}
         onViewChange={onViewChange}
-        className="ml-auto hidden md:flex"
+        className="ml-auto hidden lg:flex"
       />
     </div>
   );

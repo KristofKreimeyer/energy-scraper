@@ -166,3 +166,5 @@ deployte Files nur anhängen, nie ändern.
 - Stripe: Checkout im Testmodus → Webhook schreibt Entitlement → Preiswecker
   wird buchbar.
 
+
+<!-- deploy-topology-test2 20260801T184704Z -->

@@ -29,7 +29,11 @@ jobs:
   refresh:
     runs-on: ubuntu-latest
     steps:
+      # Produktiv-Daten leben auf live: dort auschecken und committen, damit
+      # frische Wochendaten automatisch deployen (deploy-site triggert auf live).
       - uses: actions/checkout@v5
+        with:
+          ref: live
 
       - uses: actions/setup-node@v5
         with:
@@ -60,7 +64,7 @@ jobs:
             echo 'changed=false' >> "$GITHUB_OUTPUT"
           else
             git commit -m 'chore(data): Preisdaten & -historie aktualisiert'
-            git push
+            git push origin HEAD:live
             echo 'changed=true' >> "$GITHUB_OUTPUT"
           fi
 

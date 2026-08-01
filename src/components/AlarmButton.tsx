@@ -5,10 +5,7 @@ import { useAlarmMemo, rememberAlarm, clearAlarmMemo, isBrandBlocked } from "../
 import { startCheckout, redeemProCode, type Plan } from "../lib/alarmApi";
 import ProPlans from "./ProPlans";
 import { Bell } from "lucide-react";
-
-// Basis-URL der Alarm-API (Cloudflare Worker). Lokal: wrangler dev auf :8787.
-// Produktion: via VITE_API_BASE auf die deployte Worker-URL setzen.
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8787";
+import { API_BASE } from "../lib/api";
 
 type Channel = "email" | "telegram" | "push";
 type Metric = "unit" | "liter";

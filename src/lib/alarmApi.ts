@@ -1,11 +1,10 @@
 import { subscribeToPush, PushError } from "./push";
 import { markPro } from "./alarmState";
+import { API_BASE } from "./api";
 
 // Geteilte Alarm-/Pro-API für AlarmButton und AlarmCreator: Stripe-Checkout und
 // Pro-Code-Einlösung. Der eigentliche subscribe-Call bleibt je Komponente
 // (Produkt- vs. Marken-Payload unterscheiden sich).
-
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8787";
 
 export type Channel = "email" | "telegram" | "push";
 

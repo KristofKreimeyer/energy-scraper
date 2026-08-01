@@ -2,12 +2,11 @@ import { useState } from "react";
 import { productKey, type GroupedOffer } from "../lib/offers";
 import { authHeader } from "../auth/session";
 import { Tag } from "lucide-react";
+import { API_BASE } from "../lib/api";
 
 // „Günstiger gesehen?" – anonyme Community-Preismeldung für ein bestehendes
 // Angebot. Meldung geht als 'pending' an den Worker und wird erst nach
 // Moderation als Community-Hinweis angezeigt.
-
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8787";
 
 type State =
   | { kind: "idle" }

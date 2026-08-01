@@ -3,11 +3,10 @@ import { productKey, type GroupedOffer } from "../lib/offers";
 import { getVoterId, getMyVote, setMyVote, type VoteChoice } from "../utils/community";
 import { authHeader } from "../auth/session";
 import type { VoteTally } from "../hooks/useCommunityVotes";
+import { API_BASE } from "../lib/api";
 
 // „Noch verfügbar?" – anonymes Daumen-hoch/runter je Angebot. Eine Stimme je
 // Browser (localStorage-Voter-ID); optimistisches Update, Server bestätigt.
-
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8787";
 
 // Ab so vielen „noch da"-Stimmen zeigen wir das Vertrauens-Signal – vorher
 // wäre „von 0 Huntern bestätigt" toter als gar nichts (Cold-Start).

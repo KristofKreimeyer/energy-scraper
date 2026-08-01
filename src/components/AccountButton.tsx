@@ -3,8 +3,7 @@ import { useAuth } from "../auth/AuthContext";
 import { authHeader } from "../auth/session";
 import { Modal } from "./Modal";
 import { User } from "lucide-react";
-
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8787";
+import { API_BASE } from "../lib/api";
 
 interface Contributions {
   reports: number;

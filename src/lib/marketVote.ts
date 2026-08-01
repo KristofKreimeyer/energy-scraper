@@ -1,10 +1,10 @@
 import { getVoterId } from "../utils/community";
+import { API_BASE } from "./api";
 
 // Community-Roadmap-Voting: „Welchen Markt als Nächstes scrapen?". Anonym,
 // eine Stimme je Browser (Voter-ID). Der lokale Merker spiegelt nur die eigene
 // Wahl fürs UI – gezählt wird serverseitig.
 
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8787";
 const MY_KEY = "energyhunt:my-market-vote";
 
 // Muss mit der Worker-Whitelist (MARKET_CANDIDATES) übereinstimmen.

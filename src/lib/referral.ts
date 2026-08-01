@@ -1,10 +1,10 @@
 import { authHeader } from "../auth/session";
+import { API_BASE } from "./api";
 
 // Referral („Freunde einladen"): der Eingeladene kommt über /?ref=CODE. Wir
 // merken den Code lokal und hängen ihn an die nächste Alarm-Anmeldung – belohnt
 // wird zweiseitig erst bei E-Mail-Bestätigung (serverseitig).
 
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8787";
 const REF_KEY = "energyhunt:ref";
 
 /** ?ref=CODE aus der URL übernehmen und die URL wieder säubern. Beim Start rufen. */

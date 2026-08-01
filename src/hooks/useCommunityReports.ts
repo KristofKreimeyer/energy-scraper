@@ -1,9 +1,7 @@
-import { useEffect, useState } from "react";
+import { useApiData } from "./useApiData";
 
 // Lädt die freigegebenen Community-Preismeldungen (einmal beim Mount) und gibt
 // sie gruppiert nach productKey zurück, damit die OfferCard sie anzeigen kann.
-
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8787";
 
 export interface CommunityReport {
   price: number;
@@ -15,21 +13,8 @@ export interface CommunityReport {
 
 export type ReportsByProduct = Record<string, CommunityReport[]>;
 
+const selectReports = (j: unknown) => (j as { reports?: ReportsByProduct }).reports;
+
 export function useCommunityReports(): ReportsByProduct {
-  const [reports, setReports] = useState<ReportsByProduct>({});
-  useEffect(() => {
-    let alive = true;
-    fetch(`${API_BASE}/api/reports/approved`)
-      .then((r) => (r.ok ? r.json() : { reports: {} }))
-      .then((data: { reports?: ReportsByProduct }) => {
-        if (alive && data.reports) setReports(data.reports);
-      })
-      .catch(() => {
-        /* Community-Hinweise sind optionales Beiwerk – Fehler still schlucken. */
-      });
-    return () => {
-      alive = false;
-    };
-  }, []);
-  return reports;
+  return useApiData<ReportsByProduct>("/api/reports/approved", {}, selectReports);
 }

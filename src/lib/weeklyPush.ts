@@ -1,10 +1,10 @@
 import { subscribeToPush, PushError } from "./push";
+import { API_BASE } from "./api";
 
 // Wöchentliche Deal-Erinnerung (Broadcast-Push), eigener Opt-in getrennt von
 // Marken-Alarmen. Der lokale Merker spiegelt nur die letzte Aktion dieses
 // Geräts – die Wahrheit steht in D1 (scope='weekly').
 
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8787";
 const KEY = "energyhunt:weekly-push";
 
 export function pushSupported(): boolean {

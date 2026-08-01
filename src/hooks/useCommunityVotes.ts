@@ -1,9 +1,7 @@
-import { useEffect, useState } from "react";
+import { useApiData } from "./useApiData";
 
 // Lädt die aggregierten Verfügbarkeits-Votes (einmal beim Mount), gruppiert nach
 // productKey, für die Anzeige auf der OfferCard.
-
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8787";
 
 export interface VoteTally {
   up: number;
@@ -12,21 +10,8 @@ export interface VoteTally {
 
 export type VotesByProduct = Record<string, VoteTally>;
 
+const selectVotes = (j: unknown) => (j as { votes?: VotesByProduct }).votes;
+
 export function useCommunityVotes(): VotesByProduct {
-  const [votes, setVotes] = useState<VotesByProduct>({});
-  useEffect(() => {
-    let alive = true;
-    fetch(`${API_BASE}/api/votes`)
-      .then((r) => (r.ok ? r.json() : { votes: {} }))
-      .then((data: { votes?: VotesByProduct }) => {
-        if (alive && data.votes) setVotes(data.votes);
-      })
-      .catch(() => {
-        /* Optionales Signal – Fehler still schlucken. */
-      });
-    return () => {
-      alive = false;
-    };
-  }, []);
-  return votes;
+  return useApiData<VotesByProduct>("/api/votes", {}, selectVotes);
 }

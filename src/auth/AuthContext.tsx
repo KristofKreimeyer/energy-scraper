@@ -1,11 +1,10 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { getSessionToken, setSessionToken, clearSessionToken } from "./session";
+import { API_BASE } from "../lib/api";
 
 // Leichte Identität: passwortloser Login per E-Mail-Magic-Link. Der Context hält
 // den aktuellen Nutzer und stellt Login/Logout bereit. Session-Token liegt im
 // localStorage (siehe session.ts).
-
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8787";
 
 interface User {
   email: string;

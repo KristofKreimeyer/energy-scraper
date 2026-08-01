@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { WRAP } from "../utils/helper";
 import { MARKET_CANDIDATES, getMyMarketVote, voteMarket } from "../lib/marketVote";
+import { API_BASE } from "../lib/api";
 
 // Community-Roadmap: Nutzer stimmen ab, welchen Supermarkt wir als Nächstes
 // aufnehmen. Bindet die Community ein UND liefert echte Priorisierungs-Daten.
 // Optimistisches Update; eine Stimme je Browser (Wechsel erlaubt).
-
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8787";
 
 export default function MarketVote() {
   const [votes, setVotes] = useState<Record<string, number>>({});

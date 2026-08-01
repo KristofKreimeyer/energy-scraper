@@ -7,9 +7,9 @@ import { getRef } from "../lib/referral";
 import { startCheckout, redeemProCode, type Plan } from "../lib/alarmApi";
 import ProPlans from "./ProPlans";
 import { Modal } from "./Modal";
+import { API_BASE } from "../lib/api";
 
 // Globaler Preiswecker-Dialog: markenbasiert, von überall aufrufbar.
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8787";
 
 type Channel = "email" | "telegram" | "push";
 type Metric = "unit" | "liter";

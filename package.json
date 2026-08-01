@@ -10,7 +10,8 @@
     "prebuild": "node scripts/prepare-data.mjs",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "sync-main": "bash scripts/sync-main.sh"
   },
   "dependencies": {
     "lucide-react": "^1.28.0",

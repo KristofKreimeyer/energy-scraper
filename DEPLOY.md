@@ -18,6 +18,10 @@ Actions in `.github/workflows/`:
   ```bash
   git push origin main:live
   ```
+- **Zurücksyncen** (nach dem Daten-Refresh, der nach `live` committet):
+  ```bash
+  npm run sync-main    # Fast-Forward live -> main, mit Sicherheits-Checks
+  ```
 - **Cloudflare Pages:** Production-Branch = `live`; die native „Automatic
   deployments" sind **aus** – deployt wird ausschließlich über die GitHub Action
   (sie injiziert die `VITE_*`-Build-Vars korrekt).

@@ -4,10 +4,23 @@ Deployment von EnergyHunt: **Cloudflare Pages** (statische Vite-App) +
 **Cloudflare Worker** (Alarm-API) + **D1** (Datenbank). CI/CD über GitHub
 Actions in `.github/workflows/`:
 
-- `deploy-site.yml` – baut die App und deployt zu Pages (jeder main-Push).
-- `deploy-worker.yml` – D1-Migrationen + Worker-Deploy (bei `worker/**`-Änderungen).
-- `refresh-data.yml` – wöchentlich: Scraper, Normalisierung, committet Daten
-  (löst dann automatisch `deploy-site` aus) und versendet die Alarme.
+- `deploy-site.yml` – baut die App und deployt zu Pages (jeder `live`-Push).
+- `deploy-worker.yml` – D1-Migrationen + Worker-Deploy (bei `worker/**` auf `live`).
+- `refresh-data.yml` – wöchentlich (Cron): Scraper + Normalisierung, committet die
+  frischen Daten nach `live` (löst dann automatisch `deploy-site` aus) und
+  versendet die Alarme/Wochen-Push.
+
+### Branch-Topologie
+
+- **`main`** – Entwicklungs-/Integrationsbranch. Ein Push auf `main` deployt **nicht**.
+- **`live`** – Produktionsbranch. Nur Pushes auf `live` lösen Deploys aus.
+- **Release** = `main` nach `live` promoten:
+  ```bash
+  git push origin main:live
+  ```
+- **Cloudflare Pages:** Production-Branch = `live`; die native „Automatic
+  deployments" sind **aus** – deployt wird ausschließlich über die GitHub Action
+  (sie injiziert die `VITE_*`-Build-Vars korrekt).
 
 > Reihenfolge-Tipp gegen das URL-Henne-Ei: **erst den Worker** deployen (liefert
 > die API-URL für `VITE_API_BASE`), **dann die Seite** (liefert die Origin für
@@ -26,8 +39,12 @@ npm install
 npx wrangler d1 create energyHunt
 
 # Pages-Projekt anlegen (einmalig):
-npx wrangler pages project create energyhunt --production-branch=main
+npx wrangler pages project create energyhunt --production-branch=live
 ```
+
+> Wird das Git-Repo im Pages-Dashboard verbunden, **„Automatic deployments" ausschalten**
+> (Settings → Branch control): Deployt wird über die GitHub Action, nicht über
+> Cloudflares nativen Git-Build – sonst läuft der Deploy doppelt.
 
 **API-Token** (Cloudflare-Dashboard → My Profile → API Tokens → Create): Rechte
 **Account · Workers Scripts: Edit**, **Account · Cloudflare Pages: Edit**,
@@ -115,9 +132,16 @@ Repo → Settings → Secrets and variables → Actions.
 
 ## 6. Deploy auslösen
 
-Push auf `main` startet `deploy-site` (und bei `worker/**` auch
-`deploy-worker`). Beide auch manuell über den Actions-Tab (workflow_dispatch).
-Nach dem ersten Doppel-Deploy die URL-abhängigen Werte final setzen (siehe
+Push auf `live` startet `deploy-site` (und bei `worker/**` auch `deploy-worker`).
+Für ein Release den Dev-Stand promoten: `git push origin main:live`. Beide
+Workflows lassen sich auch manuell über den Actions-Tab starten
+(workflow_dispatch, Branch `live`).
+
+> Cloudflares Pages-„Automatic deployments" müssen **aus** sein (siehe Schritt 1),
+> sonst baut Cloudflare zusätzlich nativ → doppelter Deploy. Einzige Deploy-Quelle
+> ist die GitHub Action.
+
+Nach dem ersten Deploy die URL-abhängigen Werte final setzen (siehe
 Reihenfolge-Tipp oben) und den Worker einmal neu deployen.
 
 ## 7. D1-Migrationen

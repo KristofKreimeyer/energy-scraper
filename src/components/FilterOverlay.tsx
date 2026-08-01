@@ -1,24 +1,13 @@
 import { Modal } from "./Modal";
 import type { SortKey } from "../types";
 import { SORT_OPTIONS } from "../lib/sortOptions";
+import FilterChipGroup from "./FilterChipGroup";
 
-// Filter-Overlay-Inhalt (Sortieren / Markt / Marke) im barrierefreien Modal.
-// Reine Präsentations-Komponente: aller State kommt per Props aus App.
+// Filter-Overlay-Inhalt (Sortieren / Markt / Zucker / Marke) im barrierefreien
+// Modal. Reine Präsentations-Komponente: aller State kommt per Props aus App.
 
 const EYEBROW =
   "font-mono text-[0.72rem] tracking-[0.14em] uppercase text-muted";
-
-// Chip-Grundstil (Markt- & Marken-Filter) – Zustände via aria-pressed/disabled
-const chip =
-  "group inline-flex items-center gap-[7px] min-h-[38px] px-3.5 bg-surface text-ink border border-border-strong " +
-  "rounded-full text-[0.85rem] font-semibold cursor-pointer transition-colors duration-150 enabled:aria-[pressed=false]:hover:bg-surface-2 " +
-  "aria-pressed:bg-fill aria-pressed:text-on-fill aria-pressed:border-fill " +
-  "aria-pressed:hover:opacity-90 " +
-  "disabled:opacity-40 disabled:cursor-not-allowed";
-// Zähler: kleiner als der Name, aber vertikal bündig (Chip zentriert via
-// items-center) – nicht hochgestellt.
-const chipCount =
-  "font-mono text-[0.62rem] opacity-75 tabular-nums group-aria-pressed:opacity-90";
 
 interface FilterOverlayProps {
   sort: SortKey;
@@ -97,103 +86,50 @@ export default function FilterOverlay({
         </select>
       </div>
 
-      <div className="flex flex-col gap-2">
-        <span className={`${EYEBROW} !text-[0.68rem] !tracking-[0.1em]`}>
-          Markt
-        </span>
-        <div className="flex flex-wrap gap-2">
-          <button
-            className={chip}
-            type="button"
-            aria-pressed={market === "all"}
-            onClick={() => onMarketChange("all")}
-          >
-            Alle <span className={chipCount}>{totalCount}</span>
-          </button>
-          {markets.map((m) => {
-            const count = marketTally.get(m) ?? 0;
-            const selected = market === m;
-            return (
-              <button
-                key={m}
-                className={chip}
-                type="button"
-                aria-pressed={selected}
-                disabled={count === 0 && !selected}
-                onClick={() => onMarketChange(m)}
-              >
-                {m} <span className={chipCount}>{count}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <FilterChipGroup
+        label="Markt"
+        value={market}
+        onChange={onMarketChange}
+        options={[
+          { value: "all", text: "Alle", count: totalCount },
+          ...markets.map((m) => ({
+            value: m,
+            text: m,
+            count: marketTally.get(m) ?? 0,
+          })),
+        ]}
+      />
 
-      <div className="flex flex-col gap-2">
-        <span className={`${EYEBROW} !text-[0.68rem] !tracking-[0.1em]`}>
-          Zucker
-        </span>
-        <div className="flex flex-wrap gap-2">
-          {(
-            [
-              { value: "all", text: "Alle" },
-              { value: "zero", text: "Zuckerfrei" },
-              { value: "sugar", text: "Mit Zucker" },
-            ] as const
-          ).map((opt) => {
-            const count = sugarTally.get(opt.value) ?? 0;
-            const selected = sugar === opt.value;
-            return (
-              <button
-                key={opt.value}
-                className={chip}
-                type="button"
-                aria-pressed={selected}
-                disabled={count === 0 && !selected}
-                onClick={() => onSugarChange(opt.value)}
-              >
-                {opt.text} <span className={chipCount}>{count}</span>
-              </button>
-            );
-          })}
-        </div>
-        <p className="text-[0.72rem] text-muted">
-          Sortenbündel („versch. Sorten“) enthalten beide Varianten und zählen
-          zu beiden Optionen.
-        </p>
-      </div>
+      <FilterChipGroup
+        label="Zucker"
+        value={sugar}
+        onChange={(v) => onSugarChange(v as "all" | "zero" | "sugar")}
+        options={[
+          { value: "all", text: "Alle", count: sugarTally.get("all") ?? 0 },
+          { value: "zero", text: "Zuckerfrei", count: sugarTally.get("zero") ?? 0 },
+          { value: "sugar", text: "Mit Zucker", count: sugarTally.get("sugar") ?? 0 },
+        ]}
+        footer={
+          <p className="text-[0.72rem] text-muted">
+            Sortenbündel („versch. Sorten“) enthalten beide Varianten und zählen
+            zu beiden Optionen.
+          </p>
+        }
+      />
 
-      <div className="flex flex-col gap-2">
-        <span className={`${EYEBROW} !text-[0.68rem] !tracking-[0.1em]`}>
-          Marke
-        </span>
-        <div className="flex flex-wrap gap-2">
-          <button
-            className={chip}
-            type="button"
-            aria-pressed={brand === "all"}
-            onClick={() => onBrandChange("all")}
-          >
-            Alle <span className={chipCount}>{totalCount}</span>
-          </button>
-          {brands.map((b) => {
-            const count = brandTally.get(b) ?? 0;
-            const selected = brand === b;
-            return (
-              <button
-                key={b}
-                className={chip}
-                type="button"
-                aria-pressed={selected}
-                disabled={count === 0 && !selected}
-                onClick={() => onBrandChange(b)}
-              >
-                {b} <span className={chipCount}>{count}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+      <FilterChipGroup
+        label="Marke"
+        value={brand}
+        onChange={onBrandChange}
+        options={[
+          { value: "all", text: "Alle", count: totalCount },
+          ...brands.map((b) => ({
+            value: b,
+            text: b,
+            count: brandTally.get(b) ?? 0,
+          })),
+        ]}
+      />
 
       <div className="flex items-center justify-between gap-2 pt-1">
         <button

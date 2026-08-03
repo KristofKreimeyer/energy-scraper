@@ -18,6 +18,24 @@ export function AccountButton() {
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [contrib, setContrib] = useState<Contributions | null>(null);
+  const [portalMsg, setPortalMsg] = useState<string | null>(null);
+
+  // Stripe-Kundenportal öffnen (Abo verwalten & kündigen). Nur für das
+  // eingeloggte Konto; der Worker schlägt den Stripe-Customer per E-Mail nach.
+  async function openPortal() {
+    setPortalMsg("…");
+    try {
+      const res = await fetch(`${API_BASE}/api/portal`, { method: "POST", headers: authHeader() });
+      const data = (await res.json()) as { url?: string; message?: string };
+      if (res.ok && data.url) {
+        window.location.assign(data.url);
+        return;
+      }
+      setPortalMsg(data.message ?? "Das Abo-Portal konnte nicht geöffnet werden.");
+    } catch {
+      setPortalMsg("Keine Verbindung zum Dienst.");
+    }
+  }
 
   async function onOpen() {
     setOpen(true);
@@ -84,6 +102,25 @@ export function AccountButton() {
                 </div>
                 <p className="text-[0.72rem] text-muted">Ab jetzt zählen deine Meldungen und Votes zu deinem Konto – die Basis für kommende Ränge.</p>
               </div>
+              <div className="flex flex-col gap-1.5">
+                <button
+                  type="button"
+                  onClick={openPortal}
+                  className="w-full h-10 text-[0.85rem] font-semibold text-ink bg-surface border border-border-strong rounded-lg cursor-pointer hover:bg-surface-2"
+                >
+                  Pro-Abo verwalten &amp; kündigen
+                </button>
+                {portalMsg && (
+                  <p className="text-[0.78rem] text-muted" role="status">
+                    {portalMsg}
+                  </p>
+                )}
+                <p className="text-[0.7rem] text-muted">
+                  Öffnet das gesicherte Stripe-Portal – dort kannst du dein Abo
+                  einsehen, Zahlungsdaten ändern und jederzeit kündigen.
+                </p>
+              </div>
+
               <button
                 type="button"
                 onClick={() => {

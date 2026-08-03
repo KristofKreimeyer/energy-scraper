@@ -86,6 +86,32 @@ export function registerPro(app: Hono<{ Bindings: Env }>) {
     return c.json({ url: session.url })
   })
 
+  // --- Stripe: Kunden-/Billing-Portal (Abo verwalten & kündigen, § 312k BGB) --
+  // Auth-geschützt: öffnet das Portal NUR für die E-Mail des eingeloggten Kontos
+  // (kein Öffnen fremder Abos). Der Stripe-Customer wird per E-Mail nachgeschlagen
+  // (Checkout legt ihn via customer_email an).
+  app.post('/api/portal', async (c) => {
+    const userId = await sessionUserId(c)
+    if (!userId) return c.json({ error: 'unauthorized' }, 401)
+    if (!c.env.STRIPE_SECRET_KEY) {
+      return c.json({ error: 'stripe_unconfigured', message: 'Die Zahlung ist noch nicht eingerichtet.' }, 503)
+    }
+    const u = await c.env.DB.prepare('SELECT email FROM users WHERE id=?').bind(userId).first<{ email: string }>()
+    if (!u) return c.json({ error: 'unauthorized' }, 401)
+
+    const stripe = stripeClient(c.env)
+    const customers = await stripe.customers.list({ email: u.email, limit: 1 })
+    const customer = customers.data[0]
+    if (!customer) {
+      return c.json({ error: 'no_customer', message: 'Zu diesem Konto ist kein Stripe-Abo hinterlegt.' }, 404)
+    }
+    const session = await stripe.billingPortal.sessions.create({
+      customer: customer.id,
+      return_url: `${c.env.PUBLIC_SITE_URL}/`,
+    })
+    return c.json({ url: session.url })
+  })
+
   // --- Stripe: Webhook (schreibt/entzieht das Entitlement) -------------------
   app.post('/api/stripe/webhook', async (c) => {
     const sig = c.req.header('stripe-signature')

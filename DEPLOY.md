@@ -125,6 +125,8 @@ Repo → Settings → Secrets and variables → Actions.
 | `PUBLIC_SITE_URL` | Seiten-URL (Alarm-Links) |
 | `API_BASE` | Worker-URL (Abmelde-Links) |
 | `VAPID_SUBJECT` | `mailto:alarm@deine-domain.de` |
+| `ALERT_EMAIL` | Empfänger der Scraper-Ausfall-Warnung (optional; Default = `EMAIL_FROM`) |
+| `MIN_OFFERS` | Schwelle für den Health-Check (optional; Default 1 = Alarm nur bei 0 Angeboten) |
 
 > `BREVO_API_KEY` und `TELEGRAM_BOT_TOKEN` liegen bewusst **doppelt** vor: der
 > Worker braucht sie live (Anmeldung), die Action wöchentlich (Versand).

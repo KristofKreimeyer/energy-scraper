@@ -53,6 +53,17 @@ jobs:
           ALDI_SUED_SLUG: ${{ github.event.inputs.aldi_sued_slug }}
         run: node run-all.js
 
+      # Health-Check: bei 0/zu wenigen Angeboten Alarm-Mail + Abbruch, damit
+      # keine leeren Daten committet/deployt werden (Live behält letzte gute Daten).
+      - name: Scraper-Health prüfen
+        env:
+          MIN_OFFERS: ${{ vars.MIN_OFFERS }}
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          EMAIL_FROM: ${{ vars.EMAIL_FROM }}
+          EMAIL_FROM_NAME: ${{ vars.EMAIL_FROM_NAME }}
+          ALERT_EMAIL: ${{ vars.ALERT_EMAIL }}
+        run: node scripts/notify-scrape-health.mjs
+
       - name: Aktualisierte Daten committen
         id: commit
         run: |

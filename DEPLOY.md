@@ -120,6 +120,7 @@ Repo → Settings → Secrets and variables → Actions.
 |---|---|
 | `VITE_API_BASE` | Worker-URL (Build der Seite) |
 | `VITE_VAPID_PUBLIC_KEY` | VAPID-Public-Key (Build der Seite) |
+| `VITE_CF_BEACON_TOKEN` | Cloudflare-Web-Analytics-Token (optional; ohne = keine Analytics) |
 | `EMAIL_FROM` / `EMAIL_FROM_NAME` | Absender (Versand) |
 | `PUBLIC_SITE_URL` | Seiten-URL (Alarm-Links) |
 | `API_BASE` | Worker-URL (Abmelde-Links) |
@@ -127,6 +128,11 @@ Repo → Settings → Secrets and variables → Actions.
 
 > `BREVO_API_KEY` und `TELEGRAM_BOT_TOKEN` liegen bewusst **doppelt** vor: der
 > Worker braucht sie live (Anmeldung), die Action wöchentlich (Versand).
+
+> **Web Analytics (optional, cookieless → kein Consent-Banner):** Cloudflare-
+> Dashboard → Analytics & Logs → **Web Analytics** → Site hinzufügen → den
+> Token aus dem JS-Snippet als Repo-Variable `VITE_CF_BEACON_TOKEN` setzen. Ohne
+> die Variable wird kein Beacon eingebaut.
 
 ## 5. Rechtliches (DE-Pflicht, vor dem Einsammeln von Daten/Zahlungen)
 

@@ -45,6 +45,7 @@ jobs:
           VITE_API_BASE: ${{ vars.VITE_API_BASE }}
           VITE_VAPID_PUBLIC_KEY: ${{ vars.VITE_VAPID_PUBLIC_KEY }}
           VITE_COMMUNITY_URL: ${{ vars.VITE_COMMUNITY_URL }}
+          VITE_CF_BEACON_TOKEN: ${{ vars.VITE_CF_BEACON_TOKEN }}
         run: npm run build
 
       - name: Zu Cloudflare Pages deployen

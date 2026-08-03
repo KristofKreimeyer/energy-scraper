@@ -21,6 +21,16 @@ const here = dirname(fileURLToPath(import.meta.url))
  * Inhalte statt eines leeren #root.
  */
 function seoHtmlPlugin(): Plugin {
+  // Cloudflare Web Analytics (cookieless, anonym → kein Consent-Banner). Nur
+  // aktiv, wenn ein Beacon-Token gesetzt ist (Produktion via CI-Env), nicht im
+  // Dev. Der Token ist nicht geheim (steht ohnehin im Seitenquelltext).
+  const cfToken = process.env.VITE_CF_BEACON_TOKEN?.trim()
+  const beacon = cfToken
+    ? `<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"${cfToken}"}'></script>`
+    : ''
+  const injectBeacon = (h: string) =>
+    beacon ? h.replace('</head>', `  ${beacon}\n  </head>`) : h
+
   return {
     name: 'energyhunt-seo-html',
     transformIndexHtml(html) {
@@ -28,7 +38,7 @@ function seoHtmlPlugin(): Plugin {
       try {
         parsed = JSON.parse(readFileSync(join(here, 'src/data/offers.json'), 'utf8'))
       } catch {
-        return html // ohne Daten bleibt der statische Head bestehen
+        return injectBeacon(html) // ohne Daten bleibt der statische Head bestehen
       }
       const list = parsed.offers as Parameters<typeof buildTitle>[0]
       const title = buildTitle(list)
@@ -36,17 +46,19 @@ function seoHtmlPlugin(): Plugin {
       const jsonLd = buildJsonLd(list)
       const noscript = buildNoscript(list)
 
-      return html
-        .replace(/<title>[\s\S]*?<\/title>/, `<title>${title}</title>`)
-        .replace(
-          /<meta\s+name="description"\s+content=\s*"[\s\S]*?"\s*\/>/,
-          `<meta name="description" content="${description.replace(/"/g, '&quot;')}" />`,
-        )
-        .replace(
-          '</head>',
-          `  <script type="application/ld+json">${jsonLd}</script>\n  </head>`,
-        )
-        .replace('<div id="root"></div>', `<div id="root"></div>\n    ${noscript}`)
+      return injectBeacon(
+        html
+          .replace(/<title>[\s\S]*?<\/title>/, `<title>${title}</title>`)
+          .replace(
+            /<meta\s+name="description"\s+content=\s*"[\s\S]*?"\s*\/>/,
+            `<meta name="description" content="${description.replace(/"/g, '&quot;')}" />`,
+          )
+          .replace(
+            '</head>',
+            `  <script type="application/ld+json">${jsonLd}</script>\n  </head>`,
+          )
+          .replace('<div id="root"></div>', `<div id="root"></div>\n    ${noscript}`),
+      )
     },
   }
 }

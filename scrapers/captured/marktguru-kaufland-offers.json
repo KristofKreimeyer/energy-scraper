@@ -1,20 +1,20 @@
 [
   {
-    "brand": "Monster",
+    "brand": "Red Bull",
     "supermarket": "Kaufland",
     "title": "Energy Drink",
-    "productBrand": "Monster Energy",
-    "description": "versch. Sorten, koffeinhaltig (+ 0.25 Pfand) je 0,5-l-Dose",
-    "price": "0,88 €",
-    "priceNumber": 0.88,
-    "referencePrice": 1.76,
+    "productBrand": "Red Bull",
+    "description": "oder Erfrischungsgetränk versch. Sorten, z. T. taurin- und koffeinhaltig (+ 0.25 Pfand) je 0,25 - 0,33-l-Dose",
+    "price": "0,85 €",
+    "priceNumber": 0.85,
+    "referencePrice": 3.4,
     "unit": "Liter",
     "quantity": 1,
-    "validFrom": "2026-07-22T22:00:00Z",
-    "validTo": "2026-07-29T18:00:59Z",
-    "imageUrl": "https://cdn.marktguru.de/api/v1/offers/24052457/images/default/0/medium.webp",
-    "offerId": 24052457,
-    "sourceUrl": "https://www.marktguru.de/offers/24052457",
-    "scrapedAt": "2026-07-27T06:08:29.840Z"
+    "validFrom": "2026-07-29T22:00:00Z",
+    "validTo": "2026-08-05T18:00:00Z",
+    "imageUrl": "https://cdn.marktguru.de/api/v1/offers/24197443/images/default/0/medium.webp",
+    "offerId": 24197443,
+    "sourceUrl": "https://www.marktguru.de/offers/24197443",
+    "scrapedAt": "2026-08-03T06:03:33.131Z"
   }
 ]

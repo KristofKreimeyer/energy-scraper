@@ -1,1 +1,19 @@
-[]
+[
+  {
+    "brand": "Rockstar",
+    "supermarket": "Netto Marken-Discount",
+    "title": "Energy Drink",
+    "description": "taurin- & koffeinhaltig, versch. Sorten 0,5 Liter zzgl. 0.25 Pfand",
+    "productBrand": "Rockstar",
+    "price": "1,00 €",
+    "priceNumber": 1,
+    "oldPrice": "1,49 €",
+    "pricePerBaseUnit": "(2.- / l)",
+    "validFrom": "2026-08-02T22:00:00.000+0000",
+    "validTo": "2026-08-08T18:00:00.000+0000",
+    "imageUrl": "https://content-media.bonial.biz/83fd6e78-3322-47cc-a736-83135e6b45f3/0e3a32ed-324a-4a97-b3f4-c038f2801950.jpg?impolicy=SEO-offer-normal",
+    "sourcePage": 10,
+    "sourceUrl": "https://www.kaufda.de/Netto-Marken-Discount/Sortiment/Energydrink",
+    "scrapedAt": "2026-08-03T06:04:03.381Z"
+  }
+]

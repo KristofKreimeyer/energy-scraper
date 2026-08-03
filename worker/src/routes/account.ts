@@ -123,6 +123,42 @@ export function registerAccount(app: Hono<{ Bindings: Env }>) {
     return c.json({ reports: reports?.n ?? 0, reportsApproved: approved?.n ?? 0, votes: votes?.n ?? 0 })
   })
 
+  // „Meine Alarme": die E-Mail-Alarme des Kontos (destination = Konto-E-Mail).
+  // Telegram/Push hängen an chat_id/Push-Endpunkt und sind nicht kontobasiert
+  // zuordenbar – die verwaltet man über /stop bzw. die Browser-Einstellungen.
+  app.get('/api/me/alarms', async (c) => {
+    const userId = await sessionUserId(c)
+    if (!userId) return c.json({ error: 'unauthorized' }, 401)
+    const u = await c.env.DB.prepare('SELECT email FROM users WHERE id=?').bind(userId).first<{ email: string }>()
+    if (!u) return c.json({ error: 'unauthorized' }, 401)
+    const rows = (
+      await c.env.DB
+        .prepare(
+          "SELECT id, product_label AS label, scope, status, target_price AS targetPrice, target_metric AS targetMetric, created_at AS createdAt " +
+            "FROM subscriptions WHERE channel='email' AND destination=? AND status IN ('pending','confirmed') ORDER BY created_at DESC",
+        )
+        .bind(u.email)
+        .all()
+    ).results
+    return c.json({ alarms: rows })
+  })
+
+  // Alarm löschen – nur eigene (Ownership über destination = Konto-E-Mail).
+  app.post('/api/me/alarms/delete', async (c) => {
+    const userId = await sessionUserId(c)
+    if (!userId) return c.json({ error: 'unauthorized' }, 401)
+    const u = await c.env.DB.prepare('SELECT email FROM users WHERE id=?').bind(userId).first<{ email: string }>()
+    if (!u) return c.json({ error: 'unauthorized' }, 401)
+    const body = (await c.req.json().catch(() => ({}))) as { id?: string }
+    const id = String(body.id ?? '').trim()
+    if (!id) return c.json({ error: 'missing_id', message: 'Kein Alarm angegeben.' }, 400)
+    const res = await c.env.DB
+      .prepare("DELETE FROM subscriptions WHERE id=? AND channel='email' AND destination=?")
+      .bind(id, u.email)
+      .run()
+    return c.json({ ok: true, deleted: res.meta.changes })
+  })
+
   // Referral-Link + Stand für das eingeloggte Konto. Zweiseitig: geworbene
   // Freunde und Referrer bekommen je 1 Monat Pro (Reward bei E-Mail-Bestätigung).
   app.get('/api/referral/link', async (c) => {

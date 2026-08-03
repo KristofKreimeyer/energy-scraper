@@ -11,6 +11,15 @@ interface Contributions {
   votes: number;
 }
 
+interface Alarm {
+  id: string;
+  label: string;
+  scope: string;
+  status: string;
+  targetPrice: number | null;
+  targetMetric: string | null;
+}
+
 export function AccountButton() {
   const { user, ready, requestLogin, logout } = useAuth();
   const [open, setOpen] = useState(false);
@@ -18,7 +27,31 @@ export function AccountButton() {
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [contrib, setContrib] = useState<Contributions | null>(null);
+  const [alarms, setAlarms] = useState<Alarm[] | null>(null);
   const [portalMsg, setPortalMsg] = useState<string | null>(null);
+
+  async function loadAlarms() {
+    try {
+      const res = await fetch(`${API_BASE}/api/me/alarms`, { headers: authHeader() });
+      if (res.ok) setAlarms(((await res.json()) as { alarms: Alarm[] }).alarms);
+    } catch {
+      /* egal – Sektion bleibt leer */
+    }
+  }
+
+  // Optimistisch entfernen; der Worker löscht nur eigene E-Mail-Alarme.
+  async function deleteAlarm(id: string) {
+    setAlarms((cur) => cur?.filter((a) => a.id !== id) ?? null);
+    try {
+      await fetch(`${API_BASE}/api/me/alarms/delete`, {
+        method: "POST",
+        headers: { "content-type": "application/json", ...authHeader() },
+        body: JSON.stringify({ id }),
+      });
+    } catch {
+      /* Netzfehler ignorieren – die optimistische Anzeige bleibt */
+    }
+  }
 
   // Stripe-Kundenportal öffnen (Abo verwalten & kündigen). Nur für das
   // eingeloggte Konto; der Worker schlägt den Stripe-Customer per E-Mail nach.
@@ -48,6 +81,7 @@ export function AccountButton() {
       } catch {
         /* egal – Zähler bleibt leer */
       }
+      loadAlarms();
     }
   }
 
@@ -102,6 +136,47 @@ export function AccountButton() {
                 </div>
                 <p className="text-[0.72rem] text-muted">Ab jetzt zählen deine Meldungen und Votes zu deinem Konto – die Basis für kommende Ränge.</p>
               </div>
+
+              <div className="flex flex-col gap-1.5">
+                <span className="text-[0.66rem] font-semibold uppercase tracking-[0.08em] text-muted">
+                  Meine Alarme (E-Mail)
+                </span>
+                {alarms && alarms.length > 0 ? (
+                  <ul className="flex flex-col gap-1.5">
+                    {alarms.map((a) => (
+                      <li
+                        key={a.id}
+                        className="flex items-center gap-2 rounded-lg border border-border bg-surface-2 px-3 py-2"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <div className="text-[0.85rem] text-ink truncate">{a.label}</div>
+                          <div className="text-[0.7rem] text-muted">
+                            {a.status === "pending" ? "unbestätigt" : "aktiv"}
+                            {a.targetPrice != null
+                              ? ` · Wecker ≤ ${a.targetPrice.toLocaleString("de-DE", { minimumFractionDigits: 2 })} ${a.targetMetric === "liter" ? "€/L" : "€/Dose"}`
+                              : ""}
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => deleteAlarm(a.id)}
+                          aria-label={`Alarm „${a.label}" löschen`}
+                          className="flex-none text-[0.76rem] font-semibold text-warn-ink hover:underline cursor-pointer"
+                        >
+                          Löschen
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-[0.72rem] text-muted">Aktuell keine E-Mail-Alarme.</p>
+                )}
+                <p className="text-[0.68rem] text-muted">
+                  Nur E-Mail-Alarme. Telegram: <span className="text-ink">/stop</span> im
+                  Bot · Push: über die Browser-Einstellungen.
+                </p>
+              </div>
+
               <div className="flex flex-col gap-1.5">
                 <button
                   type="button"

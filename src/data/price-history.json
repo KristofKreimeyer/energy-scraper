@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-03T06:04:48.962Z",
+  "updatedAt": "2026-08-10T05:31:55.228Z",
   "products": {
     "aldi nord|rockstar|energydrink original|0,5-l-dose": {
       "market": "Aldi Nord",
@@ -134,6 +134,12 @@
           "price": 5.29,
           "perUnit": 0.88,
           "perLiter": 3.53
+        },
+        {
+          "date": "2026-08-10",
+          "price": 4.99,
+          "perUnit": 0.83,
+          "perLiter": 3.33
         }
       ]
     },
@@ -474,6 +480,12 @@
           "price": 0.99,
           "perUnit": 0.99,
           "perLiter": 3.96
+        },
+        {
+          "date": "2026-08-10",
+          "price": 0.99,
+          "perUnit": 0.99,
+          "perLiter": 3.96
         }
       ]
     },
@@ -488,6 +500,34 @@
           "price": 1,
           "perUnit": 1,
           "perLiter": 2
+        }
+      ]
+    },
+    "aldi nord|monster|energydrink|10x0,5-l-dose": {
+      "market": "Aldi Nord",
+      "brand": "Monster",
+      "title": "Energydrink",
+      "unitLabel": "10x0,5-L-Dose",
+      "points": [
+        {
+          "date": "2026-08-10",
+          "price": 7.77,
+          "perUnit": 0.78,
+          "perLiter": 1.55
+        }
+      ]
+    },
+    "kaufland|monster|energy drink|10 x 0,5-l-dose": {
+      "market": "Kaufland",
+      "brand": "Monster",
+      "title": "Energy Drink",
+      "unitLabel": "10 x 0,5-l-Dose",
+      "points": [
+        {
+          "date": "2026-08-10",
+          "price": 7.77,
+          "perUnit": 0.78,
+          "perLiter": 1.55
         }
       ]
     }

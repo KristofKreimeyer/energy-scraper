@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-10T05:31:55.228Z",
+  "updatedAt": "2026-08-17T05:27:21.191Z",
   "products": {
     "aldi nord|rockstar|energydrink original|0,5-l-dose": {
       "market": "Aldi Nord",
@@ -12,6 +12,12 @@
           "price": 0.79,
           "perUnit": 0.79,
           "perLiter": 1.58
+        },
+        {
+          "date": "2026-08-17",
+          "price": 0.75,
+          "perUnit": 0.75,
+          "perLiter": 1.5
         }
       ]
     },
@@ -26,6 +32,12 @@
           "price": 0.79,
           "perUnit": 0.79,
           "perLiter": 1.58
+        },
+        {
+          "date": "2026-08-17",
+          "price": 0.75,
+          "perUnit": 0.75,
+          "perLiter": 1.5
         }
       ]
     },
@@ -40,6 +52,12 @@
           "price": 0.79,
           "perUnit": 0.79,
           "perLiter": 1.58
+        },
+        {
+          "date": "2026-08-17",
+          "price": 0.75,
+          "perUnit": 0.75,
+          "perLiter": 1.5
         }
       ]
     },
@@ -94,6 +112,12 @@
           "price": 1.29,
           "perUnit": 1.29,
           "perLiter": 2.58
+        },
+        {
+          "date": "2026-08-17",
+          "price": 1.29,
+          "perUnit": 1.29,
+          "perLiter": 2.58
         }
       ]
     },
@@ -137,6 +161,12 @@
         },
         {
           "date": "2026-08-10",
+          "price": 4.99,
+          "perUnit": 0.83,
+          "perLiter": 3.33
+        },
+        {
+          "date": "2026-08-17",
           "price": 4.99,
           "perUnit": 0.83,
           "perLiter": 3.33
@@ -348,6 +378,12 @@
           "price": 0.89,
           "perUnit": 0.89,
           "perLiter": 3.56
+        },
+        {
+          "date": "2026-08-17",
+          "price": 0.89,
+          "perUnit": 0.89,
+          "perLiter": 3.56
         }
       ]
     },
@@ -528,6 +564,90 @@
           "price": 7.77,
           "perUnit": 0.78,
           "perLiter": 1.55
+        }
+      ]
+    },
+    "aldi nord|red bull|energy drink sugarfree|0,25-l-dose": {
+      "market": "Aldi Nord",
+      "brand": "Red Bull",
+      "title": "Energy Drink Sugarfree",
+      "unitLabel": "0,25-L-Dose",
+      "points": [
+        {
+          "date": "2026-08-17",
+          "price": 0.89,
+          "perUnit": 0.89,
+          "perLiter": 3.56
+        }
+      ]
+    },
+    "aldi nord|red bull|energy drink classic|0,25-l-dose": {
+      "market": "Aldi Nord",
+      "brand": "Red Bull",
+      "title": "Energy Drink Classic",
+      "unitLabel": "0,25-L-Dose",
+      "points": [
+        {
+          "date": "2026-08-17",
+          "price": 0.89,
+          "perUnit": 0.89,
+          "perLiter": 3.56
+        }
+      ]
+    },
+    "aldi nord|red bull|energydrink|0,25-l-dose": {
+      "market": "Aldi Nord",
+      "brand": "Red Bull",
+      "title": "Energydrink",
+      "unitLabel": "0,25-L-Dose",
+      "points": [
+        {
+          "date": "2026-08-17",
+          "price": 0.89,
+          "perUnit": 0.89,
+          "perLiter": 3.56
+        }
+      ]
+    },
+    "aldi nord|red bull|energy drink sea blue edition|0,25-l-dose": {
+      "market": "Aldi Nord",
+      "brand": "Red Bull",
+      "title": "Energy Drink Sea Blue Edition",
+      "unitLabel": "0,25-L-Dose",
+      "points": [
+        {
+          "date": "2026-08-17",
+          "price": 0.89,
+          "perUnit": 0.89,
+          "perLiter": 3.56
+        }
+      ]
+    },
+    "netto|monster|energy drink|10 x 0,5 liter": {
+      "market": "Netto",
+      "brand": "Monster",
+      "title": "Energy Drink",
+      "unitLabel": "10 x 0,5 Liter",
+      "points": [
+        {
+          "date": "2026-08-17",
+          "price": 7.77,
+          "perUnit": 0.78,
+          "perLiter": 1.55
+        }
+      ]
+    },
+    "penny|red bull|energy-drink*|250 ml": {
+      "market": "Penny",
+      "brand": "Red Bull",
+      "title": "Energy-Drink*",
+      "unitLabel": "250 ml",
+      "points": [
+        {
+          "date": "2026-08-17",
+          "price": 0.99,
+          "perUnit": 0.99,
+          "perLiter": 3.96
         }
       ]
     }

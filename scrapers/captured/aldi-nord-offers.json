@@ -1,14 +1,98 @@
 [
   {
-    "brand": "Monster",
+    "brand": "Red Bull",
+    "supermarket": "Aldi Nord",
+    "title": "Energy Drink Sugarfree",
+    "price": "0,89 €",
+    "priceNumber": 0.89,
+    "salesUnit": "0,25-L-Dose",
+    "imageUrl": "https://s7g10.scene7.com/is/image/aldinord/1000521_22_2021_redbull_sugarfree_on1?bfc=on&wid=1440&fmt=webp-alpha",
+    "productUrl": "https://www.aldi-nord.dehttps://www.aldi-nord.de/produkt/energy-drink-sugarfree-10005210003.html",
+    "sourceUrl": "https://www.aldi-nord.de/angebote.html",
+    "scrapedAt": "2026-08-17T05:25:29.972Z"
+  },
+  {
+    "brand": "Red Bull",
+    "supermarket": "Aldi Nord",
+    "title": "Energy Drink Classic",
+    "price": "0,89 €",
+    "priceNumber": 0.89,
+    "salesUnit": "0,25-L-Dose",
+    "imageUrl": "https://s7g10.scene7.com/is/image/aldinord/1004898_13_2022_redbull_classic_on?bfc=on&wid=1440&fmt=webp-alpha",
+    "productUrl": "https://www.aldi-nord.dehttps://www.aldi-nord.de/produkt/energy-drink-classic-10048980003.html",
+    "sourceUrl": "https://www.aldi-nord.de/angebote.html",
+    "scrapedAt": "2026-08-17T05:25:29.973Z"
+  },
+  {
+    "brand": "Red Bull",
     "supermarket": "Aldi Nord",
     "title": "Energydrink",
-    "price": "7,77 €",
-    "priceNumber": 7.77,
-    "salesUnit": "10x0,5-L-Dose",
-    "imageUrl": "https://s7g10.scene7.com/is/image/aldinord/1009476_21_2026_monsterenergy10erpack_0310er_on_comp_160726_081942?bfc=on&wid=1440&fmt=webp-alpha",
-    "productUrl": "https://www.aldi-nord.de/produkt/energydrink-1009476.html",
+    "price": "0,89 €",
+    "priceNumber": 0.89,
+    "salesUnit": "0,25-L-Dose",
+    "imageUrl": "https://s7g10.scene7.com/is/image/aldinord/1000083_28_2026_redbullenergydrinkedition_04_comp_050826_112645?bfc=on&wid=1440&fmt=webp-alpha",
+    "productUrl": "https://www.aldi-nord.dehttps://www.aldi-nord.de/produkt/energydrink-1000083.html",
     "sourceUrl": "https://www.aldi-nord.de/angebote.html",
-    "scrapedAt": "2026-08-10T05:29:56.352Z"
+    "scrapedAt": "2026-08-17T05:25:29.973Z"
+  },
+  {
+    "brand": "Red Bull",
+    "supermarket": "Aldi Nord",
+    "title": "Energy Drink Sea Blue Edition",
+    "price": "0,89 €",
+    "priceNumber": 0.89,
+    "salesUnit": "0,25-L-Dose",
+    "imageUrl": "https://s7g10.scene7.com/is/image/aldinord/1026196_12_2025_redbulljuneberry_01_on?bfc=on&wid=1440&fmt=webp-alpha",
+    "productUrl": "https://www.aldi-nord.dehttps://www.aldi-nord.de/produkt/energy-drink-sea-blue-edition-10261960003.html",
+    "sourceUrl": "https://www.aldi-nord.de/angebote.html",
+    "scrapedAt": "2026-08-17T05:25:29.973Z"
+  },
+  {
+    "brand": "Red Bull",
+    "supermarket": "Aldi Nord",
+    "title": "Energydrink White Edition",
+    "price": "0,89 €",
+    "priceNumber": 0.89,
+    "salesUnit": "0,25-L-Dose",
+    "imageUrl": "https://s7g10.scene7.com/is/image/aldinord/1019280_17_2022_redbullwhite_fs_on?bfc=on&wid=1440&fmt=webp-alpha",
+    "productUrl": "https://www.aldi-nord.dehttps://www.aldi-nord.de/produkt/energydrink-white-edition-10192800004.html",
+    "sourceUrl": "https://www.aldi-nord.de/angebote.html",
+    "scrapedAt": "2026-08-17T05:25:29.973Z"
+  },
+  {
+    "brand": "Rockstar",
+    "supermarket": "Aldi Nord",
+    "title": "Energydrink Original",
+    "price": "0,75 €",
+    "priceNumber": 0.75,
+    "salesUnit": "0,5-L-Dose",
+    "imageUrl": "https://s7g10.scene7.com/is/image/aldinord/1014192_34_2026_energy_rockstar_original_05l_dose_1_on?bfc=on&wid=1440&fmt=webp-alpha",
+    "productUrl": "https://www.aldi-nord.dehttps://www.aldi-nord.de/produkt/energydrink-original-1014192.html",
+    "sourceUrl": "https://www.aldi-nord.de/angebote.html",
+    "scrapedAt": "2026-08-17T05:25:29.973Z"
+  },
+  {
+    "brand": "Rockstar",
+    "supermarket": "Aldi Nord",
+    "title": "Energydrink Blueberry-Pomegranate-Açai",
+    "price": "0,75 €",
+    "priceNumber": 0.75,
+    "salesUnit": "0,5-L-Dose",
+    "imageUrl": "https://s7g10.scene7.com/is/image/aldinord/1014193_34_2026_energy_rockstar_blueberry_on?bfc=on&wid=1440&fmt=webp-alpha",
+    "productUrl": "https://www.aldi-nord.dehttps://www.aldi-nord.de/produkt/energydrink-blueberry-pomegranate-acai-1014193.html",
+    "sourceUrl": "https://www.aldi-nord.de/angebote.html",
+    "scrapedAt": "2026-08-17T05:25:29.973Z"
+  },
+  {
+    "brand": "Rockstar",
+    "supermarket": "Aldi Nord",
+    "title": "Energydrink Tropical Guava",
+    "price": "0,75 €",
+    "priceNumber": 0.75,
+    "salesUnit": "0,5-L-Dose",
+    "imageUrl": "https://s7g10.scene7.com/is/image/aldinord/1016626_34_2026_rockstar_tropical_guava_05l_dose_1_on?bfc=on&wid=1440&fmt=webp-alpha",
+    "productUrl": "https://www.aldi-nord.dehttps://www.aldi-nord.de/produkt/energydrink-tropical-guava-1016626.html",
+    "sourceUrl": "https://www.aldi-nord.de/angebote.html",
+    "scrapedAt": "2026-08-17T05:25:29.973Z"
   }
 ]

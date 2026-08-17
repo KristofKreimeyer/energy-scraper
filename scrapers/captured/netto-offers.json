@@ -1,1 +1,19 @@
-[]
+[
+  {
+    "brand": "Monster",
+    "supermarket": "Netto Marken-Discount",
+    "title": "Energy Drink",
+    "description": "taurin- & koffeinhaltig, versch. Sorten, auch ZERO ZUCKER 10 x 0,5 Liter zzgl. 2.50 Pfand",
+    "productBrand": "Monster",
+    "price": "7,77 €",
+    "priceNumber": 7.77,
+    "oldPrice": "14,90 €",
+    "pricePerBaseUnit": "(1.55 / l)",
+    "validFrom": "2026-08-16T22:00:00.000+0000",
+    "validTo": "2026-08-22T18:00:00.000+0000",
+    "imageUrl": "https://content-media.bonial.biz/e51eda31-5bc3-40b5-af6f-7d19a5c1601f/a2a4fc55-6cfb-4905-b7e3-02ec36a6f012.jpg?impolicy=SEO-offer-normal",
+    "sourcePage": 2,
+    "sourceUrl": "https://www.kaufda.de/Netto-Marken-Discount/Sortiment/Energydrink",
+    "scrapedAt": "2026-08-17T05:26:35.598Z"
+  }
+]

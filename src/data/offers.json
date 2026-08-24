@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-24T05:32:15.050Z",
+  "generatedAt": "2026-08-24T10:19:57.191Z",
   "count": 8,
   "offers": [
     {
@@ -24,8 +24,8 @@
       "validFrom": null,
       "validTo": null,
       "imageUrl": "https://s7g10.scene7.com/is/image/aldinord/1024623_50_2023_monsterenergy05l_01_on?bfc=on&wid=1440&fmt=webp-alpha",
-      "url": "https://www.aldi-nord.dehttps://www.aldi-nord.de/produkt/energy-drink-original-10246230002.html",
-      "scrapedAt": "2026-08-24T05:28:26.113Z"
+      "url": "https://www.aldi-nord.de/produkt/energy-drink-original-10246230002.html",
+      "scrapedAt": "2026-08-24T10:19:51.661Z"
     },
     {
       "id": "aldi-nord-monster-energydrink-0-79",
@@ -49,8 +49,8 @@
       "validFrom": null,
       "validTo": null,
       "imageUrl": "https://s7g10.scene7.com/is/image/aldinord/1024624_50_2023_monsterenergy05lmixtray_02_on_comp?bfc=on&wid=1440&fmt=webp-alpha",
-      "url": "https://www.aldi-nord.dehttps://www.aldi-nord.de/produkt/energydrink-10246240002.html",
-      "scrapedAt": "2026-08-24T05:28:26.113Z"
+      "url": "https://www.aldi-nord.de/produkt/energydrink-10246240002.html",
+      "scrapedAt": "2026-08-24T10:19:51.662Z"
     },
     {
       "id": "205245_kw30",

@@ -211,8 +211,14 @@ async function fetchCategory(yearWeek, cat) {
       validFrom,
       validTo,
       imageUrl: tile.imageRendition ? tile.imageRendition.tileSm || null : null,
+      // linkHref kommt mal relativ ("/angebote/..."), mal schon absolut
+      // (z. B. Kampagnen-Kacheln wie "https://www.penny.de/aktionen/...") -
+      // die Domain nur voranstellen, wenn sie nicht schon drin steckt
+      // (sonst "https://www.penny.dehttps://www.penny.de/...").
       sourceUrl: tile.linkHref
-        ? `https://www.penny.de${tile.linkHref}`
+        ? /^https?:\/\//i.test(tile.linkHref)
+          ? tile.linkHref
+          : `https://www.penny.de${tile.linkHref}`
         : "https://www.penny.de/angebote",
       offerId: tile.uuid || `penny-${cat}-${title}`,
       scrapedAt,

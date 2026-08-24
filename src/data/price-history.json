@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-24T10:05:43.321Z",
+  "updatedAt": "2026-08-24T10:38:59.081Z",
   "products": {
     "aldi nord|rockstar|energydrink original|0,5-l-dose": {
       "market": "Aldi Nord",
@@ -188,6 +188,12 @@
           "price": 0.99,
           "perUnit": 0.99,
           "perLiter": 3.96
+        },
+        {
+          "date": "2026-08-24",
+          "price": 0.99,
+          "perUnit": 0.99,
+          "perLiter": 3.96
         }
       ]
     },
@@ -320,6 +326,12 @@
           "price": 0.88,
           "perUnit": 0.88,
           "perLiter": 1.76
+        },
+        {
+          "date": "2026-08-24",
+          "price": 0.75,
+          "perUnit": 0.75,
+          "perLiter": 1.5
         }
       ]
     },
@@ -410,6 +422,12 @@
           "price": 0.89,
           "perUnit": 0.89,
           "perLiter": 1.78
+        },
+        {
+          "date": "2026-08-24",
+          "price": 0.75,
+          "perUnit": 0.75,
+          "perLiter": 1.5
         }
       ]
     },
@@ -466,6 +484,12 @@
           "price": 0.85,
           "perUnit": 0.85,
           "perLiter": 3.4
+        },
+        {
+          "date": "2026-08-24",
+          "price": 0.85,
+          "perUnit": 0.85,
+          "perLiter": 3.4
         }
       ]
     },
@@ -508,6 +532,20 @@
           "price": 0.79,
           "perUnit": 0.79,
           "perLiter": 1.58
+        }
+      ]
+    },
+    "aldi süd|red bull|energy drink|24 x 0,25 l": {
+      "market": "Aldi Süd",
+      "brand": "Red Bull",
+      "title": "Energy Drink",
+      "unitLabel": "24 x 0,25 l",
+      "points": [
+        {
+          "date": "2026-08-24",
+          "price": 19.99,
+          "perUnit": 0.83,
+          "perLiter": 3.33
         }
       ]
     }

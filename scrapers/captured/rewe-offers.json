@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "brand": "Red Bull",
+    "supermarket": "Rewe",
+    "title": "Red Bull Energy Drink",
+    "offerId": null,
+    "price": "0,99 €",
+    "priceLabel": "Aktion",
+    "pricePerLiter": "3.96",
+    "details": "versch. Sorten, koffeinhaltig , je 0,25-l-Dose , (1 l = 3,96 €) , zzgl. 0,25 € Pfand",
+    "loyaltyBonus": null,
+    "imageUrl": "https://img.rewe-static.de/REWE_Center_HZ35_2026/2201429/3209700-67_digital-image.png?impolicy=s-offers&imwidth=200",
+    "sourceUrl": "https://www.rewe.de/angebote/nationale-angebote/alkoholfreie-getraenke/",
+    "scrapedAt": "2026-08-24T10:36:47.768Z"
+  }
+]

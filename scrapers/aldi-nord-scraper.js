@@ -132,7 +132,14 @@ function matchBrand(text) {
         priceNumber,
         salesUnit: offer.salesUnit,
         imageUrl: offer.imageUrl,
-        productUrl: offer.link ? BASE_URL + offer.link : null,
+        // Aldi Nord liefert den Link mal relativ, mal absolut - BASE_URL nur
+        // voranstellen, wenn er nicht schon selbst eine volle URL ist
+        // (sonst "https://www.aldi-nord.dehttps://www.aldi-nord.de/...").
+        productUrl: offer.link
+          ? /^https?:\/\//i.test(offer.link)
+            ? offer.link
+            : BASE_URL + offer.link
+          : null,
         sourceUrl: TARGET_URL,
         scrapedAt: new Date().toISOString(),
       };

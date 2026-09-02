@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
     inputs:
       aldi_sued_slug:
-        description: 'Aldi-Süd-Prospekt-Slug (z. B. kw30-26-op-mp) – leer lassen, um Aldi Süd zu überspringen'
+        description: 'Aldi-Süd-Prospekt-Slug erzwingen (z. B. kw30-26-op-mp) – leer lassen, der Scraper leitet ihn selbst aus der aktuellen ISO-Woche ab'
         required: false
         default: ''
 

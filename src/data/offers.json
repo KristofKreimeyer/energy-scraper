@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-31T11:15:19.647Z",
+  "generatedAt": "2026-09-02T11:40:42.062Z",
   "count": 6,
   "offers": [
     {
@@ -25,32 +25,32 @@
       "validTo": null,
       "imageUrl": "https://s7g10.scene7.com/is/image/aldinord/5831_36_2026_redbull6x250ml_03_on?bfc=on&wid=1440&fmt=webp-alpha",
       "url": "https://www.aldi-nord.de/produkt/energydrink-5831.html",
-      "scrapedAt": "2026-08-31T11:13:00.482Z"
+      "scrapedAt": "2026-09-02T11:39:38.173Z"
     },
     {
-      "id": "686705_kw35",
+      "id": "444184_kw36",
       "brand": "Red Bull",
       "title": "Energy Drink",
-      "description": "Koffein- und taurinhaltig; 24 x 0,25 l = 6-l-Packung",
+      "description": "Versch. Sorten; koffein- und taurinhaltig; je 250-ml-Dose",
       "supermarket": "Aldi Süd",
       "market": "Aldi Süd",
       "marketColor": "#0B3A8C",
-      "price": 19.99,
-      "priceText": "19,99 €",
+      "price": 0.89,
+      "priceText": "0,89 €",
       "oldPrice": null,
-      "perLiter": 3.33,
+      "perLiter": 3.56,
       "sugar": "both",
       "requiresApp": false,
       "appPrice": null,
       "appPerLiter": null,
-      "unitLabel": "24 x 0,25 l",
-      "unitCount": 24,
-      "perUnit": 0.83,
-      "validFrom": "2026-08-28T00:00:00.000Z",
+      "unitLabel": "250-ml-Dose",
+      "unitCount": 1,
+      "perUnit": 0.89,
+      "validFrom": "2026-08-31T00:00:00.000Z",
       "validTo": null,
-      "imageUrl": "https://aldi-assets.publitas.com/feed-images/2026/35/686705_001_Red-Bull-Red-Bull_Produkt_001.png",
-      "url": "https://prospekt.aldi-sued.de/kw35-26-op-mp/page/19-20",
-      "scrapedAt": "2026-08-24T10:38:41.481Z"
+      "imageUrl": "https://aldi-assets.publitas.com/feed-images/2026/36/444184_001_Regular-Red-Bull-Regular_Produkt_001.png",
+      "url": "https://prospekt.aldi-sued.de/kw36-26-op-mp/page/11-12",
+      "scrapedAt": "2026-09-02T11:36:54.161Z"
     },
     {
       "id": "24546153",

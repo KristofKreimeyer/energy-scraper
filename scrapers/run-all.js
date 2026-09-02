@@ -11,10 +11,13 @@
  *
  * Nutzung:
  *   node run-all.js
- *   ALDI_SUED_SLUG="kw30-26-op-mp" node run-all.js   (Aldi-Süd-Prospekt mitnehmen)
+ *   ALDI_SUED_SLUG="kw30-26-op-mp" node run-all.js   (Aldi-Süd-Prospekt-Slug erzwingen)
  *
- * Der Aldi-Süd-Prospekt-Slug wechselt wöchentlich und lässt sich nicht sicher
- * ableiten – ohne ALDI_SUED_SLUG wird diese eine Quelle übersprungen (mit Hinweis).
+ * Aldi Süd läuft immer mit – der Scraper leitet den Publikations-Slug selbst
+ * aus der aktuellen ISO-Kalenderwoche ab (empirisch verifiziert). ALDI_SUED_SLUG
+ * ist nur noch ein Notausstieg, falls Aldi Süd das URL-Schema mal ändert oder
+ * der Cron-Lauf zufällig genau in der Rollover-Lücke zwischen zwei
+ * Prospekt-Wochen läuft.
  *
  * Exit-Code: 1, wenn KEIN Scraper durchlief oder die Normalisierung scheiterte;
  * sonst 0 (Teilausfälle einzelner Händler sind tolerierbar).
@@ -32,24 +35,19 @@ const SCRAPER_TIMEOUT_MS = 5 * 60 * 1000
 // (nur Seitentreffer, kein Stückpreis) bleiben bewusst außen vor.
 const jobs = [
   { name: 'Aldi Nord', script: 'aldi-nord-scraper.js', args: [] },
+  // Ohne Argument leitet der Scraper den Slug selbst aus der ISO-Woche ab;
+  // ALDI_SUED_SLUG (falls gesetzt) erzwingt einen bestimmten Slug.
+  {
+    name: 'Aldi Süd (Prospekt)',
+    script: 'aldi-sued-prospekt-scraper.js',
+    args: process.env.ALDI_SUED_SLUG ? [process.env.ALDI_SUED_SLUG] : [],
+  },
   { name: 'Kaufland (marktguru)', script: 'marktguru-api-scraper.js', args: ['kaufland'] },
   { name: 'Lidl (marktguru)', script: 'marktguru-api-scraper.js', args: ['lidl'] },
   { name: 'Penny (nativer Feed)', script: 'penny-native-scraper.js', args: [] },
   { name: 'Netto (kaufda)', script: 'netto-kaufda-scraper.js', args: [] },
   { name: 'Rewe', script: 'rewe-scraper.js', args: [] },
 ]
-
-const aldiSuedSlug = process.env.ALDI_SUED_SLUG
-if (aldiSuedSlug) {
-  // direkt nach Aldi Nord einreihen
-  jobs.splice(1, 0, {
-    name: 'Aldi Süd (Prospekt)',
-    script: 'aldi-sued-prospekt-scraper.js',
-    args: [aldiSuedSlug],
-  })
-} else {
-  console.warn('[run-all] ALDI_SUED_SLUG nicht gesetzt – Aldi-Süd-Prospekt wird übersprungen.')
-}
 
 const results = []
 for (const job of jobs) {

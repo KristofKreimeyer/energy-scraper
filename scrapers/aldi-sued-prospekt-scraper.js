@@ -8,22 +8,40 @@
  * Doppelseiten, bis keine weiteren mehr existieren.
  *
  * Nutzung:
- *   node aldi-sued-prospekt-scraper.js "kw29-26-op-mp"
+ *   node aldi-sued-prospekt-scraper.js                  # aktuelle ISO-Woche (auto)
+ *   node aldi-sued-prospekt-scraper.js "kw29-26-op-mp"  # bestimmten Slug erzwingen
  *
  * Das Argument ist der Publikations-Slug aus der URL, z.B. bei
  * https://prospekt.aldi-sued.de/kw29-26-op-mp/page/10-11
- * ist der Slug "kw29-26-op-mp".
+ * ist der Slug "kw29-26-op-mp". Ohne Argument wird "kw<ISO-Woche>-<JJ>-op-mp"
+ * aus dem heutigen Datum abgeleitet (empirisch verifiziert: der Slug folgt
+ * zuverlässig der ISO-Kalenderwoche, alte/zukünftige Wochen liefern 404) -
+ * das ist der Regelfall für den wöchentlichen Cron-Lauf, der keinen Slug von
+ * Hand übergeben kann. Ein explizites Argument (oder ALDI_SUED_SLUG) bleibt
+ * als Notausstieg, falls Aldi Süd das URL-Schema mal ändert.
  */
 
 const fs = require('fs');
 const path = require('path');
 
-const PUBLICATION_SLUG = process.argv[2];
-if (!PUBLICATION_SLUG) {
-  console.error('Bitte Publikations-Slug angeben, z.B.:');
-  console.error('  node aldi-sued-prospekt-scraper.js "kw29-26-op-mp"');
-  process.exit(1);
+/** ISO-8601-Kalenderwoche (gleiche, mehrfach verifizierte Logik wie im Penny-Scraper). */
+function isoYearWeek(date) {
+  const t = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+  const day = (t.getUTCDay() + 6) % 7; // Mo=0 … So=6
+  t.setUTCDate(t.getUTCDate() - day + 3); // auf den Donnerstag der Woche
+  const firstThursday = new Date(Date.UTC(t.getUTCFullYear(), 0, 4));
+  const week =
+    1 +
+    Math.round(((t - firstThursday) / 86400000 - 3 + ((firstThursday.getUTCDay() + 6) % 7)) / 7);
+  return { year: t.getUTCFullYear(), week };
 }
+
+function deriveCurrentSlug() {
+  const { year, week } = isoYearWeek(new Date());
+  return `kw${week}-${String(year).slice(-2)}-op-mp`;
+}
+
+const PUBLICATION_SLUG = process.argv[2] || process.env.ALDI_SUED_SLUG || deriveCurrentSlug();
 
 const BASE_URL = `https://prospekt.aldi-sued.de/${PUBLICATION_SLUG}/page`;
 const OUT_DIR = path.join(__dirname, 'captured');
@@ -56,7 +74,8 @@ async function fetchPage(pageRange) {
 }
 
 (async () => {
-  console.log(`Publikation: ${PUBLICATION_SLUG}`);
+  const source = process.argv[2] ? 'Argument' : process.env.ALDI_SUED_SLUG ? 'ALDI_SUED_SLUG' : 'auto (ISO-Woche)';
+  console.log(`Publikation: ${PUBLICATION_SLUG} (Quelle: ${source})`);
   console.log('Durchsuche Doppelseiten...\n');
 
   const allHotspots = [];

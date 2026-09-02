@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-02T11:50:23.800Z",
+  "generatedAt": "2026-09-02T15:34:05.283Z",
   "count": 6,
   "offers": [
     {
@@ -25,7 +25,7 @@
       "validTo": null,
       "imageUrl": "https://s7g10.scene7.com/is/image/aldinord/5831_36_2026_redbull6x250ml_03_on?bfc=on&wid=1440&fmt=webp-alpha",
       "url": "https://www.aldi-nord.de/produkt/energydrink-5831.html",
-      "scrapedAt": "2026-09-02T11:47:35.467Z"
+      "scrapedAt": "2026-09-02T15:31:36.179Z"
     },
     {
       "id": "444184_kw36",
@@ -50,7 +50,7 @@
       "validTo": null,
       "imageUrl": "https://aldi-assets.publitas.com/feed-images/2026/36/444184_001_Regular-Red-Bull-Regular_Produkt_001.png",
       "url": "https://prospekt.aldi-sued.de/kw36-26-op-mp/page/11-12",
-      "scrapedAt": "2026-09-02T11:47:57.980Z"
+      "scrapedAt": "2026-09-02T15:31:41.675Z"
     },
     {
       "id": "24546153",
@@ -75,7 +75,7 @@
       "validTo": "2026-09-02T18:00:00.000Z",
       "imageUrl": "https://cdn.marktguru.de/api/v1/offers/24546153/images/default/0/medium.webp",
       "url": "https://www.marktguru.de/offers/24546153",
-      "scrapedAt": "2026-09-02T11:49:09.772Z"
+      "scrapedAt": "2026-09-02T15:32:53.647Z"
     },
     {
       "id": "24569873",
@@ -100,7 +100,7 @@
       "validTo": "2026-09-05T21:59:00.000Z",
       "imageUrl": "https://cdn.marktguru.de/api/v1/offers/24569873/images/default/0/medium.webp",
       "url": "https://www.marktguru.de/offers/24569873",
-      "scrapedAt": "2026-09-02T11:49:35.395Z"
+      "scrapedAt": "2026-09-02T15:33:17.327Z"
     },
     {
       "id": "24670413",
@@ -125,7 +125,7 @@
       "validTo": "2026-09-12T21:59:00.000Z",
       "imageUrl": "https://cdn.marktguru.de/api/v1/offers/24670413/images/default/0/medium.webp",
       "url": "https://www.marktguru.de/offers/24670413",
-      "scrapedAt": "2026-09-02T11:49:35.396Z"
+      "scrapedAt": "2026-09-02T15:33:17.328Z"
     },
     {
       "id": "netto-red-bull-energy-drink-1-49",
@@ -150,7 +150,7 @@
       "validTo": "2026-09-05T18:00:00.000Z",
       "imageUrl": "https://content-media.bonial.biz/aad7a77f-bcba-4aae-8e17-06fc7c8b32ff/571a44ec-cfe2-4434-a6f5-68083d6c7a44.jpg?impolicy=SEO-offer-normal",
       "url": "https://www.kaufda.de/Netto-Marken-Discount/Sortiment/Energydrink",
-      "scrapedAt": "2026-09-02T11:49:38.202Z"
+      "scrapedAt": "2026-09-02T15:33:19.820Z"
     }
   ]
 }

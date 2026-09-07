@@ -1,20 +1,20 @@
 [
   {
-    "brand": "Monster",
+    "brand": "Rockstar",
     "supermarket": "Kaufland",
-    "title": "Energy Drink",
-    "productBrand": "Monster Energy",
-    "description": "versch. Sorten, koffeinhaltig (+0.25 Pfand) je 0,5-l-Dose",
-    "price": "0,75 €",
-    "priceNumber": 0.75,
-    "referencePrice": 1.5,
+    "title": "Energy-Drink",
+    "productBrand": "Rockstar",
+    "description": "HINWEIS: MIT KAUFLAND CARD XTRA 0.79€  taurin- und koffein-haltig, versch. Sorten (+0.25 Pfand) je 0,5-l-Dose",
+    "price": "0,99 €",
+    "priceNumber": 0.99,
+    "referencePrice": 1.98,
     "unit": "Liter",
     "quantity": 1,
-    "validFrom": "2026-08-26T22:00:00Z",
-    "validTo": "2026-09-02T18:00:00Z",
-    "imageUrl": "https://cdn.marktguru.de/api/v1/offers/24546153/images/default/0/medium.webp",
-    "offerId": 24546153,
-    "sourceUrl": "https://www.marktguru.de/offers/24546153",
-    "scrapedAt": "2026-09-02T15:32:53.647Z"
+    "validFrom": "2026-09-02T22:00:00Z",
+    "validTo": "2026-09-09T18:00:00Z",
+    "imageUrl": "https://cdn.marktguru.de/api/v1/offers/24686718/images/default/0/medium.webp",
+    "offerId": 24686718,
+    "sourceUrl": "https://www.marktguru.de/offers/24686718",
+    "scrapedAt": "2026-09-07T09:52:03.928Z"
   }
 ]

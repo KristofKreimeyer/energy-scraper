@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-02T15:34:05.291Z",
+  "updatedAt": "2026-09-07T09:53:21.587Z",
   "products": {
     "aldi nord|rockstar|energydrink original|0,5-l-dose": {
       "market": "Aldi Nord",
@@ -310,6 +310,12 @@
           "price": 0.89,
           "perUnit": 0.89,
           "perLiter": 1.78
+        },
+        {
+          "date": "2026-09-07",
+          "price": 0.89,
+          "perUnit": 0.89,
+          "perLiter": 1.78
         }
       ]
     },
@@ -396,6 +402,12 @@
           "price": 0.89,
           "perUnit": 0.89,
           "perLiter": 3.56
+        },
+        {
+          "date": "2026-09-07",
+          "price": 0.85,
+          "perUnit": 0.85,
+          "perLiter": 3.4
         }
       ]
     },
@@ -410,6 +422,12 @@
           "price": 0.89,
           "perUnit": 0.89,
           "perLiter": 3.56
+        },
+        {
+          "date": "2026-09-07",
+          "price": 0.85,
+          "perUnit": 0.85,
+          "perLiter": 3.4
         }
       ]
     },
@@ -614,6 +632,118 @@
           "price": 1.49,
           "perUnit": 1.49,
           "perLiter": 4.2
+        }
+      ]
+    },
+    "aldi nord|red bull|energy drink classic|0,25-l-dose": {
+      "market": "Aldi Nord",
+      "brand": "Red Bull",
+      "title": "Energy Drink Classic",
+      "unitLabel": "0,25-L-Dose",
+      "points": [
+        {
+          "date": "2026-09-07",
+          "price": 0.85,
+          "perUnit": 0.85,
+          "perLiter": 3.4
+        }
+      ]
+    },
+    "aldi nord|red bull|energy drink sugarfree|0,25-l-dose": {
+      "market": "Aldi Nord",
+      "brand": "Red Bull",
+      "title": "Energy Drink Sugarfree",
+      "unitLabel": "0,25-L-Dose",
+      "points": [
+        {
+          "date": "2026-09-07",
+          "price": 0.85,
+          "perUnit": 0.85,
+          "perLiter": 3.4
+        }
+      ]
+    },
+    "aldi nord|red bull|energydrink|0,25-l-dose": {
+      "market": "Aldi Nord",
+      "brand": "Red Bull",
+      "title": "Energydrink",
+      "unitLabel": "0,25-L-Dose",
+      "points": [
+        {
+          "date": "2026-09-07",
+          "price": 0.85,
+          "perUnit": 0.85,
+          "perLiter": 3.4
+        }
+      ]
+    },
+    "aldi nord|red bull|energydrink peach|0,25-l-dose": {
+      "market": "Aldi Nord",
+      "brand": "Red Bull",
+      "title": "Energydrink Peach",
+      "unitLabel": "0,25-L-Dose",
+      "points": [
+        {
+          "date": "2026-09-07",
+          "price": 0.85,
+          "perUnit": 0.85,
+          "perLiter": 3.4
+        }
+      ]
+    },
+    "aldi nord|monster|energydrink|10x0,5-l-dose": {
+      "market": "Aldi Nord",
+      "brand": "Monster",
+      "title": "Energydrink",
+      "unitLabel": "10x0,5-L-Dose",
+      "points": [
+        {
+          "date": "2026-09-07",
+          "price": 7.77,
+          "perUnit": 0.78,
+          "perLiter": 1.55
+        }
+      ]
+    },
+    "kaufland|rockstar|energy-drink|0,5-l-dose": {
+      "market": "Kaufland",
+      "brand": "Rockstar",
+      "title": "Energy-Drink",
+      "unitLabel": "0,5-l-Dose",
+      "points": [
+        {
+          "date": "2026-09-07",
+          "price": 0.99,
+          "perUnit": 0.99,
+          "perLiter": 1.98
+        }
+      ]
+    },
+    "netto|gönnergy|gönrgy energy drink|0,5 liter": {
+      "market": "Netto",
+      "brand": "Gönnergy",
+      "title": "Gönrgy Energy Drink",
+      "unitLabel": "0,5 Liter",
+      "points": [
+        {
+          "date": "2026-09-07",
+          "price": 0.9,
+          "perUnit": 0.9,
+          "perLiter": 1.8
+        }
+      ]
+    },
+    "netto|gönnergy|energy drink|0,5 liter": {
+      "market": "Netto",
+      "brand": "Gönnergy",
+      "title": "Energy Drink",
+      "unitLabel": "0,5 Liter",
+      "points": [
+        {
+          "date": "2026-09-07",
+          "price": 0.9,
+          "perUnit": 0.9,
+          "perLiter": 1.8
         }
       ]
     }

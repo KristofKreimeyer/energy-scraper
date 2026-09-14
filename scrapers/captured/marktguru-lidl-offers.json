@@ -1,20 +1,20 @@
 [
   {
-    "brand": "Monster",
+    "brand": "Red Bull",
     "supermarket": "Lidl",
     "title": "Energy Drink",
-    "productBrand": "Monster Energy",
-    "description": "Versch. Sorten. Taurin- und koffeinhaltig. Je 0,5 l zzgl. 0.25 Pfand",
-    "price": "0,89 €",
-    "priceNumber": 0.89,
-    "referencePrice": 1.78,
+    "productBrand": "Red Bull",
+    "description": "Versch. Sorten. Taurin- und koffeinhaltig. Je 6x 0,25 l zzgl. 1.50 Pfand",
+    "price": "5,29 €",
+    "priceNumber": 5.29,
+    "referencePrice": 3.53,
     "unit": "Liter",
-    "quantity": 1,
-    "validFrom": "2026-09-09T22:00:00Z",
-    "validTo": "2026-09-12T21:59:00Z",
-    "imageUrl": "https://cdn.marktguru.de/api/v1/offers/24670413/images/default/0/medium.webp",
-    "offerId": 24670413,
-    "sourceUrl": "https://www.marktguru.de/offers/24670413",
-    "scrapedAt": "2026-09-07T09:52:33.008Z"
+    "quantity": 6,
+    "validFrom": "2026-09-20T22:00:00Z",
+    "validTo": "2026-09-26T21:59:00Z",
+    "imageUrl": "https://cdn.marktguru.de/api/v1/offers/24894563/images/default/0/medium.webp",
+    "offerId": 24894563,
+    "sourceUrl": "https://www.marktguru.de/offers/24894563",
+    "scrapedAt": "2026-09-14T10:16:11.917Z"
   }
 ]

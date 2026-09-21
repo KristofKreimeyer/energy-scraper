@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-14T10:16:59.491Z",
+  "updatedAt": "2026-09-21T10:22:16.025Z",
   "products": {
     "aldi nord|rockstar|energydrink original|0,5-l-dose": {
       "market": "Aldi Nord",
@@ -161,6 +161,12 @@
         },
         {
           "date": "2026-09-14",
+          "price": 5.29,
+          "perUnit": 0.88,
+          "perLiter": 3.53
+        },
+        {
+          "date": "2026-09-21",
           "price": 5.29,
           "perUnit": 0.88,
           "perLiter": 3.53
@@ -580,6 +586,12 @@
           "price": 0.85,
           "perUnit": 0.85,
           "perLiter": 3.4
+        },
+        {
+          "date": "2026-09-21",
+          "price": 0.79,
+          "perUnit": 0.79,
+          "perLiter": 3.16
         }
       ]
     },
@@ -838,6 +850,34 @@
           "price": 0.99,
           "perUnit": 0.99,
           "perLiter": 3.96
+        }
+      ]
+    },
+    "lidl|rockstar|energy-drink|4x 0,5 l": {
+      "market": "Lidl",
+      "brand": "Rockstar",
+      "title": "Energy-Drink",
+      "unitLabel": "4x 0,5 l",
+      "points": [
+        {
+          "date": "2026-09-21",
+          "price": 2,
+          "perUnit": 0.5,
+          "perLiter": 2
+        }
+      ]
+    },
+    "penny|monster|energy-drink*|0,5 l": {
+      "market": "Penny",
+      "brand": "Monster",
+      "title": "Energy-Drink*",
+      "unitLabel": "0,5 l",
+      "points": [
+        {
+          "date": "2026-09-21",
+          "price": 0.99,
+          "perUnit": 0.99,
+          "perLiter": 1.98
         }
       ]
     }

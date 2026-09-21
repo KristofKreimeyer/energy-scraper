@@ -15,6 +15,24 @@
     "imageUrl": "https://cdn.marktguru.de/api/v1/offers/24894563/images/default/0/medium.webp",
     "offerId": 24894563,
     "sourceUrl": "https://www.marktguru.de/offers/24894563",
-    "scrapedAt": "2026-09-14T10:16:11.917Z"
+    "scrapedAt": "2026-09-21T10:21:28.495Z"
+  },
+  {
+    "brand": "Rockstar",
+    "supermarket": "Lidl",
+    "title": "Energy-Drink",
+    "productBrand": "Rockstar",
+    "description": "HINWEIS: MIT LIDL PLUS APP Versch. Sorten. Taurin- und koffeinhaltig. Je 4x 0,5 l zzgl. 1.- Pfand Entspricht -.50/Stk. beim Kauf von 4 Stk. Einzelpeis: -.99 zzgl. 0.25 Pfand",
+    "price": "2,00 €",
+    "priceNumber": 2,
+    "referencePrice": 2,
+    "unit": "Liter",
+    "quantity": 4,
+    "validFrom": "2026-09-27T22:00:00Z",
+    "validTo": "2026-10-02T21:59:00Z",
+    "imageUrl": "https://cdn.marktguru.de/api/v1/offers/24982943/images/default/0/medium.webp",
+    "offerId": 24982943,
+    "sourceUrl": "https://www.marktguru.de/offers/24982943",
+    "scrapedAt": "2026-09-21T10:21:28.496Z"
   }
 ]

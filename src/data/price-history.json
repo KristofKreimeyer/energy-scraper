@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-21T10:22:16.025Z",
+  "updatedAt": "2026-09-28T11:25:08.688Z",
   "products": {
     "aldi nord|rockstar|energydrink original|0,5-l-dose": {
       "market": "Aldi Nord",
@@ -75,6 +75,12 @@
         },
         {
           "date": "2026-09-02",
+          "price": 0.89,
+          "perUnit": 0.89,
+          "perLiter": 3.56
+        },
+        {
+          "date": "2026-09-28",
           "price": 0.89,
           "perUnit": 0.89,
           "perLiter": 3.56
@@ -418,6 +424,12 @@
           "price": 0.89,
           "perUnit": 0.89,
           "perLiter": 3.56
+        },
+        {
+          "date": "2026-09-28",
+          "price": 0.89,
+          "perUnit": 0.89,
+          "perLiter": 3.56
         }
       ]
     },
@@ -438,6 +450,12 @@
           "price": 0.85,
           "perUnit": 0.85,
           "perLiter": 3.4
+        },
+        {
+          "date": "2026-09-28",
+          "price": 0.89,
+          "perUnit": 0.89,
+          "perLiter": 3.56
         }
       ]
     },
@@ -458,6 +476,12 @@
           "price": 0.85,
           "perUnit": 0.85,
           "perLiter": 3.4
+        },
+        {
+          "date": "2026-09-28",
+          "price": 0.89,
+          "perUnit": 0.89,
+          "perLiter": 3.56
         }
       ]
     },
@@ -472,6 +496,12 @@
           "price": 0.89,
           "perUnit": 0.89,
           "perLiter": 3.56
+        },
+        {
+          "date": "2026-09-28",
+          "price": 0.89,
+          "perUnit": 0.89,
+          "perLiter": 3.56
         }
       ]
     },
@@ -483,6 +513,12 @@
       "points": [
         {
           "date": "2026-07-27",
+          "price": 0.89,
+          "perUnit": 0.89,
+          "perLiter": 3.56
+        },
+        {
+          "date": "2026-09-28",
           "price": 0.89,
           "perUnit": 0.89,
           "perLiter": 3.56
@@ -606,6 +642,12 @@
           "price": 0.99,
           "perUnit": 0.99,
           "perLiter": 3.96
+        },
+        {
+          "date": "2026-09-28",
+          "price": 0.85,
+          "perUnit": 0.85,
+          "perLiter": 3.4
         }
       ]
     },
@@ -864,6 +906,12 @@
           "price": 2,
           "perUnit": 0.5,
           "perLiter": 2
+        },
+        {
+          "date": "2026-09-28",
+          "price": 2,
+          "perUnit": 0.5,
+          "perLiter": 2
         }
       ]
     },
@@ -878,6 +926,20 @@
           "price": 0.99,
           "perUnit": 0.99,
           "perLiter": 1.98
+        }
+      ]
+    },
+    "aldi nord|red bull|energydrink white peach|0,25-l-dose": {
+      "market": "Aldi Nord",
+      "brand": "Red Bull",
+      "title": "Energydrink White Peach",
+      "unitLabel": "0,25-L-Dose",
+      "points": [
+        {
+          "date": "2026-09-28",
+          "price": 0.89,
+          "perUnit": 0.89,
+          "perLiter": 3.56
         }
       ]
     }

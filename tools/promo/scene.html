@@ -96,16 +96,56 @@
     ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath()
   }
 
-  /** Energy-Dose (Foto „Thunder Energy", CC0, Wikimedia Commons). Das Bild setzt
-   *  scripts/render-promo.mjs als window.canImg (Data-URL, sonst wäre das Canvas „tainted"). */
-  function drawCan(cx, cy, h, rot) {
-    const w = h * (960 / 2548)
+  // Kondenswasser-Tropfen: Kopie von src/lib/droplets.ts (gleiche Zahlen, gleiche Optik)
+  const DROPS = (() => {
+    const r = mulberry(21)
+    return Array.from({ length: 18 }, () => ({ x: 0.16 + r() * 0.68, y0: 0.06 + r() * 0.5, len: 0.22 + r() * 0.3, period: 5 + r() * 6, phase: r(), r: 0.0075 + r() * 0.0085 }))
+  })()
+  function drawDroplets(c, w, h, t) {
+    for (const d of DROPS) {
+      const u = (t / d.period + d.phase) % 1
+      const v = Math.min(1, Math.max(0, (u - 0.12) / 0.8))
+      const slide = v * v * (3 - 2 * v) + 0.025 * Math.sin(v * 22)
+      const x = d.x * w + Math.sin(v * 9 + d.phase * 6) * w * 0.004
+      const y = (d.y0 + d.len * slide) * h
+      const startY = d.y0 * h
+      const rad = d.r * w * Math.min(1, u / 0.12 + 0.25)
+      c.save()
+      c.globalAlpha = u > 0.9 ? 1 - (u - 0.9) / 0.1 : 1
+      if (y > startY + 2) {
+        const tr = c.createLinearGradient(0, startY, 0, y)
+        tr.addColorStop(0, 'rgba(200,230,255,0)'); tr.addColorStop(1, 'rgba(200,230,255,0.28)')
+        c.strokeStyle = tr; c.lineWidth = rad * 0.7; c.lineCap = 'round'
+        c.beginPath(); c.moveTo(x, startY); c.lineTo(x, y); c.stroke()
+      }
+      const g = c.createRadialGradient(x - rad * 0.35, y - rad * 0.5, rad * 0.1, x, y, rad * 1.5)
+      g.addColorStop(0, 'rgba(255,255,255,0.95)'); g.addColorStop(0.35, 'rgba(190,225,255,0.45)'); g.addColorStop(1, 'rgba(120,170,230,0.12)')
+      c.fillStyle = g
+      c.beginPath(); c.ellipse(x, y, rad, rad * 1.35, 0, 0, Math.PI * 2); c.fill()
+      c.strokeStyle = 'rgba(255,255,255,0.55)'; c.lineWidth = Math.max(1, rad * 0.14); c.stroke()
+      c.restore()
+    }
+  }
+
+  /** Energy-Dose: KI-generiertes Produktfoto der EnergyHunt-Dose (freigestellt, siehe public/media/CREDITS.md) mit
+   *  laufenden Tropfen. Das Bild setzt scripts/render-promo.mjs als window.canImg (Data-URL,
+   *  sonst wäre das Canvas „tainted"). t = Videozeit für die Tropfen. */
+  let dropLayer = null
+  function drawCan(cx, cy, h, rot, t) {
+    const w = h * (610 / 1500)
+    if (!dropLayer) { dropLayer = document.createElement('canvas'); dropLayer.width = 610; dropLayer.height = 1500 }
+    const dc = dropLayer.getContext('2d')
+    dc.globalCompositeOperation = 'source-over'
+    dc.clearRect(0, 0, 610, 1500)
+    drawDroplets(dc, 610, 1500, t)
+    dc.globalCompositeOperation = 'destination-in'
+    dc.drawImage(window.canImg, 0, 0, 610, 1500)
     ctx.save()
     ctx.translate(cx, cy); ctx.rotate(rot)
-    ctx.shadowColor = BLUE; ctx.shadowBlur = 90
+    ctx.shadowColor = MAGENTA; ctx.shadowBlur = 90
     ctx.drawImage(window.canImg, -w / 2, -h / 2, w, h)
-    ctx.shadowColor = MAGENTA; ctx.shadowBlur = 60
-    ctx.drawImage(window.canImg, -w / 2, -h / 2, w, h)
+    ctx.shadowBlur = 0
+    ctx.drawImage(dropLayer, -w / 2, -h / 2, w, h)
     ctx.restore()
   }
 
@@ -178,7 +218,7 @@
       const flick = 0.5 + 0.5 * Math.abs(Math.sin(t * 9 + i * 2))
       drawBolt(100 + i + Math.floor(t * 8), cx + rx, 560 + ry - 160, cx + rx * 0.5, 560 + ry * 0.5 + 120, flick * 0.9, i % 2 ? BLUE : YELLOW, 0.6)
     }
-    drawCan(cx, cy, 800, -0.1 + Math.sin(t * 1.1) * 0.04 + (1 - rise) * 0.5)
+    drawCan(cx, cy, 880, -0.06 + Math.sin(t * 1.1) * 0.03 + (1 - rise) * 0.5, t)
     ctx.restore()
     // Text links
     const lines = [['JEDE WOCHE', 4.6, '#ffffff'], ['ALLE PROSPEKTE.', 5.1, '#ffffff'], ['EIN PREIS PRO LITER.', 5.6, YELLOW]]

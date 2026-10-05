@@ -1,3 +1,4 @@
 # Bildnachweis
 
-- `dose.webp` – Foto „Thunder Energy" (Wikimedia Commons, Datei „Thunder Energy.png"), Lizenz CC0 (gemeinfrei, keine Namensnennung nötig). Verkleinert und als WebP gespeichert. Die Marke gehört ihren Inhabern; das Foto dient hier nur als Beispiel für eine Energy-Drink-Dose.
+- `dose.webp` – KI-generiertes Produktfoto der EnergyHunt-Dose (No-Name-Dose mit Wortmarke und Logo der Seite), erzeugt mit Higgsfield (Nano Banana 2), Hintergrund per Higgsfield „Image Background Remover" freigestellt und zugeschnitten. Die Dose ist ein Entwurf, kein reales Produkt.
+- Die Wassertropfen auf der Dose sind eine Code-Animation (`src/lib/droplets.ts`), keine Fotografie.

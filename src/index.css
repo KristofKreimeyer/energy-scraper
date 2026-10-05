@@ -323,9 +323,8 @@ h3 {
   left: 0;
   top: 0;
   width: clamp(5rem, 10vw, 10rem);
-  height: auto;
   will-change: transform;
-  filter: drop-shadow(0 0 2.5rem rgb(56 198 255 / 0.55)) drop-shadow(0 0 6rem rgb(255 56 208 / 0.35));
+  filter: drop-shadow(0 0 2.5rem rgb(255 56 208 / 0.55)) drop-shadow(0 0 6rem rgb(255 214 10 / 0.25));
   transform: translate3d(calc(var(--can-x, 70) * 1vw - 50%), calc(var(--can-y, 90) * 1vh - 50%), 0) rotate(calc(var(--can-r, 8) * 1deg)) scale(var(--can-s, 1));
 }
 .cine-copy {

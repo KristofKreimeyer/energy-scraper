@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { WRAP } from "../lib/layout";
+import DropletCan from "./DropletCan";
 import { useCinematicScroll } from "../hooks/useCinematicScroll";
 import type { Timeframe } from "../lib/offers";
 
@@ -66,7 +67,7 @@ export default function CinematicStage({ timeframe }: { timeframe: Timeframe }) 
         <Strike className="left-[18%]" d="M90 0 L130 140 L80 260 L124 380 L70 520 L110 660 L86 800" />
         <div className="cine-flash" />
 
-        <img src="/media/dose.webp" alt="" width={377} height={1000} className="cine-can z-[2]" fetchPriority="high" />
+        <DropletCan className="cine-can z-[2]" />
 
         <div className={`${WRAP} relative z-[3] flex h-full flex-col justify-center`}>
           <div className="cine-title">

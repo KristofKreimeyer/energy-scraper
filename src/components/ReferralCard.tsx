@@ -29,9 +29,7 @@ export default function ReferralCard() {
 
   const wrap = (children: React.ReactNode) => (
     <section className={`${WRAP} mt-9`} aria-labelledby="referral-title">
-      <div className="rounded-card p-6 border border-[color-mix(in_srgb,var(--accent-strong)_35%,transparent)] bg-accent-tint">
-        {children}
-      </div>
+      <div className="rounded-card p-6 border-[3px] border-border-strong shadow-card bg-accent-tint">{children}</div>
     </section>
   );
 

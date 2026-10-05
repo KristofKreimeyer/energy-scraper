@@ -106,7 +106,7 @@ export function AccountButton() {
       {open && (
         <Modal onClose={() => setOpen(false)} label={user ? "Konto" : "Anmelden"}>
           <div className="flex items-start justify-between gap-3">
-            <h2 className="text-[1.15rem] font-bold text-ink">{user ? "Dein Konto" : "Anmelden"}</h2>
+            <h2 className="text-[1.75rem] text-ink">{user ? "Dein Konto" : "Anmelden"}</h2>
             <button
               type="button"
               onClick={() => setOpen(false)}

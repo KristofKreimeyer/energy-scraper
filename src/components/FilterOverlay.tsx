@@ -52,7 +52,7 @@ export default function FilterOverlay({
   return (
     <Modal onClose={onClose} label="Anzeige anpassen">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-[1.15rem] font-bold text-ink">Anzeige anpassen</h2>
+        <h2 className="text-[1.75rem] text-ink">Anzeige anpassen</h2>
         <button
           type="button"
           onClick={onClose}

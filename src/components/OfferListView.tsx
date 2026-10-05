@@ -45,7 +45,7 @@ export function OfferListView({ offer, isBest, reports, votes }: Props) {
           </div>
 
           <div className="flex-none text-right">
-            <div className="font-mono text-[1.1rem] font-bold tracking-[-0.02em] tabular-nums text-ink whitespace-nowrap">
+            <div className="font-display text-[1.6rem] tabular-nums text-ink whitespace-nowrap">
               {formatEuro(offer.perUnit)}
               <span className="text-[0.62rem] font-medium text-muted"> {isMulti ? "/ Dose" : ""}</span>
             </div>

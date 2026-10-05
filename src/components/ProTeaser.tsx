@@ -17,7 +17,7 @@ export default function ProTeaser({ onOpenCreator }: { onOpenCreator: () => void
       <div className="rounded-card p-6 border-[3px] border-border-strong shadow-card bg-accent-tint flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="flex-1">
           <div className="text-[0.7rem] font-semibold uppercase tracking-[0.1em] text-accent-strong">EnergyHunt Pro</div>
-          <h2 id="pro-teaser-title" className="mt-1 text-[1.15rem] font-bold text-ink leading-snug">
+          <h2 id="pro-teaser-title" className="mt-1 text-[1.75rem] text-ink leading-snug">
             Nie wieder ein Angebot verpassen.
           </h2>
           <ul className="mt-3 flex flex-col gap-1.5 text-[0.9rem] text-muted">

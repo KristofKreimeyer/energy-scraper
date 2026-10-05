@@ -5,7 +5,7 @@ import { Can, StatCard, TopDealBanner } from "./heroParts";
 // Hero-Kopf + Top-Deal-Banner + Kennzahlen-Grid des gewählten Zeitraums.
 // Reine Präsentations-Komponente: Zahlen kommen fertig berechnet aus App.
 
-const STAT_VALUE = "font-mono text-[1.85rem] font-bold tracking-[-0.02em] tabular-nums";
+const STAT_VALUE = "font-display text-[3rem] leading-none tabular-nums";
 const STAT_SUB = "text-[0.82rem] text-muted";
 
 export interface HeroStats {
@@ -24,7 +24,7 @@ interface HeroProps {
 
 const noLiter = (
   <>
-    <span className="font-mono text-[1.85rem] font-bold tabular-nums">—</span>
+    <span className="font-display text-[3rem] leading-none">—</span>
     <span className={STAT_SUB}>Kein Grundpreis verfügbar</span>
   </>
 );
@@ -39,7 +39,7 @@ export default function Hero({ timeframe, deal, dealSaving, stats }: HeroProps) 
           <p className="font-mono text-[clamp(0.75rem,1.6vw,1.1rem)] tracking-[0.2em] uppercase text-good mb-4">
             Energy-Drink-Angebote · {timeframe === "current" ? "Diese Woche" : "Nächste Woche · Vorschau"}
           </p>
-          <h1 id="page-title" className="hero-title text-[clamp(1.5rem,7vw,6.25rem)] leading-[1.05] tracking-[-0.01em] text-balance">
+          <h1 id="page-title" className="hero-title text-[clamp(2.5rem,14vw,9rem)] leading-[0.88] tracking-[-0.01em] text-balance">
             {timeframe === "current" ? (
               <>Schnäppchenjagd auf Energy&#8209;Drinks.</>
             ) : (
@@ -94,7 +94,7 @@ export default function Hero({ timeframe, deal, dealSaving, stats }: HeroProps) 
                 label="Preisspanne pro Liter"
                 value={
                   stats.literStats ? (
-                    <span className="font-mono text-[1.4rem] font-bold tracking-[-0.02em] tabular-nums">
+                    <span className="font-display text-[2.4rem] leading-none tabular-nums">
                       {formatNumber(stats.literStats.min)}–{formatNumber(stats.literStats.max)}
                       <span className="text-[0.9rem] text-muted"> €/L</span>
                     </span>

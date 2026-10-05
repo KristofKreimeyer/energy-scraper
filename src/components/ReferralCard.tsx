@@ -41,7 +41,7 @@ export default function ReferralCard() {
           🎁
         </span>
         <div className="flex-1 min-w-[200px]">
-          <h2 id="referral-title" className="font-bold text-ink leading-snug">
+          <h2 id="referral-title" className="text-[1.6rem] text-ink leading-none">
             Freunde einladen, Pro gratis
           </h2>
           <p className="text-[0.85rem] text-muted">
@@ -80,7 +80,7 @@ export default function ReferralCard() {
           🎁
         </span>
         <div className="flex-1 min-w-[200px]">
-          <h2 id="referral-title" className="font-bold text-ink leading-snug">
+          <h2 id="referral-title" className="text-[1.6rem] text-ink leading-none">
             Freunde einladen, Pro gratis
           </h2>
           <p className="text-[0.85rem] text-muted">

@@ -9,7 +9,7 @@ export default function Header({ onOpenCreator }: { onOpenCreator: () => void })
   return (
     <header className="sticky top-0 z-20 bg-[color-mix(in_srgb,var(--surface)_88%,transparent)] backdrop-blur-[8px] backdrop-saturate-150 border-b-4 border-border-strong">
       <div className={`${WRAP} flex items-center gap-2 sm:gap-4 h-[62px]`}>
-        <div className="font-display flex items-center gap-2.5 tracking-[0.02em] text-[1.15rem] min-w-0">
+        <div className="font-display flex items-center gap-2.5 text-[1.75rem] leading-none min-w-0">
           <span
             className="w-[30px] h-[30px] flex-none grid place-items-center bg-fill text-on-fill rounded-[4px] border-2 border-border-strong text-[1.1rem]"
             aria-hidden="true"

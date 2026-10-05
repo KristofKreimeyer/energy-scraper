@@ -131,7 +131,7 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
     <Modal onClose={onClose} label="Preis-Alarm einrichten">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-[1.15rem] font-bold text-ink leading-tight">Preis-Alarm einrichten</h2>
+          <h2 className="text-[1.75rem] text-ink leading-tight">Preis-Alarm einrichten</h2>
           <p className="text-[0.8rem] text-muted mt-0.5">Wähle Marken – wir melden uns, sobald ein Deal auftaucht.</p>
         </div>
         <button

@@ -6,7 +6,7 @@ export default function LegalHeader() {
   return (
     <header className="sticky top-0 z-20 bg-[color-mix(in_srgb,var(--surface)_88%,transparent)] backdrop-blur-[8px] backdrop-saturate-150 border-b border-border">
       <div className={`${WRAP} flex items-center gap-4 h-[62px]`}>
-        <a href="#" className="font-display flex items-center gap-2.5 font-[700] tracking-[-0.02em] text-[1.15rem]">
+        <a href="#" className="font-display flex items-center gap-2.5 text-[1.75rem] leading-none">
           <span
             className="w-[30px] h-[30px] flex-none grid place-items-center bg-fill text-on-fill rounded-lg text-[1.1rem]"
             aria-hidden="true"

@@ -69,7 +69,7 @@ export function OfferCardView({ offer, isBest, rowHasVariant = false, reports, v
               {offer.perLiter != null ? (
                 <>
                   <span
-                    className={`font-mono text-[1.7rem] font-bold tracking-[-0.02em] tabular-nums whitespace-nowrap ${
+                    className={`font-display text-[2.75rem] leading-none tabular-nums whitespace-nowrap ${
                       isBest ? "text-good" : "text-accent-strong"
                     }`}
                   >
@@ -82,7 +82,7 @@ export function OfferCardView({ offer, isBest, rowHasVariant = false, reports, v
                 </>
               ) : (
                 <>
-                  <span className="font-mono text-[1.7rem] font-bold tabular-nums text-ink" aria-label="unbekannt">
+                  <span className="font-display text-[2.75rem] leading-none text-ink" aria-label="unbekannt">
                     —
                   </span>
                   <span className="font-mono text-[0.66rem] tracking-[0.06em] uppercase text-muted">Grundpreis</span>

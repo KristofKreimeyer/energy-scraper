@@ -43,7 +43,7 @@ export default function WeeklyReminder() {
           🔔
         </span>
         <div className="flex-1 min-w-[200px]">
-          <h2 id="weekly-title" className="font-semibold text-ink leading-snug">
+          <h2 id="weekly-title" className="text-[1.6rem] text-ink leading-none">
             Neue Woche, neue Deals?
           </h2>
           <p className="text-[0.85rem] text-muted">Eine Push pro Woche, sobald die frischen Angebote live sind – ohne Marke, ohne Konto.</p>

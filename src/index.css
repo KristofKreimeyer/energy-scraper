@@ -1,38 +1,21 @@
 @import 'tailwindcss';
 
-/* ---- Display-Schrift (self-hosted, kein Google-Fonts-Link) ----------------
-   Space Grotesk: geometrisch, leicht eigenwillig – trägt den Dark-Tech-/
-   Jagd-Ton der Marke, ohne die Lesbarkeit der System-Sans im Fließtext zu
-   opfern. Nur für Überschriften & Wortmarke. */
+/* ---- Schriften (self-hosted, kein Google-Fonts-Link) ----------------------
+   Barlow Condensed 600: die EINE Display-Schrift (Überschriften, Wortmarke,
+   große Preise). Hanken Grotesk (variabel 400–700): Fließtext und Labels. */
 @font-face {
-  font-family: 'Space Grotesk';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url('/fonts/space-grotesk-500.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Space Grotesk';
+  font-family: 'Barlow Condensed';
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url('/fonts/space-grotesk-600.woff2') format('woff2');
+  src: url('/fonts/barlow-condensed-600.woff2') format('woff2');
 }
 @font-face {
-  font-family: 'Space Grotesk';
+  font-family: 'Hanken Grotesk';
   font-style: normal;
-  font-weight: 700;
+  font-weight: 400 700;
   font-display: swap;
-  src: url('/fonts/space-grotesk-700.woff2') format('woff2');
-}
-
-/* Bowlby One: fette 80er/90er-Display-Schrift für Hero, Abschnittstitel, Wortmarke */
-@font-face {
-  font-family: 'Bowlby One';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('/fonts/bowlby-one-400.woff2') format('woff2');
+  src: url('/fonts/hanken-grotesk-var.woff2') format('woff2');
 }
 
 /* ---- Design-Tokens (WCAG 2.2 AA) ----------------------------------------
@@ -113,10 +96,9 @@
 
 /* ---- Tokens für Tailwind-Utilities verfügbar machen --------------------- */
 @theme {
-  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', Menlo, Consolas, monospace;
-  --font-display: 'Bowlby One', 'Space Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-head: 'Space Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-sans: 'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Barlow Condensed', 'Arial Narrow', system-ui, sans-serif;
   --color-neon-cyan: var(--neon-cyan);
   --color-neon-yellow: var(--neon-yellow);
 }
@@ -127,11 +109,11 @@ h1,
 h2,
 .font-display {
   font-family: var(--font-display);
-  font-weight: 400;
+  font-weight: 600;
   text-transform: uppercase;
+  letter-spacing: 0.01em;
 }
 h3 {
-  font-family: var(--font-head);
   font-weight: 700;
 }
 
@@ -186,8 +168,9 @@ h3 {
     background: var(--ground);
     color: var(--ink);
     font-family: var(--font-sans);
-    font-size: 16px;
-    line-height: 1.5;
+    font-size: 17px;
+    line-height: 1.55;
+    font-variant-numeric: tabular-nums;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -307,10 +290,10 @@ h3 {
   border-radius: 0 0 999px 999px;
   background: repeating-linear-gradient(0deg, var(--ground) 0 6px, transparent 6px 16px);
 }
+/* Titel: schmale Display-Schrift, sehr groß, eng gesetzt */
 .hero-title {
   color: var(--hero-title);
   overflow-wrap: anywhere;
-  text-shadow: 0.05em 0.05em 0 var(--accent), 0.1em 0.1em 0 var(--neon-cyan);
 }
 
 /* Ticker als Neon-Band */

@@ -67,7 +67,7 @@ export function TopDealBanner({
           <span className="pulse-dot" aria-hidden="true" />
           {timeframe === "current" ? "Top-Deal der Woche" : "Top-Deal · nächste Woche"}
         </p>
-        <h2 id="deal-title" className="mt-2 text-[1.3rem] tracking-[-0.02em] leading-[1.15] text-balance">
+        <h2 id="deal-title" className="mt-2 text-[2.25rem] leading-none text-balance">
           {deal.brand} {deal.title}
         </h2>
         <p className="mt-[3px] font-mono text-muted text-[0.85rem]">
@@ -91,9 +91,7 @@ export function TopDealBanner({
         </div>
       </div>
       <div className="text-right max-[560px]:text-left">
-        <div className="font-mono text-[clamp(1.9rem,4vw,2.3rem)] font-bold tracking-[-0.03em] tabular-nums text-ink leading-none">
-          {formatEuro(deal.price)}
-        </div>
+        <div className="font-display text-[clamp(3rem,6vw,4.5rem)] tabular-nums text-ink leading-none">{formatEuro(deal.price)}</div>
         {deal.perLiter != null && (
           <div className="mt-1.5 font-mono text-[0.84rem] font-semibold tabular-nums text-accent-strong">
             {formatNumber(deal.perLiter)} €/L

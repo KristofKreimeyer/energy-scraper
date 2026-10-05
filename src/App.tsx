@@ -10,6 +10,7 @@ import Footer from "./components/Footer";
 import Header from "./components/Header";
 import ControlsBar from "./components/ControlsBar";
 import FilterOverlay from "./components/FilterOverlay";
+import { WRAP } from "./lib/layout";
 import Hero from "./components/Hero";
 import PromoVideo from "./components/PromoVideo";
 import OfferResults from "./components/OfferResults";
@@ -139,9 +140,10 @@ function App() {
 
         <MarketVote />
 
-        <WeeklyReminder />
-
-        <ReferralCard />
+        <div className={`${WRAP} mt-16 grid gap-8 md:grid-cols-2 md:[&>*:only-child]:col-span-2`}>
+          <WeeklyReminder />
+          <ReferralCard />
+        </div>
 
         <ProTeaser onOpenCreator={() => setShowCreator(true)} />
       </main>

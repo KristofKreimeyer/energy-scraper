@@ -10,19 +10,19 @@ const LABEL = "font-mono text-[1rem] tracking-[0.04em] uppercase text-muted";
 export function Can({ className = "" }: { className?: string }) {
   return (
     <svg viewBox="0 0 200 420" className={className} aria-hidden="true">
-      <rect x="14" y="6" width="172" height="408" rx="26" fill="#ffe600" stroke="#0b0626" strokeWidth="8" />
-      <rect x="14" y="6" width="172" height="46" rx="22" fill="#0b0626" />
-      <rect x="14" y="368" width="172" height="46" rx="22" fill="#0b0626" />
-      <polygon points="24,120 176,96 176,186 24,210" fill="#ff2e93" stroke="#0b0626" strokeWidth="6" />
-      <polygon points="24,236 176,212 176,262 24,286" fill="#19f0ff" stroke="#0b0626" strokeWidth="6" />
+      <rect x="14" y="6" width="172" height="408" rx="26" fill="var(--surface)" stroke="var(--border-strong)" strokeWidth="8" />
+      <rect x="14" y="6" width="172" height="46" rx="22" fill="var(--border-strong)" />
+      <rect x="14" y="368" width="172" height="46" rx="22" fill="var(--border-strong)" />
+      <polygon points="24,160 176,136 176,236 24,260" fill="var(--accent)" stroke="var(--border-strong)" strokeWidth="6" />
       <text
         x="100"
-        y="168"
+        y="206"
         textAnchor="middle"
-        fontFamily="Bowlby One, sans-serif"
-        fontSize="40"
+        fontFamily="Barlow Condensed, sans-serif"
+        fontWeight="600"
+        fontSize="52"
         fill="#0b0626"
-        transform="rotate(-7 100 168)"
+        transform="rotate(-7 100 206)"
       >
         €/L
       </text>
@@ -63,7 +63,7 @@ export function TopDealBanner({
       aria-labelledby="deal-title"
     >
       <div className="min-w-0">
-        <p className="flex items-center gap-2 font-mono text-[1rem] tracking-[0.04em] uppercase text-accent-strong font-semibold">
+        <p className="flex items-center gap-2 font-mono text-[1rem] tracking-[0.04em] uppercase text-muted font-semibold">
           <span className="pulse-dot" aria-hidden="true" />
           {timeframe === "current" ? "Top-Deal der Woche" : "Top-Deal · nächste Woche"}
         </p>

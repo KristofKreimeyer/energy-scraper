@@ -34,14 +34,15 @@ export default function Hero({ timeframe, deal, dealSaving, stats }: HeroProps) 
     <section className="relative" aria-labelledby="page-title">
       {/* Bühne: bleibt beim Scrollen stehen, das Kennzahlen-Panel schiebt sich darüber */}
       <div className="sticky top-[3.875rem] min-h-[min(78vh,40rem)] overflow-hidden flex items-center">
-        <div className="hero-sun" aria-hidden="true" />
         <div className={`${WRAP} hero-enter relative pb-24`}>
-          <p className="font-mono text-[clamp(0.75rem,1.6vw,1.1rem)] tracking-[0.2em] uppercase text-good mb-4">
+          <p className="font-mono text-[clamp(0.75rem,1.6vw,1.1rem)] tracking-[0.2em] uppercase text-muted mb-4">
             Energy-Drink-Angebote · {timeframe === "current" ? "Diese Woche" : "Nächste Woche · Vorschau"}
           </p>
           <h1 id="page-title" className="hero-title text-[clamp(2.5rem,14vw,9rem)] leading-[0.88] tracking-[-0.01em] text-balance">
             {timeframe === "current" ? (
-              <>Schnäppchenjagd auf Energy&#8209;Drinks.</>
+              <>
+                Schnäppchenjagd auf <span className="text-accent-strong">Energy&#8209;Drinks</span>.
+              </>
             ) : (
               <>Der Ausblick: Energy&#8209;Deals der nächsten Woche.</>
             )}
@@ -50,7 +51,7 @@ export default function Hero({ timeframe, deal, dealSaving, stats }: HeroProps) 
       </div>
 
       {/* Panel: überlappt die Bühne; die Dose ragt über die Oberkante */}
-      <div className="relative z-[5] -mt-[16vh] bg-neon-cyan text-[#0b0626] border-t-[0.625rem] border-neon-yellow pt-16 pb-14">
+      <div className="relative z-[5] -mt-[16vh] bg-surface-2 text-ink border-t-[0.25rem] border-border-strong pt-16 pb-14">
         <Can className="absolute right-[5%] -top-[8.125rem] w-[clamp(4.5rem,11vw,8.75rem)] rotate-[8deg] z-[6]" />
         <div className={WRAP}>
           <p className="text-[1.15rem] leading-snug font-bold max-w-[40ch]">

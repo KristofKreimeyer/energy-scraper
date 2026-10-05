@@ -60,7 +60,7 @@ export function Sparkline({ trend, colorClass }: { trend: PriceInsight["trend"];
 /** Kopfzeile „Marke · Markt". */
 export function BrandLine({ offer }: { offer: GroupedOffer }) {
   return (
-    <span className="font-mono text-[1rem] tracking-[0.04em] uppercase text-accent-strong font-bold">
+    <span className="font-mono text-[1rem] tracking-[0.04em] uppercase text-ink font-bold">
       {offer.brand} · {offer.market}
     </span>
   );

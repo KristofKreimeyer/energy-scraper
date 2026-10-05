@@ -70,7 +70,7 @@ export function OfferCardView({ offer, isBest, rowHasVariant = false, reports, v
                 <>
                   <span
                     className={`font-display text-[2.75rem] leading-none tabular-nums whitespace-nowrap ${
-                      isBest ? "text-accent-strong" : "text-ink"
+                      isBest ? "text-accent" : "text-ink"
                     }`}
                   >
                     {formatEuro(offer.perLiter)}

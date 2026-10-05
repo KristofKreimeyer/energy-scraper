@@ -24,12 +24,12 @@ export function OfferCardView({ offer, isBest, rowHasVariant = false, reports, v
   return (
     <li className="flex">
       <article
-        className={`offer-card glass-card group relative flex flex-col h-full w-full rounded-card overflow-hidden shadow-card p-[1.125rem] transition-[transform,border-color] duration-150 hover:-translate-y-[3px] hover:border-border-strong focus-within:border-focus ${
+        className={`offer-card glass-card group relative flex flex-col h-full w-full rounded-card overflow-hidden shadow-card p-6 transition-[transform,border-color] duration-150 hover:-translate-y-[3px] hover:border-border-strong focus-within:border-focus ${
           isBest ? "border-[color-mix(in_srgb,var(--good)_45%,var(--border))]" : ""
         }`}
         aria-label={alt}
       >
-        <div className="flex flex-col gap-1 flex-1">
+        <div className="flex flex-col gap-2 flex-1">
           <div className="flex items-center gap-2 flex-wrap">
             <BrandLine offer={offer} />
             <BestTag isBest={isBest} />
@@ -38,7 +38,7 @@ export function OfferCardView({ offer, isBest, rowHasVariant = false, reports, v
           <h3 className="text-[1.25rem] leading-[1.25] tracking-[-0.01em]">{offer.title}</h3>
           {extraVariants > 0 && (
             <span
-              className="self-start mt-[0.3125rem] text-[1rem] text-muted cursor-default"
+              className="self-start mt-0 text-[1rem] text-muted cursor-default"
               title={offer.variantTitles.join(", ")}
               aria-label={`${offer.variantCount} Sorten zum gleichen Preis: ${offer.variantTitles.join(", ")}`}
             >
@@ -49,15 +49,15 @@ export function OfferCardView({ offer, isBest, rowHasVariant = false, reports, v
             // Platzhalter reserviert die Höhe der „X Sorten"-Zeile, wenn
             // irgendein Angebot der Liste eine hat – so fluchten die Preisblöcke
             // reihenweise (2- und 3-Spalter). Erst ab md, mobil (1 Spalte) unnötig.
-            <span className="hidden md:block self-start mt-[0.3125rem] text-[1rem]" aria-hidden="true">
+            <span className="hidden md:block self-start mt-0 text-[1rem]" aria-hidden="true">
               {" "}
             </span>
           )}
 
           {/* Preis-Hierarchie: €/L ist der Vergleichs-Held (groß + Akzent),
               der Stückpreis („was du zahlst") steht bewusst sekundär daneben. */}
-          <div className="flex items-baseline gap-3.5 pt-3">
-            <span className="flex flex-col gap-px flex-none min-w-0">
+          <div className="flex items-baseline gap-4 pt-4">
+            <span className="flex flex-col gap-0 flex-none min-w-0">
               <span className="font-mono text-[1.1rem] font-semibold tracking-[-0.02em] tabular-nums text-muted whitespace-nowrap">
                 {formatEuro(offer.perUnit)}
               </span>
@@ -65,7 +65,7 @@ export function OfferCardView({ offer, isBest, rowHasVariant = false, reports, v
                 {isMulti ? "je Dose" : offer.unitLabel}
               </span>
             </span>
-            <span className="flex flex-col gap-px flex-1 min-w-0 items-end text-right">
+            <span className="flex flex-col gap-0 flex-1 min-w-0 items-end text-right">
               {offer.perLiter != null ? (
                 <>
                   <span
@@ -91,14 +91,14 @@ export function OfferCardView({ offer, isBest, rowHasVariant = false, reports, v
             </span>
           </div>
           {isMulti && (
-            <p className="mt-2 font-mono text-[1rem] tabular-nums text-muted">
+            <p className="mt-4 font-mono text-[1rem] tabular-nums text-muted">
               {offer.unitLabel} · {formatEuro(offer.price)} gesamt
             </p>
           )}
 
           {offer.requiresApp && offer.appPrice != null && (
-            <p className="flex items-center gap-2 mt-2.5 text-[1rem]">
-              <span className="flex-none font-semibold text-accent-strong bg-[color-mix(in_srgb,var(--accent)_12%,transparent)] border border-[color-mix(in_srgb,var(--accent)_30%,transparent)] rounded-[0.4375rem] px-2 py-[3px]">
+            <p className="flex items-center gap-2 mt-4 text-[1rem]">
+              <span className="flex-none font-semibold text-accent-strong bg-[color-mix(in_srgb,var(--accent)_12%,transparent)] border border-[color-mix(in_srgb,var(--accent)_30%,transparent)] rounded-[0.4375rem] px-2 py-0">
                 <span aria-hidden="true">📱</span> mit App
               </span>
               <span className="text-muted font-mono tabular-nums">
@@ -115,8 +115,8 @@ export function OfferCardView({ offer, isBest, rowHasVariant = false, reports, v
           )}
 
           {saved && (
-            <p className="flex items-center gap-2 mt-2.5 text-[1rem]">
-              <span className="flex-none font-mono font-bold tabular-nums text-good bg-good-tint border border-[color-mix(in_srgb,var(--good)_30%,transparent)] rounded-[0.4375rem] px-2 py-[3px]">
+            <p className="flex items-center gap-2 mt-4 text-[1rem]">
+              <span className="flex-none font-mono font-bold tabular-nums text-good bg-good-tint border border-[color-mix(in_srgb,var(--good)_30%,transparent)] rounded-[0.4375rem] px-2 py-0">
                 <span aria-hidden="true">−{saved.percent}&nbsp;%</span>
                 <span className="visually-hidden">{saved.percent} Prozent gespart</span>
               </span>
@@ -131,26 +131,26 @@ export function OfferCardView({ offer, isBest, rowHasVariant = false, reports, v
             </p>
           )}
 
-          <InsightBlock offer={offer} className="mt-2.5" />
-          <CommunityBlock reports={reports} className="mt-2.5" />
+          <InsightBlock offer={offer} className="mt-4" />
+          <CommunityBlock reports={reports} className="mt-4" />
 
           {/* Dehnt sich: fehlende App-/Rabatt-Zeilen erzeugen den Leerraum HIER,
               damit Gültigkeits-Badge, Aktionen und CTA kartenübergreifend bündig
               am unteren Rand sitzen. */}
           <div className="flex-1" aria-hidden="true" />
 
-          <div className="mt-3">
+          <div className="mt-4">
             <ValidBadge offer={offer} />
           </div>
 
-          <div className="mt-3">
+          <div className="mt-4">
             <CardActions offer={offer} votes={votes} />
           </div>
 
           {offer.url && (
             <a
               data-cta=""
-              className="mt-3 pt-3 border-t border-border text-accent-strong text-[1rem] font-[650] no-underline inline-flex items-center gap-1.5 after:content-[''] after:absolute after:inset-0 after:rounded-card group-hover:text-accent focus-visible:outline-none"
+              className="mt-4 pt-4 border-t border-border text-accent-strong text-[1rem] font-[650] no-underline inline-flex items-center gap-2 after:content-[''] after:absolute after:inset-0 after:rounded-card group-hover:text-accent focus-visible:outline-none"
               href={offer.url}
               target="_blank"
               rel="noopener noreferrer"

@@ -1,8 +1,9 @@
 import { formatEuro, formatNumber, perLiterStats, savings, topDeal, type GroupedOffer, type Timeframe } from "../lib/offers";
 import { WRAP } from "../lib/layout";
-import { Can, StatCard, TopDealBanner } from "./heroParts";
+import { StatCard, TopDealBanner } from "./heroParts";
+import CinematicStage from "./CinematicStage";
 
-// Hero-Kopf + Top-Deal-Banner + Kennzahlen-Grid des gewählten Zeitraums.
+// Kino-Hero + Top-Deal-Banner + Kennzahlen-Grid des gewählten Zeitraums.
 // Reine Präsentations-Komponente: Zahlen kommen fertig berechnet aus App.
 
 const STAT_VALUE = "font-display text-[3rem] leading-none tabular-nums";
@@ -31,32 +32,12 @@ const noLiter = (
 
 export default function Hero({ timeframe, deal, dealSaving, stats }: HeroProps) {
   return (
-    <section className="relative" aria-labelledby="page-title">
-      {/* Bühne: bleibt beim Scrollen stehen, das Kennzahlen-Panel schiebt sich darüber */}
-      <div className="sticky top-[3.875rem] min-h-[min(78vh,40rem)] overflow-hidden flex items-center">
-        <div className={`${WRAP} hero-enter relative pb-24`}>
-          <p className="font-mono text-[clamp(0.75rem,1.6vw,1.1rem)] tracking-[0.2em] uppercase text-muted mb-4">
-            Energy-Drink-Angebote · {timeframe === "current" ? "Diese Woche" : "Nächste Woche · Vorschau"}
-          </p>
-          <h1 id="page-title" className="hero-title text-[clamp(2.5rem,14vw,9rem)] leading-[0.88] tracking-[-0.01em] text-balance">
-            {timeframe === "current" ? (
-              <>
-                Schnäppchenjagd auf <span className="text-accent">Energy&#8209;Drinks</span>.
-              </>
-            ) : (
-              <>Der Ausblick: Energy&#8209;Deals der nächsten Woche.</>
-            )}
-          </h1>
-        </div>
-      </div>
+    <section className="relative">
+      <CinematicStage timeframe={timeframe} />
 
-      {/* Panel: überlappt die Bühne; die Dose ragt über die Oberkante */}
-      <div className="relative z-[5] -mt-[16vh] bg-blue text-black border-t-[0.25rem] border-black pt-16 pb-14">
-        <Can className="absolute right-[5%] -top-[8.125rem] w-[clamp(4.5rem,11vw,8.75rem)] rotate-[8deg] z-[6]" />
+      {/* Panel: Kennzahlen unter dem Kino-Hero */}
+      <div className="relative z-[5] bg-blue text-black border-t-[0.25rem] border-black pt-16 pb-14">
         <div className={WRAP}>
-          <p className="text-[1.15rem] leading-snug font-bold max-w-[40ch]">
-            Jede Woche automatisch aus allen Prospekten, verglichen nach Preis pro Liter — das beste €/L steht oben.
-          </p>
           {deal && dealSaving && <TopDealBanner deal={deal} dealSaving={dealSaving} timeframe={timeframe} />}
 
           {stats ? (
@@ -121,7 +102,7 @@ export default function Hero({ timeframe, deal, dealSaving, stats }: HeroProps) 
               />
             </ul>
           ) : (
-            <p className="mt-6 px-5 py-12 text-center text-muted border border-dashed border-border-strong rounded-card">
+            <p className="mt-6 px-6 py-12 text-muted border border-dashed border-border-strong rounded-card">
               Für nächste Woche liegen noch keine Angebote vor. Sobald neue Prospekte erscheinen, tauchen sie hier auf.
             </p>
           )}

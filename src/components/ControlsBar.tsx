@@ -43,10 +43,10 @@ export default function ControlsBar({
   onViewChange,
 }: ControlsBarProps) {
   return (
-    <div className="md:sticky md:top-[3.875rem] z-[15] bg-[color-mix(in_srgb,var(--ground)_92%,transparent)] backdrop-blur-[0.375rem] py-4 mt-[1.875rem] border-b-4 border-border-strong">
-      <div className={`${WRAP} flex flex-wrap items-center gap-3`}>
+    <div className="md:sticky md:top-[3.875rem] z-[15] bg-surface py-4 border-y-4 border-border-strong">
+      <div className={`${WRAP} flex flex-wrap items-center gap-4`}>
         <div
-          className="inline-flex flex-none gap-1 p-1 bg-surface-2 border border-border rounded-[0.875rem]"
+          className="inline-flex flex-none gap-2 p-2 bg-surface-2 border border-border rounded-[0.875rem]"
           role="group"
           aria-label="Zeitraum wählen"
         >
@@ -59,7 +59,7 @@ export default function ControlsBar({
               onClick={() => onTimeframeChange(t.value)}
             >
               {t.label}
-              <span className="font-mono text-[1rem] tabular-nums text-muted bg-ground rounded-full px-[0.4375rem] py-px group-aria-pressed:text-on-fill group-aria-pressed:bg-[color-mix(in_srgb,var(--on-fill)_16%,transparent)]">
+              <span className="font-mono text-[1rem] tabular-nums text-muted bg-ground rounded-full px-2 py-0 group-aria-pressed:text-on-fill group-aria-pressed:bg-[color-mix(in_srgb,var(--on-fill)_16%,transparent)]">
                 {timeframeCounts[t.value]}
               </span>
             </button>
@@ -74,13 +74,13 @@ export default function ControlsBar({
         {favoriteCount > 0 && (
           <button
             type="button"
-            className="group inline-flex flex-none items-center gap-1.5 min-h-10 px-3.5 rounded-[0.875rem] border text-[1rem] font-semibold cursor-pointer transition-colors duration-150 aria-pressed:bg-fill aria-pressed:text-on-fill aria-pressed:border-fill bg-surface text-ink border-border-strong hover:bg-surface-2"
+            className="group inline-flex flex-none items-center gap-2 min-h-10 px-4 rounded-[0.875rem] border text-[1rem] font-semibold cursor-pointer transition-colors duration-150 aria-pressed:bg-fill aria-pressed:text-on-fill aria-pressed:border-fill bg-surface text-ink border-border-strong hover:bg-surface-2"
             aria-pressed={favoritesOnly}
             onClick={() => onFavoritesOnlyChange(!favoritesOnly)}
           >
             <span aria-hidden="true">{favoritesOnly ? "♥" : "♡"}</span>
             Meine Marken
-            <span className="font-mono text-[1rem] tabular-nums text-muted bg-ground rounded-full px-[0.4375rem] py-px group-aria-pressed:text-on-fill group-aria-pressed:bg-[color-mix(in_srgb,var(--on-fill)_16%,transparent)]">
+            <span className="font-mono text-[1rem] tabular-nums text-muted bg-ground rounded-full px-2 py-0 group-aria-pressed:text-on-fill group-aria-pressed:bg-[color-mix(in_srgb,var(--on-fill)_16%,transparent)]">
               {favoriteCount}
             </span>
           </button>

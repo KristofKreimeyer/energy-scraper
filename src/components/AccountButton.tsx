@@ -97,7 +97,7 @@ export function AccountButton() {
         id="account-trigger"
         onClick={onOpen}
         aria-label={user ? "Konto" : "Anmelden"}
-        className="flex-none h-10 px-3 min-w-[2.75rem] justify-center bg-surface text-ink border border-border-strong rounded-[0.625rem] text-[1rem] font-semibold cursor-pointer inline-flex items-center gap-[0.4375rem] hover:bg-surface-2 max-w-[10rem]"
+        className="flex-none h-10 px-4 min-w-[2.75rem] justify-center bg-surface text-ink border border-border-strong rounded-[0.625rem] text-[1rem] font-semibold cursor-pointer inline-flex items-center gap-2 hover:bg-surface-2 max-w-[10rem]"
       >
         <User size={16} strokeWidth={2.2} aria-hidden />
         <span className="hidden sm:inline truncate">{user ? user.email : "Anmelden"}</span>
@@ -105,7 +105,7 @@ export function AccountButton() {
 
       {open && (
         <Modal onClose={() => setOpen(false)} label={user ? "Konto" : "Anmelden"}>
-          <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start justify-between gap-4">
             <h2 className="text-[1.75rem] text-ink">{user ? "Dein Konto" : "Anmelden"}</h2>
             <button
               type="button"
@@ -122,16 +122,16 @@ export function AccountButton() {
               <p className="text-[1rem] text-muted">
                 Angemeldet als <span className="font-semibold text-ink">{user.email}</span>
               </p>
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-2">
                 <span className="text-[1rem] font-semibold uppercase tracking-[0.04em] text-muted">Meine Beiträge</span>
                 <div className="flex gap-2">
-                  <div className="flex-1 rounded-lg border border-border bg-surface-2 px-3 py-2.5 text-center">
+                  <div className="flex-1 rounded-lg border border-border bg-surface-2 px-4 py-2 text-center">
                     <div className="font-mono text-[1.4rem] font-bold text-ink tabular-nums">{contrib?.reports ?? "–"}</div>
                     <div className="text-[1rem] text-muted">
                       Meldungen{contrib && contrib.reportsApproved > 0 ? ` (${contrib.reportsApproved} ✓)` : ""}
                     </div>
                   </div>
-                  <div className="flex-1 rounded-lg border border-border bg-surface-2 px-3 py-2.5 text-center">
+                  <div className="flex-1 rounded-lg border border-border bg-surface-2 px-4 py-2 text-center">
                     <div className="font-mono text-[1.4rem] font-bold text-ink tabular-nums">{contrib?.votes ?? "–"}</div>
                     <div className="text-[1rem] text-muted">Votes</div>
                   </div>
@@ -141,12 +141,12 @@ export function AccountButton() {
                 </p>
               </div>
 
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-2">
                 <span className="text-[1rem] font-semibold uppercase tracking-[0.04em] text-muted">Meine Alarme (E-Mail)</span>
                 {alarms && alarms.length > 0 ? (
-                  <ul className="flex flex-col gap-1.5">
+                  <ul className="flex flex-col gap-2">
                     {alarms.map((a) => (
-                      <li key={a.id} className="flex items-center gap-2 rounded-lg border border-border bg-surface-2 px-3 py-2">
+                      <li key={a.id} className="flex items-center gap-2 rounded-lg border border-border bg-surface-2 px-4 py-2">
                         <div className="flex-1 min-w-0">
                           <div className="text-[1rem] text-ink truncate">{a.label}</div>
                           <div className="text-[1rem] text-muted">
@@ -175,7 +175,7 @@ export function AccountButton() {
                 </p>
               </div>
 
-              <div className="flex flex-col gap-1.5">
+              <div className="flex flex-col gap-2">
                 <button
                   type="button"
                   onClick={openPortal}
@@ -206,7 +206,7 @@ export function AccountButton() {
             </>
           ) : (
             <form
-              className="flex flex-col gap-2.5"
+              className="flex flex-col gap-2"
               onSubmit={(e) => {
                 e.preventDefault();
                 submit();
@@ -224,7 +224,7 @@ export function AccountButton() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="du@example.com"
-                className="w-full h-10 px-3 text-[1rem] bg-surface text-ink border border-border-strong rounded-lg outline-none"
+                className="w-full h-10 px-4 text-[1rem] bg-surface text-ink border border-border-strong rounded-lg outline-none"
               />
               <button
                 type="submit"

@@ -11,7 +11,7 @@ export default function Header({ onOpenCreator }: { onOpenCreator: () => void })
       <div className={`${WRAP} flex items-center gap-2 sm:gap-4 h-[3.875rem]`}>
         <div className="font-display flex items-center gap-2 text-[1.75rem] leading-none min-w-0">
           <span
-            className="w-[1.875rem] h-[1.875rem] flex-none grid place-items-center bg-fill text-on-fill rounded-[0.25rem] border-2 border-border-strong text-[1.1rem]"
+            className="w-[1.875rem] h-[1.875rem] flex-none grid place-items-center bg-sun text-black rounded-[0.25rem] border-2 border-border-strong text-[1.1rem]"
             aria-hidden="true"
           >
             ⚡

@@ -6,30 +6,6 @@ import { Clock } from "lucide-react";
 
 const LABEL = "font-mono text-[1rem] tracking-[0.04em] uppercase text-muted";
 
-/** Dekorative Energy-Dose (Vektor) – ragt aus dem Hero-Panel heraus. */
-export function Can({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 200 420" className={className} aria-hidden="true">
-      <rect x="14" y="6" width="172" height="408" rx="26" fill="#ff38d0" stroke="#000000" strokeWidth="8" />
-      <rect x="14" y="6" width="172" height="46" rx="22" fill="#000000" />
-      <rect x="14" y="368" width="172" height="46" rx="22" fill="#000000" />
-      <polygon points="24,160 176,136 176,236 24,260" fill="#ffffff" stroke="#000000" strokeWidth="6" />
-      <text
-        x="100"
-        y="206"
-        textAnchor="middle"
-        fontFamily="Barlow Condensed, sans-serif"
-        fontWeight="600"
-        fontSize="52"
-        fill="#000000"
-        transform="rotate(-7 100 206)"
-      >
-        €/L
-      </text>
-    </svg>
-  );
-}
-
 /** Eine Kennzahl-Kachel (Label + Wert + Untertitel). Wert/Untertitel als Nodes,
  *  da die Formatierung je Kachel unterschiedlich ist. */
 export function StatCard({ label, value, sub, className = "" }: { label: string; value: ReactNode; sub: ReactNode; className?: string }) {

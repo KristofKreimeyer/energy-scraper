@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { WRAP } from "../utils/helper";
+import { WRAP } from "../lib/layout";
 import { useAuth } from "../auth/AuthContext";
 import { fetchReferral, type ReferralInfo } from "../lib/referral";
 import { ShareButton } from "./ShareButton";
@@ -39,14 +39,15 @@ export default function ReferralCard() {
   if (!user) {
     return wrap(
       <div className="flex items-center gap-4 flex-wrap">
-        <span aria-hidden="true" className="text-[1.4rem]">🎁</span>
+        <span aria-hidden="true" className="text-[1.4rem]">
+          🎁
+        </span>
         <div className="flex-1 min-w-[200px]">
           <h2 id="referral-title" className="font-bold text-ink leading-snug">
             Freunde einladen, Pro gratis
           </h2>
           <p className="text-[0.85rem] text-muted">
-            Lade Freunde ein – sobald sie ihren ersten Alarm bestätigen,
-            bekommt ihr <b className="text-ink">beide 1 Monat Pro</b>.
+            Lade Freunde ein – sobald sie ihren ersten Alarm bestätigen, bekommt ihr <b className="text-ink">beide 1 Monat Pro</b>.
           </p>
         </div>
         <button
@@ -61,8 +62,7 @@ export default function ReferralCard() {
   }
 
   const url = info?.url ?? "";
-  const shareText =
-    "Ich spare bei Energy-Drinks mit EnergyHunt – über meinen Link bekommst du 1 Monat Pro gratis:";
+  const shareText = "Ich spare bei Energy-Drinks mit EnergyHunt – über meinen Link bekommst du 1 Monat Pro gratis:";
 
   async function copy() {
     if (!url) return;
@@ -78,14 +78,15 @@ export default function ReferralCard() {
   return wrap(
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-3 flex-wrap">
-        <span aria-hidden="true" className="text-[1.4rem]">🎁</span>
+        <span aria-hidden="true" className="text-[1.4rem]">
+          🎁
+        </span>
         <div className="flex-1 min-w-[200px]">
           <h2 id="referral-title" className="font-bold text-ink leading-snug">
             Freunde einladen, Pro gratis
           </h2>
           <p className="text-[0.85rem] text-muted">
-            Ihr bekommt <b className="text-ink">beide 1 Monat Pro</b>, sobald ein
-            eingeladener Freund seinen ersten Alarm bestätigt.
+            Ihr bekommt <b className="text-ink">beide 1 Monat Pro</b>, sobald ein eingeladener Freund seinen ersten Alarm bestätigt.
           </p>
         </div>
         {info && (

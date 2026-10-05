@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { getSessionToken, setSessionToken, clearSessionToken } from "./session";
-import { API_BASE } from "../lib/api";
+import { apiFetch } from "../lib/api";
 
 // Leichte Identität: passwortloser Login per E-Mail-Magic-Link. Der Context hält
 // den aktuellen Nutzer und stellt Login/Logout bereit. Session-Token liegt im
@@ -35,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const token = getSessionToken();
     if (!token) return;
-    fetch(`${API_BASE}/api/auth/me`, { headers: { authorization: `Bearer ${token}` } })
+    apiFetch("/api/auth/me", { auth: true })
       .then(async (res) => {
         if (res.ok) {
           const d = (await res.json()) as { email: string };
@@ -52,11 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function requestLogin(email: string) {
     try {
-      const res = await fetch(`${API_BASE}/api/auth/request`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
+      const res = await apiFetch("/api/auth/request", { method: "POST", body: { email } });
       const d = (await res.json()) as { message?: string };
       return { ok: res.ok, message: d.message ?? "Prüfe deine Mail." };
     } catch {
@@ -66,11 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function verifyToken(token: string) {
     try {
-      const res = await fetch(`${API_BASE}/api/auth/verify`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ token }),
-      });
+      const res = await apiFetch("/api/auth/verify", { method: "POST", body: { token } });
       if (!res.ok) return false;
       const d = (await res.json()) as { token: string; email: string };
       setSessionToken(d.token);
@@ -84,7 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   function logout() {
     const token = getSessionToken();
     if (token) {
-      fetch(`${API_BASE}/api/auth/logout`, { method: "POST", headers: { authorization: `Bearer ${token}` } }).catch(() => {});
+      apiFetch("/api/auth/logout", { method: "POST", auth: true }).catch(() => {});
     }
     clearSessionToken();
     setUser(null);

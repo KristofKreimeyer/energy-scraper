@@ -1,6 +1,9 @@
 import type { Offer, OffersData, PriceHistory, SortKey } from '../types'
 import data from '../data/offers.json'
 import historyData from '../data/price-history.json'
+import { DAY_MS, median, parseLiters, productKey, utcDay } from '../../shared/core.mjs'
+
+export { productKey }
 
 const dataset = data as OffersData
 
@@ -8,22 +11,6 @@ export const offers: Offer[] = dataset.offers
 export const generatedAt: string = dataset.generatedAt
 
 const history = historyData as PriceHistory
-
-/**
- * Preisunabhängiger Produktschlüssel – muss identisch zu productKey in
- * scripts/prepare-data.mjs sein, damit ein Angebot seinen Historieneintrag
- * findet (Markt|Marke|Titel|Gebinde, getrimmt & kleingeschrieben).
- */
-export function productKey(o: {
-  market: string
-  brand: string
-  title: string
-  unitLabel: string
-}): string {
-  return [o.market, o.brand, o.title, o.unitLabel]
-    .map((s) => String(s ?? '').trim().toLowerCase())
-    .join('|')
-}
 
 /** Preisniveau des aktuellen Angebots gemessen an seiner eigenen Historie. */
 export type PriceLevel = 'best' | 'good' | 'normal' | 'high'
@@ -60,9 +47,7 @@ export function priceInsight(offer: Offer): PriceInsight | null {
   for (const p of entry.points) {
     if (p.perLiter != null) byDay.set(p.date, p.perLiter)
   }
-  const trend = [...byDay.entries()]
-    .sort((a, b) => a[0].localeCompare(b[0]))
-    .map(([date, perLiter]) => ({ date, perLiter }))
+  const trend = [...byDay.entries()].sort((a, b) => a[0].localeCompare(b[0])).map(([date, perLiter]) => ({ date, perLiter }))
   if (trend.length < MIN_DAYS_FOR_INSIGHT) return null
 
   const values = trend.map((t) => t.perLiter).sort((a, b) => a - b)
@@ -71,17 +56,16 @@ export function priceInsight(offer: Offer): PriceInsight | null {
   // Praktisch konstanter Preis (≤ 0,5 % Spanne): keine Vergleichsbasis.
   if (max - min <= min * 0.005) return null
 
-  const mid = Math.floor(values.length / 2)
-  const median = values.length % 2 ? values[mid] : (values[mid - 1] + values[mid]) / 2
+  const med = median(values)!
 
   const p = offer.perLiter
   let level: PriceLevel
   if (p <= min * 1.001) level = 'best'
-  else if (p <= median * 0.99) level = 'good'
-  else if (p >= median * 1.05) level = 'high'
+  else if (p <= med * 0.99) level = 'good'
+  else if (p >= med * 1.05) level = 'high'
   else level = 'normal'
 
-  return { level, dayCount: trend.length, min, median, trend }
+  return { level, dayCount: trend.length, min, median: med, trend }
 }
 
 /** Ein Angebot, das stellvertretend für mehrere Geschmackssorten steht. */
@@ -91,20 +75,18 @@ export interface GroupedOffer extends Offer {
 }
 
 /**
- * Kanonisches Gebinde-Volumen (Liter, gerundet) aus dem Gebinde-Freitext –
- * damit identische Mengen in unterschiedlicher Schreibweise („0,25-L-Dose" vs.
- * „250-ml-Dose") denselben Gruppenschlüssel ergeben. Fällt auf den getrimmten
+ * Kanonisches Gesamtvolumen (ml) aus dem Gebinde-Freitext – damit identische
+ * Mengen in unterschiedlicher Schreibweise („0,25-L-Dose" vs. „250-ml-Dose")
+ * denselben Gruppenschlüssel ergeben und Mehrfachgebinde („6x0,25-L-Dose" =
+ * 1500 ml) nicht mit Einzeldosen verschmelzen. Fällt auf den getrimmten
  * Rohstring zurück, wenn kein Volumen erkennbar ist.
  */
 function canonicalUnit(unitLabel: string): string {
-  const s = String(unitLabel ?? '').toLowerCase()
-  const m = s.match(/(\d+(?:[.,]\d+)?)\s*-?\s*(ml|liter|l)(?![a-z])/)
-  if (m) {
-    let vol = parseFloat(m[1].replace(',', '.'))
-    if (m[2] === 'ml') vol /= 1000
-    if (vol > 0) return `${Math.round(vol * 1000)}ml`
-  }
-  return s.trim()
+  const liters = parseLiters(unitLabel)
+  if (liters != null && liters > 0) return `${Math.round(liters * 1000)}ml`
+  return String(unitLabel ?? '')
+    .toLowerCase()
+    .trim()
 }
 
 /**
@@ -156,11 +138,12 @@ export function formatNumber(value: number): string {
 
 /** Kennzahlen über die Grundpreise (€/L) einer Angebotsliste. */
 export function perLiterStats(list: Offer[]): { min: number; max: number; median: number } | null {
-  const values = list.map((o) => o.perLiter).filter((v): v is number => v != null).sort((a, b) => a - b)
+  const values = list
+    .map((o) => o.perLiter)
+    .filter((v): v is number => v != null)
+    .sort((a, b) => a - b)
   if (values.length === 0) return null
-  const mid = Math.floor(values.length / 2)
-  const median = values.length % 2 ? values[mid] : (values[mid - 1] + values[mid]) / 2
-  return { min: values[0], max: values[values.length - 1], median }
+  return { min: values[0], max: values[values.length - 1], median: median(values)! }
 }
 
 /** Ganze Tage bis zum Ablauf (validTo), relativ zu `now`. Null ohne Enddatum. */
@@ -168,12 +151,7 @@ export function daysUntil(validTo: string | null, now: Date = new Date()): numbe
   if (!validTo) return null
   const end = Date.parse(validTo)
   if (Number.isNaN(end)) return null
-  return Math.ceil((end - now.getTime()) / 86_400_000)
-}
-
-/** Kalendertag (UTC) als ganze Zahl – für Zeitraum-Vergleiche auf Tagesebene. */
-function utcDay(d: Date): number {
-  return Math.floor(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()) / 86_400_000)
+  return Math.ceil((end - now.getTime()) / DAY_MS)
 }
 
 export type OfferPhase = 'current' | 'upcoming' | 'expired' | 'ongoing'
@@ -205,7 +183,10 @@ export function inTimeframe<T extends Offer>(list: T[], tf: Timeframe, now: Date
 const dayFmt = new Intl.DateTimeFormat('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })
 
 /** Menschliche Gültigkeitsangabe + Statusflags. */
-export function validity(offer: Offer, now: Date = new Date()): {
+export function validity(
+  offer: Offer,
+  now: Date = new Date(),
+): {
   label: string
   ending: boolean
   upcoming: boolean
@@ -312,7 +293,7 @@ export function allMarkets(list: Offer[]): string[] {
 /** Alle vorkommenden Marken, häufigste zuerst. */
 export function allBrands(list: Offer[]): string[] {
   const counts = countBy(list, (o) => o.brand)
-  return [...counts.keys()].sort((a, b) => (counts.get(b)! - counts.get(a)!) || a.localeCompare(b, 'de'))
+  return [...counts.keys()].sort((a, b) => counts.get(b)! - counts.get(a)! || a.localeCompare(b, 'de'))
 }
 
 /** Häufigkeiten je Schlüssel – für kontextuelle Chip-Zähler. */
@@ -320,4 +301,20 @@ export function countBy(list: Offer[], key: (o: Offer) => string): Map<string, n
   const map = new Map<string, number>()
   for (const o of list) map.set(key(o), (map.get(key(o)) ?? 0) + 1)
   return map
+}
+
+/**
+ * Kontextuelle Facetten-Zähler (faceted search): zählt die Angebote je Option
+ * einer Facette unter den JEWEILS anderen aktiven Filtern – so zeigen die Chips,
+ * was ein Klick noch bringt. Bei 'sugar' zählen 'both'-Angebote in beide
+ * Optionen ('zero' und 'sugar'); der Schlüssel 'all' ist die Gesamtzahl.
+ */
+export function facetCounts(list: Offer[], f: FilterState, facet: 'market' | 'brand' | 'sugar'): Map<string, number> {
+  const base = filterOffers(list, { ...f, [facet]: 'all' })
+  if (facet !== 'sugar') return countBy(base, (o) => o[facet])
+  return new Map<string, number>([
+    ['all', base.length],
+    ['zero', base.filter((o) => o.sugar === 'zero' || o.sugar === 'both').length],
+    ['sugar', base.filter((o) => o.sugar === 'sugar' || o.sugar === 'both').length],
+  ])
 }

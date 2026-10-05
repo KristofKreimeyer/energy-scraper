@@ -2,7 +2,7 @@ import { OfferCardView } from "./OfferCardView";
 import { OfferListView } from "./OfferListView";
 import { productKey, type GroupedOffer } from "../lib/offers";
 import type { SortKey } from "../types";
-import { WRAP } from "../utils/helper";
+import { WRAP } from "../lib/layout";
 import type { ReportsByProduct } from "../hooks/useCommunityReports";
 import type { VotesByProduct } from "../hooks/useCommunityVotes";
 
@@ -28,7 +28,7 @@ interface OfferListProps {
   communityVotes: VotesByProduct;
 }
 
-export default function OfferList({
+export default function OfferResults({
   offers,
   sort,
   filtersActive,
@@ -45,14 +45,8 @@ export default function OfferList({
 
   return (
     <div className={WRAP}>
-      <p
-        className="mt-4 mb-1 text-[0.88rem] text-muted font-mono"
-        role="status"
-        aria-live="polite"
-      >
-        <b className="text-ink">{offers.length}</b>{" "}
-        {offers.length === 1 ? "Angebot" : "Angebote"} · sortiert nach{" "}
-        {SORT_LABELS[sort]}
+      <p className="mt-4 mb-1 text-[0.88rem] text-muted font-mono" role="status" aria-live="polite">
+        <b className="text-ink">{offers.length}</b> {offers.length === 1 ? "Angebot" : "Angebote"} · sortiert nach {SORT_LABELS[sort]}
         {filtersActive && (
           <>
             {" · "}
@@ -70,9 +64,7 @@ export default function OfferList({
       {offers.length > 0 ? (
         <ul
           className={`list-none mt-1.5 p-0 ${
-            view === "list"
-              ? "flex flex-col gap-2.5"
-              : "grid gap-5 grid-cols-1 md:grid-cols-2 xl:grid-cols-3"
+            view === "list" ? "flex flex-col gap-2.5" : "grid gap-5 grid-cols-1 md:grid-cols-2 xl:grid-cols-3"
           }`}
           aria-label="Energy-Drink-Angebote"
         >

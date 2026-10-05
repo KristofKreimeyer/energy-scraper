@@ -11,7 +11,7 @@ import Header from "./components/Header";
 import ControlsBar from "./components/ControlsBar";
 import FilterOverlay from "./components/FilterOverlay";
 import Hero from "./components/Hero";
-import OfferList from "./components/OfferList";
+import OfferResults from "./components/OfferResults";
 import Ticker from "./components/Ticker";
 import TrustCards from "./components/TrustCards";
 import Leaderboard from "./components/Leaderboard";
@@ -101,12 +101,7 @@ function App() {
       <Ticker offers={offers} />
 
       <main id="main">
-        <Hero
-          timeframe={timeframe}
-          deal={deal}
-          dealSaving={dealSaving}
-          stats={stats}
-        />
+        <Hero timeframe={timeframe} deal={deal} dealSaving={dealSaving} stats={stats} />
 
         <ControlsBar
           timeframe={timeframe}
@@ -124,7 +119,7 @@ function App() {
           onViewChange={setView}
         />
 
-        <OfferList
+        <OfferResults
           offers={visible}
           sort={sort}
           filtersActive={filtersActive}

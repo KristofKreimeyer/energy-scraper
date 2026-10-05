@@ -14,18 +14,18 @@ export default function Leaderboard() {
   if (board.length === 0) return null;
 
   return (
-    <section className={`${WRAP} mt-8`} aria-labelledby="leaderboard-title">
+    <section className={`${WRAP} mt-16`} aria-labelledby="leaderboard-title">
       <div className="glass-card rounded-card p-6 shadow-card">
         <div className="flex items-baseline justify-between gap-4 flex-wrap">
-          <h2 id="leaderboard-title" className="text-[1.5rem] leading-none text-ink">
+          <h2 id="leaderboard-title" className="text-[1.5rem] leading-tight text-ink">
             🏆 Top-Hunter der Woche
           </h2>
           <span className="text-[1rem] text-muted">Punkte: freigegebene Meldung ×3 · Bestätigung ×1</span>
         </div>
 
-        <ol className="mt-4 flex flex-col divide-y divide-border">
+        <ol className="mt-6 flex flex-col divide-y divide-border">
           {board.map((e) => (
-            <li key={e.rank} className="flex items-center gap-4 py-2 text-[1rem]">
+            <li key={e.rank} className="flex items-center gap-4 py-4 text-[1rem]">
               <span className="w-6 flex-none text-center font-mono font-bold tabular-nums">{MEDALS[e.rank - 1] ?? e.rank}</span>
               <span className="flex-1 font-semibold text-ink">{e.handle}</span>
               <span className="text-[1rem] text-muted tabular-nums">

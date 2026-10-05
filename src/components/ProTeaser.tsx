@@ -13,14 +13,14 @@ const BENEFITS = [
 
 export default function ProTeaser({ onOpenCreator }: { onOpenCreator: () => void }) {
   return (
-    <section className={`${WRAP} mt-8`} aria-labelledby="pro-teaser-title">
+    <section className={`${WRAP} mt-16`} aria-labelledby="pro-teaser-title">
       <div className="rounded-card p-6 border-[3px] border-border-strong shadow-card bg-accent-tint flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="flex-1">
           <div className="text-[1rem] font-semibold uppercase tracking-[0.04em] text-muted">EnergyHunt Pro</div>
-          <h2 id="pro-teaser-title" className="mt-2 text-[1.75rem] text-ink leading-snug">
+          <h2 id="pro-teaser-title" className="mt-2 text-[1.75rem] text-ink leading-tight">
             Nie wieder ein Angebot verpassen.
           </h2>
-          <ul className="mt-4 flex flex-col gap-2 text-[1rem] text-muted">
+          <ul className="mt-6 flex flex-col gap-4 text-[1rem] text-muted">
             {BENEFITS.map((b) => (
               <li key={b.text} className="flex items-center gap-2">
                 <span aria-hidden="true">{b.icon}</span>

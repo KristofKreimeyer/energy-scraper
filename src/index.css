@@ -29,8 +29,8 @@
   --surface: #ffffff;
   --surface-2: #f4f4f4;
   --ink: #000000;
-  --muted: #555555;
-  --border: #e2e2e2;
+  --muted: #3d3d3d;
+  --border: #8c8c8c;
   --border-strong: #000000;
   --accent: #ff38d0; /* Magenta: Fläche mit schwarzem Text */
   --accent-strong: #c4009a; /* Text/Links auf hellem Grund (AA) */
@@ -61,8 +61,8 @@
     --surface: #111111;
     --surface-2: #1c1c1c;
     --ink: #ffffff;
-    --muted: #b8b8b8;
-    --border: #333333;
+    --muted: #d6d6d6;
+    --border: #6e6e6e;
     --border-strong: #ffffff;
     --accent: #ff38d0;
     --accent-strong: #ff5ad8;
@@ -81,14 +81,14 @@
 /* Explizite Theme-Umschaltung überschreibt die Systemvorgabe in beide Richtungen */
 :root[data-theme='light'] {
   --ground: #ffffff; --surface: #ffffff; --surface-2: #f4f4f4;
-  --ink: #000000; --muted: #555555; --border: #e2e2e2; --border-strong: #000000;
+  --ink: #000000; --muted: #3d3d3d; --border: #8c8c8c; --border-strong: #000000;
   --accent: #ff38d0; --accent-strong: #c4009a; --accent-tint: #f4f4f4; --fill: #ff38d0; --on-fill: #000000;
   --good: #0b6e99; --good-tint: #e3f4fb; --warn-ink: #000000; --warn-tint: #f4f4f4;
   --focus: #0b6e99; --shadow: 0.375rem 0.375rem 0 #000000;
 }
 :root[data-theme='dark'] {
   --ground: #000000; --surface: #111111; --surface-2: #1c1c1c;
-  --ink: #ffffff; --muted: #b8b8b8; --border: #333333; --border-strong: #ffffff;
+  --ink: #ffffff; --muted: #d6d6d6; --border: #6e6e6e; --border-strong: #ffffff;
   --accent: #ff38d0; --accent-strong: #ff5ad8; --accent-tint: #1c1c1c; --fill: #ff38d0; --on-fill: #000000;
   --good: #38c6ff; --good-tint: #0a2a38; --warn-ink: #ffffff; --warn-tint: #1c1c1c;
   --focus: #38c6ff; --shadow: 0.375rem 0.375rem 0 #ff38d0;

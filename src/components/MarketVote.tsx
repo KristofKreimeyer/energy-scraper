@@ -45,17 +45,17 @@ export default function MarketVote() {
   const ranked = [...candidates].sort((a, b) => (votes[b] ?? 0) - (votes[a] ?? 0));
 
   return (
-    <section className={`${WRAP} mt-8`} aria-labelledby="market-vote-title">
+    <section className={`${WRAP} mt-16`} aria-labelledby="market-vote-title">
       <div className="glass-card rounded-card p-6 shadow-card">
         <div className="flex items-baseline justify-between gap-4 flex-wrap">
-          <h2 id="market-vote-title" className="text-[1.5rem] leading-none text-ink">
+          <h2 id="market-vote-title" className="text-[1.5rem] leading-tight text-ink">
             🗳 Welcher Markt als Nächstes?
           </h2>
           <span className="text-[1rem] text-muted">
             {total} {total === 1 ? "Stimme" : "Stimmen"}
           </span>
         </div>
-        <p className="mt-2 text-[1rem] text-muted">
+        <p className="mt-4 text-[1rem] text-muted">
           Stimm ab, welchen Supermarkt wir als Nächstes aufnehmen – die meistgewählten kommen zuerst dran.
         </p>
 

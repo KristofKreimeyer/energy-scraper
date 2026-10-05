@@ -13,7 +13,7 @@ export default function TrustCards() {
   if (!showConfirmed && !showFund) return null;
 
   return (
-    <section className={`${WRAP} mt-8`} aria-label="Von der Community">
+    <section className={`${WRAP} mt-16`} aria-label="Von der Community">
       <div className="grid gap-4 grid-cols-2 max-[35rem]:grid-cols-1">
         {showFund && fund && (
           <div className="glass-card rounded-card p-6 shadow-card">

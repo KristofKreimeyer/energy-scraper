@@ -28,7 +28,7 @@ export default function ReferralCard() {
   if (!ready) return null;
 
   const wrap = (children: React.ReactNode) => (
-    <section className={`${WRAP} mt-8`} aria-labelledby="referral-title">
+    <section className={`${WRAP} mt-16`} aria-labelledby="referral-title">
       <div className="rounded-card p-6 border-[3px] border-border-strong shadow-card bg-accent-tint">{children}</div>
     </section>
   );
@@ -41,10 +41,10 @@ export default function ReferralCard() {
           🎁
         </span>
         <div className="flex-1 min-w-[12.5rem]">
-          <h2 id="referral-title" className="text-[1.6rem] text-ink leading-none">
+          <h2 id="referral-title" className="text-[1.6rem] text-ink leading-tight">
             Freunde einladen, Pro gratis
           </h2>
-          <p className="text-[1rem] text-muted">
+          <p className="mt-2 text-[1rem] text-muted">
             Lade Freunde ein – sobald sie ihren ersten Alarm bestätigen, bekommt ihr <b className="text-ink">beide 1 Monat Pro</b>.
           </p>
         </div>
@@ -80,10 +80,10 @@ export default function ReferralCard() {
           🎁
         </span>
         <div className="flex-1 min-w-[12.5rem]">
-          <h2 id="referral-title" className="text-[1.6rem] text-ink leading-none">
+          <h2 id="referral-title" className="text-[1.6rem] text-ink leading-tight">
             Freunde einladen, Pro gratis
           </h2>
-          <p className="text-[1rem] text-muted">
+          <p className="mt-2 text-[1rem] text-muted">
             Ihr bekommt <b className="text-ink">beide 1 Monat Pro</b>, sobald ein eingeladener Freund seinen ersten Alarm bestätigt.
           </p>
         </div>

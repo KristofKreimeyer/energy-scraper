@@ -24,7 +24,7 @@ export function OfferCardView({ offer, isBest, rowHasVariant = false, reports, v
   return (
     <li className="flex">
       <article
-        className={`offer-card glass-card group relative flex flex-col h-full w-full rounded-card overflow-hidden shadow-card p-4 transition-[transform,border-color] duration-150 hover:-translate-y-[3px] hover:border-border-strong focus-within:border-focus ${
+        className={`offer-card glass-card group relative flex flex-col h-full w-full rounded-card overflow-hidden shadow-card p-6 transition-[transform,border-color] duration-150 hover:-translate-y-[3px] hover:border-border-strong focus-within:border-focus ${
           isBest ? "border-[color-mix(in_srgb,var(--good)_45%,var(--border))]" : ""
         }`}
         aria-label={alt}
@@ -91,13 +91,13 @@ export function OfferCardView({ offer, isBest, rowHasVariant = false, reports, v
             </span>
           </div>
           {isMulti && (
-            <p className="mt-2 font-mono text-[1rem] tabular-nums text-muted">
+            <p className="mt-4 font-mono text-[1rem] tabular-nums text-muted">
               {offer.unitLabel} · {formatEuro(offer.price)} gesamt
             </p>
           )}
 
           {offer.requiresApp && offer.appPrice != null && (
-            <p className="flex items-center gap-2 mt-2 text-[1rem]">
+            <p className="flex items-center gap-2 mt-4 text-[1rem]">
               <span className="flex-none font-semibold text-accent-strong bg-[color-mix(in_srgb,var(--accent)_12%,transparent)] border border-[color-mix(in_srgb,var(--accent)_30%,transparent)] rounded-[0.4375rem] px-2 py-0">
                 <span aria-hidden="true">📱</span> mit App
               </span>
@@ -115,7 +115,7 @@ export function OfferCardView({ offer, isBest, rowHasVariant = false, reports, v
           )}
 
           {saved && (
-            <p className="flex items-center gap-2 mt-2 text-[1rem]">
+            <p className="flex items-center gap-2 mt-4 text-[1rem]">
               <span className="flex-none font-mono font-bold tabular-nums text-good bg-good-tint border border-[color-mix(in_srgb,var(--good)_30%,transparent)] rounded-[0.4375rem] px-2 py-0">
                 <span aria-hidden="true">−{saved.percent}&nbsp;%</span>
                 <span className="visually-hidden">{saved.percent} Prozent gespart</span>
@@ -131,8 +131,8 @@ export function OfferCardView({ offer, isBest, rowHasVariant = false, reports, v
             </p>
           )}
 
-          <InsightBlock offer={offer} className="mt-2" />
-          <CommunityBlock reports={reports} className="mt-2" />
+          <InsightBlock offer={offer} className="mt-4" />
+          <CommunityBlock reports={reports} className="mt-4" />
 
           {/* Dehnt sich: fehlende App-/Rabatt-Zeilen erzeugen den Leerraum HIER,
               damit Gültigkeits-Badge, Aktionen und CTA kartenübergreifend bündig

@@ -4,8 +4,8 @@ import { WRAP } from "../lib/layout";
 // des Haupt-Footers.
 export default function LegalFooter() {
   return (
-    <footer className="border-t border-border mt-10 pt-6 pb-10 text-muted text-[1rem]">
-      <div className={`${WRAP} flex flex-wrap gap-x-4 gap-y-2 items-center`}>
+    <footer className="border-t border-border mt-16 pt-8 pb-16 text-muted text-[1rem]">
+      <div className={`${WRAP} flex flex-wrap gap-x-6 gap-y-4 items-center`}>
         <span>EnergyHunt — Angebotsübersicht</span>
         <a className="hover:text-accent-strong underline underline-offset-2" href="#/impressum">
           Impressum

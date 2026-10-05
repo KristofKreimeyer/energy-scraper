@@ -103,6 +103,7 @@ export function InsightBlock({ offer, className = "" }: { offer: GroupedOffer; c
   if (!insight) return null;
   return (
     <div
+      role="group"
       className={`flex flex-col gap-2 text-[1rem] ${className}`}
       aria-label={`Preisniveau: ${INSIGHT_COPY[insight.level].label}. Typischer Grundpreis ${formatEuro(insight.median)} pro Liter über ${insight.dayCount} erfasste Tage.`}
     >

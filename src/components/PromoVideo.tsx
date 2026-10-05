@@ -51,7 +51,8 @@ export default function PromoVideo() {
             loop
             playsInline
             preload="metadata"
-            aria-label="Animierter Clip: Blitze, eine Energy-Drink-Dose und der beste Preis pro Liter"
+            aria-label="Animierter Clip: EnergyHunt-Dose und bester Preis pro Liter"
+            aria-describedby="promo-beschreibung"
             onPlay={() => setPlaying(true)}
             onPause={() => setPlaying(false)}
           >
@@ -68,6 +69,12 @@ export default function PromoVideo() {
             {playing ? "Pause" : "Abspielen"}
           </button>
         </div>
+        <p id="promo-beschreibung" className="mt-4 max-w-[60ch] text-[1.125rem] text-white/80">
+          Textfassung des Clips (ohne Ton): Blitze zucken über einen dunklen Hintergrund, dazu der Schriftzug „Fühl den Strom.“ Eine
+          Energy-Drink-Dose von EnergyHunt erscheint, umkreist von Blitzen. Der Preis pro Liter fällt von 6,99 € auf 3,33 €, dazu
+          Beispielkarten von Red Bull bei Aldi Nord, Aldi Süd und Rewe. Zum Schluss das Logo EnergyHunt mit dem Hinweis auf den besten Preis
+          pro Liter.
+        </p>
       </div>
     </section>
   );

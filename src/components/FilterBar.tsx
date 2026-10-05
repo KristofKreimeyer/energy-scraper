@@ -17,7 +17,7 @@ export default function FilterBar({ market, brand, query, onQueryChange, onOpenF
   const activeFilterCount = (market !== "all" ? 1 : 0) + (brand !== "all" ? 1 : 0);
   return (
     <div className="flex flex-wrap items-center gap-4">
-      <div className="flex items-center gap-2 flex-1 basis-[13.75rem] min-w-[11.25rem] bg-surface border border-border-strong rounded-[0.875rem] px-4 h-11">
+      <div className="flex items-center gap-2 flex-1 basis-[13.75rem] min-w-[11.25rem] bg-surface border border-border-strong rounded-[0.875rem] px-4 h-11 focus-within:outline focus-within:outline-[3px] focus-within:outline-offset-2 focus-within:outline-[color:var(--focus)]">
         <Search size={18} strokeWidth={2.2} aria-hidden className="flex-none text-muted" />
         <input
           id="q"

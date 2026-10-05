@@ -15,28 +15,12 @@
  *   node netto-kaufda-scraper.js "Netto-Supermarkt"   (die andere Netto-Kette)
  */
 
-const fs = require("fs");
-const path = require("path");
+const { matchBrand: matchBrandIn, writeOffers } = require('./lib/common');
 
-const RETAILER_PATH_SEGMENT = process.argv[2] || "Netto-Marken-Discount";
+const RETAILER_PATH_SEGMENT = process.argv[2] || 'Netto-Marken-Discount';
 const URL = `https://www.kaufda.de/${RETAILER_PATH_SEGMENT}/Sortiment/Energydrink`;
 
-const OUT_DIR = path.join(__dirname, "captured");
-if (!fs.existsSync(OUT_DIR)) fs.mkdirSync(OUT_DIR);
-
-const BRAND_PATTERNS = [
-  { brand: "Monster", pattern: /\bmonster\b/i },
-  { brand: "Red Bull", pattern: /red\s*bull/i },
-  { brand: "Rockstar", pattern: /rockstar/i },
-  { brand: "Gönnergy", pattern: /g[öo]nnergy|g[öo]nrgy|montana\s*black/i },
-];
-
-function matchBrand(text) {
-  const hit = BRAND_PATTERNS.find((b) => b.pattern.test(text));
-  if (!hit) return null;
-  if (!/energy/i.test(text)) return null;
-  return hit.brand;
-}
+const matchBrand = (text) => matchBrandIn(text, { strict: true, requireEnergy: true });
 
 const NEXT_DATA_MARKER = '__NEXT_DATA__" type="application/json">';
 
@@ -44,7 +28,7 @@ const NEXT_DATA_MARKER = '__NEXT_DATA__" type="application/json">';
   console.log(`Rufe ab: ${URL}\n`);
 
   const res = await fetch(URL, {
-    headers: { "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" },
+    headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' },
   });
   if (!res.ok) {
     console.error(`Fehler: HTTP ${res.status}`);
@@ -54,25 +38,21 @@ const NEXT_DATA_MARKER = '__NEXT_DATA__" type="application/json">';
 
   const start = html.indexOf(NEXT_DATA_MARKER);
   if (start === -1) {
-    console.error(
-      "__NEXT_DATA__ nicht gefunden - Seitenstruktur hat sich evtl. geändert.",
-    );
+    console.error('__NEXT_DATA__ nicht gefunden - Seitenstruktur hat sich evtl. geändert.');
     process.exit(1);
   }
   const jsonStart = start + NEXT_DATA_MARKER.length;
-  const jsonEnd = html.indexOf("</script>", jsonStart);
+  const jsonEnd = html.indexOf('</script>', jsonStart);
   const nextData = JSON.parse(html.slice(jsonStart, jsonEnd));
 
   const offers = nextData.props.pageProps.pageInformation.offers;
   const items = offers && offers.main ? offers.main.items : [];
 
-  console.log(
-    `${items.length} Angebot(e) gefunden (Seite ist bereits auf "Energydrink" vorgefiltert).`,
-  );
+  console.log(`${items.length} Angebot(e) gefunden (Seite ist bereits auf "Energydrink" vorgefiltert).`);
 
   const energyDrinkOffers = items
     .map((item) => {
-      const searchText = `${item.brand || ""} ${item.title || ""}`;
+      const searchText = `${item.brand || ''} ${item.title || ''}`;
       const brand = matchBrand(searchText);
       if (!brand) return null;
 
@@ -80,7 +60,7 @@ const NEXT_DATA_MARKER = '__NEXT_DATA__" type="application/json">';
 
       return {
         brand,
-        supermarket: "Netto Marken-Discount",
+        supermarket: 'Netto Marken-Discount',
         title: item.title,
         description: item.description || null,
         productBrand: item.brand,
@@ -98,26 +78,16 @@ const NEXT_DATA_MARKER = '__NEXT_DATA__" type="application/json">';
     })
     .filter(Boolean);
 
-  console.log(
-    `Davon ${energyDrinkOffers.length} Energy-Drink-Angebot(e) (Monster/Red Bull/Rockstar/Gönnergy).\n`,
-  );
+  console.log(`Davon ${energyDrinkOffers.length} Energy-Drink-Angebot(e) (Monster/Red Bull/Rockstar/Gönnergy).\n`);
 
   energyDrinkOffers.forEach((o) => {
-    console.log(
-      `  [${o.brand}] ${o.title} – ${o.price} (gültig bis ${o.validTo})`,
-    );
+    console.log(`  [${o.brand}] ${o.title} – ${o.price} (gültig bis ${o.validTo})`);
   });
 
-  const outPath = path.join(OUT_DIR, "netto-offers.json");
-  fs.writeFileSync(outPath, JSON.stringify(energyDrinkOffers, null, 2));
-  console.log(`\nGespeichert: captured/netto-offers.json`);
+  writeOffers('netto-offers.json', energyDrinkOffers);
 
   if (energyDrinkOffers.length === 0 && items.length > 0) {
-    console.log(
-      "\nHinweis: Angebote gefunden, aber keine unserer 4 Marken. Alle Titel/Marken zur Kontrolle:",
-    );
-    items.forEach((it) =>
-      console.log(`  - ${it.title} (Marke: ${it.brand || "–"})`),
-    );
+    console.log('\nHinweis: Angebote gefunden, aber keine unserer 4 Marken. Alle Titel/Marken zur Kontrolle:');
+    items.forEach((it) => console.log(`  - ${it.title} (Marke: ${it.brand || '–'})`));
   }
 })();

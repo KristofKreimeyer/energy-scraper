@@ -33,7 +33,7 @@ export function PayBanner() {
   const success = kind === "success";
 
   return (
-    <div role="status" className={`${success ? "bg-good-tint text-good" : "bg-warn-tint text-warn-ink"} border-b border-border`}>
+    <div role="status" className={`${success ? "bg-good-tint text-good" : "bg-warn-tint text-warn-ink"} border-b-4 border-border-strong`}>
       <div className="mx-auto w-full max-w-[var(--maxw)] px-5 py-2.5 flex items-center gap-2 text-[0.86rem] font-semibold">
         <span aria-hidden="true">{success ? "✅" : "ℹ️"}</span>
         <span>

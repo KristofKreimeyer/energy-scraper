@@ -26,6 +26,15 @@
   src: url('/fonts/space-grotesk-700.woff2') format('woff2');
 }
 
+/* Bowlby One: fette 80er/90er-Display-Schrift für Hero, Abschnittstitel, Wortmarke */
+@font-face {
+  font-family: 'Bowlby One';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/bowlby-one-400.woff2') format('woff2');
+}
+
 /* ---- Design-Tokens (WCAG 2.2 AA) ----------------------------------------
    Die Farbwerte leben als CSS-Variablen, damit ein einziger Satz Utilities
    (bg-surface, text-muted …) sowohl der System-Vorgabe (prefers-color-scheme)
@@ -33,27 +42,30 @@
    dark:-Variante, die den „System-Default, bis manuell umgeschaltet“-Fall
    nicht sauber abbildet. */
 :root {
-  --ground: #edf0f3;
+  --ground: #fff7e6;
   --surface: #ffffff;
-  --surface-2: #f4f6f8;
-  --ink: #10151b;
-  --muted: #5b6772;
-  --border: #dbe1e7;
-  --border-strong: #c3ccd5;
-  --accent: #e24a08; /* Signal-Orange: nur groß oder als Fläche mit weißem Text */
-  --accent-strong: #b23c07; /* Text/Links auf hellem Grund */
-  --accent-tint: #fbeae1;
-  --fill: #b23c07; /* gefüllte Akzentfläche (aktive Segmente/Chips), AA mit --on-fill */
-  --on-fill: #ffffff;
-  --good: #0a7a42; /* semantisch: bester Grundpreis */
-  --good-tint: #e1f1e8;
-  --warn-ink: #7a4b00;
-  --warn-tint: #f6ecd6;
-  --focus: #1155dd;
+  --surface-2: #ffefcc;
+  --ink: #0b0626;
+  --muted: #4b4580;
+  --border: #d9cff0;
+  --border-strong: #0b0626;
+  --accent: #ff2e93; /* Neon-Pink: Fläche mit Ink-Text */
+  --accent-strong: #c20a63; /* Text/Links auf hellem Grund */
+  --accent-tint: #ffe0ef;
+  --fill: #ff2e93; /* gefüllte Akzentfläche, AA mit --on-fill */
+  --on-fill: #0b0626;
+  --good: #006c7a;
+  --good-tint: #d6f7fa;
+  --warn-ink: #6b5400;
+  --warn-tint: #fff1a8;
+  --focus: #3b1fd1;
+  --neon-cyan: #19f0ff;
+  --neon-yellow: #ffe600;
+  --hero-title: #0b0626;
 
-  --radius: 18px;
-  --radius-sm: 12px;
-  --shadow: 0 1px 2px rgba(16, 21, 27, 0.05), 0 10px 30px rgba(16, 21, 27, 0.10);
+  --radius: 6px;
+  --radius-sm: 4px;
+  --shadow: 6px 6px 0 #0b0626;
   --maxw: 1160px;
 
   color-scheme: light dark;
@@ -61,57 +73,66 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --ground: #0d1116;
-    --surface: #151b22;
-    --surface-2: #1b222b;
-    --ink: #e8edf2;
-    --muted: #9aa6b1;
-    --border: #29323c;
-    --border-strong: #3a4653;
-    --accent: #ff6a33;
-    --accent-strong: #ff7a45;
-    --accent-tint: #2a1810;
-    --fill: #ff6a33;
-    --on-fill: #10151b;
-    --good: #35c978;
-    --good-tint: #10281c;
-    --warn-ink: #e6b65c;
-    --warn-tint: #2a2213;
-    --focus: #6fa8ff;
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 14px 34px rgba(0, 0, 0, 0.4);
+    --ground: #0b0626;
+    --surface: #17104a;
+    --surface-2: #1f1660;
+    --ink: #fff7e6;
+    --muted: #b9b3e0;
+    --border: #3a2d8f;
+    --border-strong: #fff7e6;
+    --accent: #ff2e93;
+    --accent-strong: #ff5cad;
+    --accent-tint: #3a0f34;
+    --fill: #ff2e93;
+    --on-fill: #0b0626;
+    --good: #19f0ff;
+    --good-tint: #07323f;
+    --warn-ink: #ffe600;
+    --warn-tint: #3a3300;
+    --focus: #ffe600;
+    --shadow: 6px 6px 0 #ff2e93;
+    --hero-title: #ffe600;
   }
 }
 
 /* Explizite Theme-Umschaltung überschreibt die Systemvorgabe in beide Richtungen */
 :root[data-theme='light'] {
-  --ground: #edf0f3; --surface: #ffffff; --surface-2: #f4f6f8;
-  --ink: #10151b; --muted: #5b6772; --border: #dbe1e7; --border-strong: #c3ccd5;
-  --accent: #e24a08; --accent-strong: #b23c07; --accent-tint: #fbeae1; --fill: #b23c07; --on-fill: #ffffff;
-  --good: #0a7a42; --good-tint: #e1f1e8; --warn-ink: #7a4b00; --warn-tint: #f6ecd6;
-  --focus: #1155dd; --shadow: 0 1px 2px rgba(16, 21, 27, 0.05), 0 10px 30px rgba(16, 21, 27, 0.10);
+  --ground: #fff7e6; --surface: #ffffff; --surface-2: #ffefcc;
+  --ink: #0b0626; --muted: #4b4580; --border: #d9cff0; --border-strong: #0b0626;
+  --accent: #ff2e93; --accent-strong: #c20a63; --accent-tint: #ffe0ef; --fill: #ff2e93; --on-fill: #0b0626;
+  --good: #006c7a; --good-tint: #d6f7fa; --warn-ink: #6b5400; --warn-tint: #fff1a8;
+  --focus: #3b1fd1; --shadow: 6px 6px 0 #0b0626; --hero-title: #0b0626;
 }
 :root[data-theme='dark'] {
-  --ground: #0d1116; --surface: #151b22; --surface-2: #1b222b;
-  --ink: #e8edf2; --muted: #9aa6b1; --border: #29323c; --border-strong: #3a4653;
-  --accent: #ff6a33; --accent-strong: #ff7a45; --accent-tint: #2a1810; --fill: #ff6a33; --on-fill: #10151b;
-  --good: #35c978; --good-tint: #10281c; --warn-ink: #e6b65c; --warn-tint: #2a2213;
-  --focus: #6fa8ff; --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 14px 34px rgba(0, 0, 0, 0.4);
+  --ground: #0b0626; --surface: #17104a; --surface-2: #1f1660;
+  --ink: #fff7e6; --muted: #b9b3e0; --border: #3a2d8f; --border-strong: #fff7e6;
+  --accent: #ff2e93; --accent-strong: #ff5cad; --accent-tint: #3a0f34; --fill: #ff2e93; --on-fill: #0b0626;
+  --good: #19f0ff; --good-tint: #07323f; --warn-ink: #ffe600; --warn-tint: #3a3300;
+  --focus: #ffe600; --shadow: 6px 6px 0 #ff2e93; --hero-title: #ffe600;
 }
 
 /* ---- Tokens für Tailwind-Utilities verfügbar machen --------------------- */
 @theme {
   --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', Menlo, Consolas, monospace;
-  --font-display: 'Space Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Bowlby One', 'Space Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-head: 'Space Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --color-neon-cyan: var(--neon-cyan);
+  --color-neon-yellow: var(--neon-yellow);
 }
 
 /* Überschriften & Wortmarke tragen die Display-Schrift (Basis-Regel, damit
    Komponenten nichts wissen müssen). */
 h1,
 h2,
-h3,
 .font-display {
   font-family: var(--font-display);
+  font-weight: 400;
+  text-transform: uppercase;
+}
+h3 {
+  font-family: var(--font-head);
+  font-weight: 700;
 }
 
 /* Dezente Hero-Einblendung – zieht den Blick beim Laden auf die Kernaussage.
@@ -162,11 +183,7 @@ h3,
 @layer base {
   body {
     margin: 0;
-    background:
-      radial-gradient(72% 55% at 88% -8%, color-mix(in srgb, var(--accent) 11%, transparent), transparent 55%),
-      radial-gradient(65% 60% at 3% 108%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 55%),
-      var(--ground);
-    background-attachment: fixed;
+    background: var(--ground);
     color: var(--ink);
     font-family: var(--font-sans);
     font-size: 16px;
@@ -217,17 +234,10 @@ h3,
   /* Frosted-Glass-Fläche: halbtransparent + Blur, damit der ambiente
      Hintergrund-Verlauf durchscheint. Fallback für reduzierte Transparenz. */
   .glass-card {
-    background: color-mix(in srgb, var(--surface) 68%, transparent);
-    backdrop-filter: blur(16px) saturate(1.25);
-    border: 1px solid color-mix(in srgb, var(--ink) 9%, transparent);
-  }
-  @supports (prefers-reduced-transparency: reduce) {
-    @media (prefers-reduced-transparency: reduce) {
-      .glass-card {
-        background: var(--surface);
-        backdrop-filter: none;
-      }
-    }
+    background: var(--surface);
+    color: var(--ink);
+    border: 3px solid var(--border-strong);
+    box-shadow: var(--shadow);
   }
 
   /* Eigener Dropdown-Pfeil (appearance:none) für die Sortier-Auswahl */
@@ -278,4 +288,34 @@ h3,
 }
 @media (prefers-reduced-motion: no-preference) {
   .pulse-dot { animation: pulse-ring 2.2s ease-out infinite; }
+}
+
+/* ---- Hero: Text bleibt stehen, nächster Abschnitt schiebt sich darüber --- */
+.hero-sun {
+  position: absolute;
+  right: 4%;
+  top: 10%;
+  width: min(44vw, 440px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.hero-sun::after {
+  content: '';
+  position: absolute;
+  inset: 45% 0 0 0;
+  border-radius: 0 0 999px 999px;
+  background: repeating-linear-gradient(0deg, var(--ground) 0 6px, transparent 6px 16px);
+}
+.hero-title {
+  color: var(--hero-title);
+  overflow-wrap: anywhere;
+  text-shadow: 0.05em 0.05em 0 var(--accent), 0.1em 0.1em 0 var(--neon-cyan);
+}
+
+/* Ticker als Neon-Band */
+.ticker-band {
+  background: var(--accent);
+  color: #0b0626;
+  border-block: 4px solid var(--border-strong);
 }

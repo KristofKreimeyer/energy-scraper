@@ -56,7 +56,7 @@ export default function InstallPrompt() {
   }
 
   return (
-    <div className="border-b border-border bg-accent-tint">
+    <div className="border-b-4 border-border-strong bg-accent-tint">
       <div className={`${WRAP} flex items-center gap-3 py-2`}>
         <span aria-hidden="true" className="text-[1.05rem]">
           ⚡

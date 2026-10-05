@@ -9,31 +9,9 @@
  *   node rewe-scraper.js "https://www.rewe.de/angebote/nationale-angebote/alkoholfreie-getraenke/"
  */
 
-const { chromium } = require('playwright');
-const fs = require('fs');
-const path = require('path');
+const { matchBrand, writeOffers, openPage, acceptConsent, autoScroll, weekValidity } = require('./lib/common');
 
-const TARGET_URL =
-  process.argv[2] ||
-  'https://www.rewe.de/angebote/nationale-angebote/alkoholfreie-getraenke/';
-
-const OUT_DIR = path.join(__dirname, 'captured');
-if (!fs.existsSync(OUT_DIR)) fs.mkdirSync(OUT_DIR);
-
-// Erkennungsmuster für unsere vier Marken. Bewusst mehrere
-// Schreibweisen pro Marke, da Rewe z.B. "Monster Energy" und
-// "Monster Energy Drink" gemischt nutzen könnte.
-const BRAND_PATTERNS = [
-  { brand: 'Monster', pattern: /monster/i },
-  { brand: 'Red Bull', pattern: /red\s*bull/i },
-  { brand: 'Rockstar', pattern: /rockstar/i },
-  { brand: 'Gönnergy', pattern: /g[öo]nnergy|g[öo]nrgy|montana\s*black/i },
-];
-
-function matchBrand(text) {
-  const hit = BRAND_PATTERNS.find((b) => b.pattern.test(text));
-  return hit ? hit.brand : null;
-}
+const TARGET_URL = process.argv[2] || 'https://www.rewe.de/angebote/nationale-angebote/alkoholfreie-getraenke/';
 
 // Extrahiert den Literpreis aus einem String wie "(1 l = 3,96 €)"
 function extractPricePerLiter(additionalTexts) {
@@ -45,43 +23,12 @@ function extractPricePerLiter(additionalTexts) {
 }
 
 (async () => {
-  const browser = await chromium.launch({ headless: true });
-  const context = await browser.newContext({
-    userAgent:
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36',
-    locale: 'de-DE',
-  });
-  const page = await context.newPage();
-
-  console.log(`Lade: ${TARGET_URL}`);
-  await page.goto(TARGET_URL, { waitUntil: 'networkidle', timeout: 30000 }).catch(() => {
-    console.warn('Timeout - fahre trotzdem fort.');
-  });
-
-  const consentSelectors = [
-    'button:has-text("Alle akzeptieren")',
-    'button:has-text("Akzeptieren")',
-    'button:has-text("Zustimmen")',
-  ];
-  for (const sel of consentSelectors) {
-    try {
-      const btn = await page.$(sel);
-      if (btn) {
-        await btn.click({ timeout: 2000 });
-        await page.waitForTimeout(2000);
-        break;
-      }
-    } catch (e) {}
-  }
+  const { browser, page } = await openPage(TARGET_URL);
+  await acceptConsent(page);
 
   // Gründlich scrollen, damit auch spät ladende Lazy-Content-Bereiche
   // (weitere Kategorien/Kartenreihen) sicher gerendert sind.
-  await page.evaluate(async () => {
-    for (let i = 0; i < 20; i++) {
-      window.scrollBy(0, 700);
-      await new Promise((r) => setTimeout(r, 350));
-    }
-  });
+  await autoScroll(page, { steps: 20, delayMs: 350 });
   await page.waitForTimeout(2000);
 
   // Manche Kategorie-Seiten zeigen erst eine begrenzte Auswahl und
@@ -124,51 +71,71 @@ function extractPricePerLiter(additionalTexts) {
 
   // Nach dem Nachladen nochmal scrollen, falls neue Karten
   // erst per Lazy-Load sichtbar werden.
-  await page.evaluate(async () => {
-    for (let i = 0; i < 15; i++) {
-      window.scrollBy(0, 700);
-      await new Promise((r) => setTimeout(r, 300));
-    }
-    window.scrollTo(0, 0);
-  });
+  await autoScroll(page, { steps: 15, delayMs: 300, toTop: true });
   await page.waitForTimeout(1500);
 
-  const rawOffers = await page.evaluate(() => {
-    const tiles = Array.from(document.querySelectorAll('article.cor-offer-renderer-tile'));
+  /** Liest alle Angebotskacheln der aktuell angezeigten Woche. */
+  const scrapeTiles = () =>
+    page.evaluate(() => {
+      const tiles = Array.from(document.querySelectorAll('article.cor-offer-renderer-tile'));
 
-    return tiles.map((tile) => {
-      const titleLink = tile.querySelector('.cor-offer-information__title-link');
-      const title = titleLink ? titleLink.getAttribute('data-offer-title') : null;
-      const offerId = titleLink ? titleLink.getAttribute('data-offer-id') : null;
+      return tiles.map((tile) => {
+        const titleLink = tile.querySelector('.cor-offer-information__title-link');
+        const title = titleLink ? titleLink.getAttribute('data-offer-title') : null;
+        // Rewe liefert je Kachel die Angebotswoche ("2026/41") und eine Artikelnummer
+        // (data-offer-nan; früher data-offer-id).
+        const week = titleLink ? titleLink.getAttribute('data-offer-week') : null;
+        const nan = titleLink ? titleLink.getAttribute('data-offer-nan') || titleLink.getAttribute('data-offer-id') : null;
 
-      const additionalEls = Array.from(
-        tile.querySelectorAll('.cor-offer-information__additional')
-      );
-      const additionalTexts = additionalEls.map((el) => el.textContent.trim());
+        const additionalEls = Array.from(tile.querySelectorAll('.cor-offer-information__additional'));
+        const additionalTexts = additionalEls.map((el) => el.textContent.trim());
 
-      const priceEl = tile.querySelector('.cor-offer-price__tag-price');
-      const price = priceEl ? priceEl.textContent.trim() : null;
+        const priceEl = tile.querySelector('.cor-offer-price__tag-price');
+        const price = priceEl ? priceEl.textContent.trim() : null;
 
-      const priceLabelEl = tile.querySelector('.cor-offer-price__tag-label');
-      const priceLabel = priceLabelEl ? priceLabelEl.textContent.trim() : null;
+        const priceLabelEl = tile.querySelector('.cor-offer-price__tag-label');
+        const priceLabel = priceLabelEl ? priceLabelEl.textContent.trim() : null;
 
-      const loyaltyEl = tile.querySelector('.cor-loyalty-badge');
-      const loyaltyBonus = loyaltyEl ? loyaltyEl.textContent.trim() : null;
+        const loyaltyEl = tile.querySelector('.cor-loyalty-badge');
+        const loyaltyBonus = loyaltyEl ? loyaltyEl.textContent.trim() : null;
 
-      const imgEl = tile.querySelector('img[data-testid="offer-image"]');
-      const imageUrl = imgEl ? imgEl.getAttribute('src') : null;
+        const imgEl = tile.querySelector('img[data-testid="offer-image"]');
+        const imageUrl = imgEl ? imgEl.getAttribute('src') : null;
 
-      return {
-        title,
-        offerId,
-        price,
-        priceLabel,
-        loyaltyBonus,
-        additionalTexts,
-        imageUrl,
-      };
+        return {
+          title,
+          week,
+          nan,
+          price,
+          priceLabel,
+          loyaltyBonus,
+          additionalTexts,
+          imageUrl,
+        };
+      });
     });
-  });
+
+  const rawOffers = await scrapeTiles();
+
+  // Der Tab "Nächste Woche" ist erst ab Wochenmitte freigeschaltet (vorher
+  // disabled). Dann deren Kacheln zusätzlich einlesen, damit auch kommende
+  // Angebote erscheinen. Fehler hier dürfen den Hauptlauf nicht kippen.
+  try {
+    const nextTab = page.locator('[data-testid="sos-week-tabs__tab"][data-week="next"]');
+    if ((await nextTab.count()) > 0 && (await nextTab.first().isEnabled())) {
+      await nextTab.first().click({ timeout: 3000 });
+      await page.waitForTimeout(3000);
+      await autoScroll(page, { steps: 15, delayMs: 300, toTop: true });
+      const known = new Set(rawOffers.map((o) => `${o.week}|${o.nan}`));
+      const next = (await scrapeTiles()).filter((o) => !known.has(`${o.week}|${o.nan}`));
+      console.log(`Tab "Nächste Woche": ${next.length} weitere Kachel(n).`);
+      rawOffers.push(...next);
+    } else {
+      console.log('Tab "Nächste Woche" noch nicht freigeschaltet.');
+    }
+  } catch (e) {
+    console.warn(`Nächste Woche übersprungen: ${e.message.split('\n')[0]}`);
+  }
 
   console.log(`\n${rawOffers.length} Angebot(e) auf der Seite gefunden (alle Kategorien).`);
 
@@ -178,11 +145,17 @@ function extractPricePerLiter(additionalTexts) {
       const brand = offer.title ? matchBrand(offer.title) : null;
       if (!brand) return null;
 
+      // Gültigkeit aus der Angebotswoche der Kachel ("2026/41" -> Mo–So dieser KW).
+      const wm = /^(\d{4})\/(\d{1,2})$/.exec(offer.week || '');
+      const validity = wm ? weekValidity(Number(wm[1]), Number(wm[2]), 6) : {};
+
       return {
         brand,
         supermarket: 'Rewe',
         title: offer.title,
-        offerId: offer.offerId,
+        // Wochenscharfe ID: dasselbe Produkt in zwei Wochen = zwei Angebote.
+        offerId: offer.nan ? `rewe-${offer.week || 'x'}-${offer.nan}` : null,
+        ...validity,
         price: offer.price,
         priceLabel: offer.priceLabel,
         pricePerLiter: extractPricePerLiter(offer.additionalTexts),
@@ -201,16 +174,14 @@ function extractPricePerLiter(additionalTexts) {
     console.log(`  [${o.brand}] ${o.title} – ${o.price} (${o.priceLabel || 'kein Label'})`);
   });
 
-  const outPath = path.join(OUT_DIR, 'rewe-offers.json');
-  fs.writeFileSync(outPath, JSON.stringify(energyDrinkOffers, null, 2));
-  console.log(`\nGespeichert: captured/rewe-offers.json`);
+  writeOffers('rewe-offers.json', energyDrinkOffers);
 
   if (energyDrinkOffers.length === 0 && rawOffers.length > 0) {
     console.log(
       '\nHinweis: Es wurden Angebote gefunden, aber keine unserer 4 Marken. ' +
         'Das kann heißen: aktuell einfach kein Energy-Drink-Deal diese Woche, ' +
         'oder die Getränke-Seite zeigt nur eine Teilkategorie. ' +
-        'Erste 5 gefundene Titel zur Kontrolle:'
+        'Erste 5 gefundene Titel zur Kontrolle:',
     );
     rawOffers.slice(0, 5).forEach((o) => console.log(`  - ${o.title}`));
   }

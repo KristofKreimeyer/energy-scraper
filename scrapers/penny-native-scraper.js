@@ -19,102 +19,37 @@
  * Kein Auth-Token nötig; direkter fetch reicht (kein Playwright).
  */
 
-const fs = require("fs");
-const path = require("path");
-
-const OUT_DIR = path.join(__dirname, "captured");
-if (!fs.existsSync(OUT_DIR)) fs.mkdirSync(OUT_DIR);
+const { matchBrandHit, writeOffers, isoYearWeek, weekValidity } = require('./lib/common');
 
 // Energy-Drinks sind Getränke; sie erscheinen zuverlässig in den Top-Angeboten
 // und in der Getränke-Kategorie. Andere Slugs liefern 404 – wir ignorieren sie.
-const CATEGORIES = ["top-angebote", "getraenke"];
-
-const BRAND_PATTERNS = [
-  { brand: "Monster", pattern: /\bmonster\b/i },
-  { brand: "Red Bull", pattern: /red\s*bull/i },
-  { brand: "Rockstar", pattern: /rockstar/i },
-  { brand: "Gönnergy", pattern: /g[öo]nnergy|g[öo]nrgy|montana\s*black/i },
-];
+const CATEGORIES = ['top-angebote', 'getraenke'];
 
 // Wie bei marktguru: Marke UND "Energy" im Text nötig, um Fehltreffer
 // (z. B. "Monster Trucks") auszuschließen.
-function matchBrand(text) {
-  const hit = BRAND_PATTERNS.find((b) => b.pattern.test(text));
-  if (!hit) return null;
-  if (!/energy/i.test(text)) return null;
-  return hit;
-}
+const matchBrand = (text) => matchBrandHit(text, { strict: true, requireEnergy: true });
 
 const REQUEST_HEADERS = {
-  accept: "application/json",
-  "user-agent":
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
-  referer: "https://www.penny.de/angebote",
-  "accept-language": "de-DE,de;q=0.9",
+  accept: 'application/json',
+  'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36',
+  referer: 'https://www.penny.de/angebote',
+  'accept-language': 'de-DE,de;q=0.9',
 };
-
-/** ISO-8601-Kalenderwoche (Penny nummeriert die Angebotswoche danach). */
-function isoYearWeek(date) {
-  const t = new Date(
-    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()),
-  );
-  const day = (t.getUTCDay() + 6) % 7; // Mo=0 … So=6
-  t.setUTCDate(t.getUTCDate() - day + 3); // auf den Donnerstag der Woche
-  const firstThursday = new Date(Date.UTC(t.getUTCFullYear(), 0, 4));
-  const week =
-    1 +
-    Math.round(
-      ((t - firstThursday) / 86400000 -
-        3 +
-        ((firstThursday.getUTCDay() + 6) % 7)) /
-        7,
-    );
-  return { year: t.getUTCFullYear(), week };
-}
-
-/** UTC-Offset der Zone Europe/Berlin (Sommer +2h, Winter +1h) in Minuten. */
-function berlinOffsetMinutes(d) {
-  const local = new Date(d.toLocaleString("en-US", { timeZone: "Europe/Berlin" }));
-  const utc = new Date(d.toLocaleString("en-US", { timeZone: "UTC" }));
-  return Math.round((local - utc) / 60000);
-}
-
-/** ISO-String für ein Berliner Datum um HH:mm Ortszeit. */
-function berlinIso(year, monthIdx, day, hh, mm) {
-  // Grober UTC-Ausgangspunkt zur Offset-Bestimmung, dann exakt umrechnen.
-  const probe = new Date(Date.UTC(year, monthIdx, day, hh, mm));
-  const off = berlinOffsetMinutes(probe);
-  return new Date(Date.UTC(year, monthIdx, day, hh, mm) - off * 60000).toISOString();
-}
-
-/** Mo 00:00 bis Sa 23:59 (Ortszeit) der angegebenen ISO-Woche. */
-function weekValidity(year, week) {
-  const jan4 = new Date(Date.UTC(year, 0, 4));
-  const jan4Day = (jan4.getUTCDay() + 6) % 7;
-  const monday = new Date(jan4);
-  monday.setUTCDate(jan4.getUTCDate() - jan4Day + (week - 1) * 7);
-  const sat = new Date(monday);
-  sat.setUTCDate(monday.getUTCDate() + 5);
-  return {
-    validFrom: berlinIso(monday.getUTCFullYear(), monday.getUTCMonth(), monday.getUTCDate(), 0, 0),
-    validTo: berlinIso(sat.getUTCFullYear(), sat.getUTCMonth(), sat.getUTCDate(), 23, 59),
-  };
-}
 
 /** "1,79" / "0.79*" / "(1 l = 3.96)" -> Zahl (erste Preiszahl) oder null. */
 function num(s) {
   if (s == null) return null;
   const m = String(s).match(/(\d+(?:[.,]\d+)?)/);
-  return m ? parseFloat(m[1].replace(",", ".")) : null;
+  return m ? parseFloat(m[1].replace(',', '.')) : null;
 }
 
 /** Grundpreis (€/L) aus "… (1 l = 3.96)" ziehen. */
 function perLiter(s) {
-  const m = String(s || "").match(/1\s*l\s*=\s*(\d+(?:[.,]\d+)?)/i);
-  return m ? parseFloat(m[1].replace(",", ".")) : null;
+  const m = String(s || '').match(/1\s*l\s*=\s*(\d+(?:[.,]\d+)?)/i);
+  return m ? parseFloat(m[1].replace(',', '.')) : null;
 }
 
-const money = (n) => (n != null ? `${n.toFixed(2).replace(".", ",")} €` : null);
+const money = (n) => (n != null ? `${n.toFixed(2).replace('.', ',')} €` : null);
 
 /**
  * Preisfelder eines Tiles auf regulär/App/UVP normalisieren.
@@ -123,7 +58,7 @@ const money = (n) => (n != null ? `${n.toFixed(2).replace(".", ",")} €` : null
  *  b) price selbst mit "*" (crossOutPrice = regulär), z. B. Rockstar
  */
 function derivePrices(t) {
-  const asterisk = (s) => /\*/.test(String(s || ""));
+  const asterisk = (s) => /\*/.test(String(s || ''));
   let regularPrice = null;
   let appPrice = null;
   let uvp = null;
@@ -141,8 +76,7 @@ function derivePrices(t) {
     uvp = num(t.crossOutPrice) ?? num(t.listPrice);
   }
 
-  const oldPrice =
-    uvp != null && regularPrice != null && uvp > regularPrice ? uvp : null;
+  const oldPrice = uvp != null && regularPrice != null && uvp > regularPrice ? uvp : null;
   return { regularPrice, appPrice, uvp: oldPrice };
 }
 
@@ -158,7 +92,7 @@ async function fetchCategory(yearWeek, cat) {
   const arg = process.argv[2];
   let year, week;
   if (arg && /^\d{4}-\d{1,2}$/.test(arg)) {
-    [year, week] = arg.split("-").map(Number);
+    [year, week] = arg.split('-').map(Number);
   } else {
     ({ year, week } = isoYearWeek(new Date()));
   }
@@ -180,24 +114,21 @@ async function fetchCategory(yearWeek, cat) {
   }
 
   const scrapedAt = new Date().toISOString();
-  const offers = [];
+  const allOffers = [];
   for (const { cat, tile } of byId.values()) {
-    const hit = matchBrand(tile.title || "");
+    const hit = matchBrand(tile.title || '');
     if (!hit) continue;
 
     const { regularPrice, appPrice, uvp } = derivePrices(tile);
     if (regularPrice == null) continue;
 
-    const title = (tile.title || "")
-      .replace(hit.pattern, "")
-      .replace(/\s+/g, " ")
-      .trim();
+    const title = (tile.title || '').replace(hit.pattern, '').replace(/\s+/g, ' ').trim();
 
-    offers.push({
-      supermarket: "Penny",
+    allOffers.push({
+      supermarket: 'Penny',
       brand: hit.brand,
       productBrand: hit.brand,
-      title: title || "Energy-Drink",
+      title: title || 'Energy-Drink',
       description: tile.quantity || null,
       salesUnit: tile.quantity || null,
       price: money(regularPrice),
@@ -219,25 +150,34 @@ async function fetchCategory(yearWeek, cat) {
         ? /^https?:\/\//i.test(tile.linkHref)
           ? tile.linkHref
           : `https://www.penny.de${tile.linkHref}`
-        : "https://www.penny.de/angebote",
+        : 'https://www.penny.de/angebote',
       offerId: tile.uuid || `penny-${cat}-${title}`,
       scrapedAt,
     });
   }
 
+  // Dasselbe Angebot steht in mehreren Kategorien (top-angebote UND getraenke)
+  // mit jeweils eigener uuid – inhaltlich gleiche Einträge nur einmal behalten,
+  // sonst würde die App sie als „2 Sorten" bündeln.
+  const seen = new Set();
+  const offers = allOffers.filter((o) => {
+    const key = [o.title, o.priceNumber, o.appPriceNumber, o.validFrom, o.validTo].join('|');
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
   console.log(`\n${offers.length} Energy-Drink-Angebot(e) bei Penny:`);
   offers.forEach((o) =>
     console.log(
       `  [${o.brand}] ${o.title} – ${o.price}` +
-        (o.appPriceNumber != null ? ` (App ${money(o.appPriceNumber)})` : "") +
-        (o.oldPrice ? ` statt ${o.oldPrice}` : ""),
+        (o.appPriceNumber != null ? ` (App ${money(o.appPriceNumber)})` : '') +
+        (o.oldPrice ? ` statt ${o.oldPrice}` : ''),
     ),
   );
 
-  const outPath = path.join(OUT_DIR, "penny-offers.json");
-  fs.writeFileSync(outPath, JSON.stringify(offers, null, 2));
-  console.log(`\nGespeichert: captured/penny-offers.json`);
+  writeOffers('penny-offers.json', offers);
 })().catch((err) => {
-  console.error("Fehler:", err.message);
+  console.error('Fehler:', err.message);
   process.exit(1);
 });

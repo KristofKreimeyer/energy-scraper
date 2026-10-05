@@ -72,7 +72,7 @@ export function Modal({ onClose, label, children }: { onClose: () => void; label
         aria-modal="true"
         aria-label={label}
         tabIndex={-1}
-        className="w-full max-w-md my-auto bg-surface border-[3px] border-border-strong rounded-card shadow-card p-5 flex flex-col gap-4 outline-none"
+        className="w-full max-w-md my-auto bg-surface border-[3px] border-border-strong rounded-card shadow-card p-6 flex flex-col gap-4 outline-none"
       >
         {children}
       </div>

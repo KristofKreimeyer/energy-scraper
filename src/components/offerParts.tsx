@@ -103,12 +103,12 @@ export function InsightBlock({ offer, className = "" }: { offer: GroupedOffer; c
   if (!insight) return null;
   return (
     <div
-      className={`flex flex-col gap-[0.3125rem] text-[1rem] ${className}`}
+      className={`flex flex-col gap-2 text-[1rem] ${className}`}
       aria-label={`Preisniveau: ${INSIGHT_COPY[insight.level].label}. Typischer Grundpreis ${formatEuro(insight.median)} pro Liter über ${insight.dayCount} erfasste Tage.`}
     >
       <div className="flex items-center gap-2">
         <span
-          className={`flex-none inline-flex items-center gap-[0.3125rem] font-bold rounded-[0.4375rem] px-2 py-[3px] border ${INSIGHT_BADGE[insight.level]}`}
+          className={`flex-none inline-flex items-center gap-2 font-bold rounded-[0.4375rem] px-2 py-0 border ${INSIGHT_BADGE[insight.level]}`}
         >
           {INSIGHT_COPY[insight.level].icon === "bolt" ? (
             <Zap size={12} fill="currentColor" stroke="none" aria-hidden />
@@ -131,9 +131,7 @@ export function ValidBadge({ offer }: { offer: GroupedOffer }) {
   const { label, ending, upcoming } = validity(offer);
   const variant = ending ? VALID_VARIANT.ending : upcoming ? VALID_VARIANT.upcoming : VALID_VARIANT.base;
   return (
-    <span
-      className={`inline-flex items-center gap-1.5 self-start text-[1rem] font-semibold rounded-[0.4375rem] px-[0.5625rem] py-1 border ${variant}`}
-    >
+    <span className={`inline-flex items-center gap-2 self-start text-[1rem] font-semibold rounded-[0.4375rem] px-2 py-2 border ${variant}`}>
       <Clock size={13} strokeWidth={2.2} aria-hidden />
       {label}
     </span>
@@ -144,9 +142,9 @@ export function ValidBadge({ offer }: { offer: GroupedOffer }) {
 export function CommunityBlock({ reports, className = "" }: { reports?: CommunityReport[]; className?: string }) {
   if (!reports || reports.length === 0) return null;
   return (
-    <div className={`flex flex-col gap-1 text-[1rem] ${className}`} aria-label="Von der Community gemeldete Preise">
+    <div className={`flex flex-col gap-2 text-[1rem] ${className}`} aria-label="Von der Community gemeldete Preise">
       {reports.slice(0, 2).map((r, i) => (
-        <span key={i} className="inline-flex items-center gap-1.5 text-muted">
+        <span key={i} className="inline-flex items-center gap-2 text-muted">
           <span aria-hidden="true">💬</span>
           <span>
             Community: <b className="font-mono tabular-nums text-good">{formatEuro(r.price)}</b> bei {r.market}

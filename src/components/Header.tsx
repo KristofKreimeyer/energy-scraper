@@ -9,7 +9,7 @@ export default function Header({ onOpenCreator }: { onOpenCreator: () => void })
   return (
     <header className="sticky top-0 z-20 bg-[color-mix(in_srgb,var(--surface)_88%,transparent)] backdrop-blur-[0.5rem] backdrop-saturate-150 border-b-4 border-border-strong">
       <div className={`${WRAP} flex items-center gap-2 sm:gap-4 h-[3.875rem]`}>
-        <div className="font-display flex items-center gap-2.5 text-[1.75rem] leading-none min-w-0">
+        <div className="font-display flex items-center gap-2 text-[1.75rem] leading-none min-w-0">
           <span
             className="w-[1.875rem] h-[1.875rem] flex-none grid place-items-center bg-fill text-on-fill rounded-[0.25rem] border-2 border-border-strong text-[1.1rem]"
             aria-hidden="true"
@@ -21,7 +21,7 @@ export default function Header({ onOpenCreator }: { onOpenCreator: () => void })
           </span>
         </div>
         <button
-          className="flex-none ml-auto h-10 px-3 sm:px-3.5 bg-fill text-on-fill border border-fill rounded-[0.625rem] text-[1rem] font-semibold cursor-pointer inline-flex items-center gap-1.5 hover:opacity-90"
+          className="flex-none ml-auto h-10 px-4 sm:px-4 bg-fill text-on-fill border border-fill rounded-[0.625rem] text-[1rem] font-semibold cursor-pointer inline-flex items-center gap-2 hover:opacity-90"
           type="button"
           onClick={onOpenCreator}
         >

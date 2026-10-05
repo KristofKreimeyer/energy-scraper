@@ -51,7 +51,7 @@ export default function FilterOverlay({
 }: FilterOverlayProps) {
   return (
     <Modal onClose={onClose} label="Anzeige anpassen">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-4">
         <h2 className="text-[1.75rem] text-ink">Anzeige anpassen</h2>
         <button
           type="button"
@@ -69,7 +69,7 @@ export default function FilterOverlay({
         </span>
         <select
           id="sort"
-          className="select-chevron w-full h-11 pl-3 pr-[2.125rem] text-[1rem] text-ink bg-surface border border-border-strong rounded-[0.625rem] cursor-pointer"
+          className="select-chevron w-full h-11 pl-4 pr-8 text-[1rem] text-ink bg-surface border border-border-strong rounded-[0.625rem] cursor-pointer"
           aria-labelledby="sort-label"
           value={sort}
           onChange={(e) => onSortChange(e.target.value as SortKey)}
@@ -124,7 +124,7 @@ export default function FilterOverlay({
         ]}
       />
 
-      <div className="flex items-center justify-between gap-2 pt-1">
+      <div className="flex items-center justify-between gap-2 pt-2">
         <button
           type="button"
           className="text-[1rem] text-accent-strong hover:text-accent underline underline-offset-2 cursor-pointer disabled:opacity-40 disabled:no-underline"
@@ -136,7 +136,7 @@ export default function FilterOverlay({
         <button
           type="button"
           onClick={onClose}
-          className="h-10 px-5 text-[1rem] font-semibold text-on-fill bg-fill border border-fill rounded-[0.75rem] cursor-pointer hover:opacity-90"
+          className="h-10 px-6 text-[1rem] font-semibold text-on-fill bg-fill border border-fill rounded-[0.75rem] cursor-pointer hover:opacity-90"
         >
           {visibleCount} {visibleCount === 1 ? "Angebot" : "Angebote"} zeigen
         </button>

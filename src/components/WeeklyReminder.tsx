@@ -37,8 +37,8 @@ export default function WeeklyReminder() {
   }
 
   return (
-    <section className={`${WRAP} mt-9`} aria-labelledby="weekly-title">
-      <div className="glass-card rounded-card p-5 shadow-card flex items-center gap-4 flex-wrap">
+    <section className={`${WRAP} mt-8`} aria-labelledby="weekly-title">
+      <div className="glass-card rounded-card p-6 shadow-card flex items-center gap-4 flex-wrap">
         <span aria-hidden="true" className="text-[1.4rem]">
           🔔
         </span>
@@ -48,7 +48,7 @@ export default function WeeklyReminder() {
           </h2>
           <p className="text-[1rem] text-muted">Eine Push pro Woche, sobald die frischen Angebote live sind – ohne Marke, ohne Konto.</p>
           {msg && (
-            <p className={`mt-1 text-[1rem] ${msg.ok ? "text-good" : "text-warn-ink"}`} role="status">
+            <p className={`mt-2 text-[1rem] ${msg.ok ? "text-good" : "text-warn-ink"}`} role="status">
               {msg.text}
             </p>
           )}

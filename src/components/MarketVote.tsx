@@ -45,9 +45,9 @@ export default function MarketVote() {
   const ranked = [...candidates].sort((a, b) => (votes[b] ?? 0) - (votes[a] ?? 0));
 
   return (
-    <section className={`${WRAP} mt-9`} aria-labelledby="market-vote-title">
-      <div className="glass-card rounded-card p-5 shadow-card">
-        <div className="flex items-baseline justify-between gap-3 flex-wrap">
+    <section className={`${WRAP} mt-8`} aria-labelledby="market-vote-title">
+      <div className="glass-card rounded-card p-6 shadow-card">
+        <div className="flex items-baseline justify-between gap-4 flex-wrap">
           <h2 id="market-vote-title" className="text-[1.5rem] leading-none text-ink">
             🗳 Welcher Markt als Nächstes?
           </h2>
@@ -55,11 +55,11 @@ export default function MarketVote() {
             {total} {total === 1 ? "Stimme" : "Stimmen"}
           </span>
         </div>
-        <p className="mt-1 text-[1rem] text-muted">
+        <p className="mt-2 text-[1rem] text-muted">
           Stimm ab, welchen Supermarkt wir als Nächstes aufnehmen – die meistgewählten kommen zuerst dran.
         </p>
 
-        <ul className="mt-3 flex flex-col gap-2">
+        <ul className="mt-4 flex flex-col gap-2">
           {ranked.map((market) => {
             const count = votes[market] ?? 0;
             const pct = total ? Math.round((count / total) * 100) : 0;
@@ -79,8 +79,8 @@ export default function MarketVote() {
                     className={`absolute inset-y-0 left-0 ${active ? "bg-accent-tint" : "bg-surface-2"}`}
                     style={{ width: `${pct}%` }}
                   />
-                  <span className="relative flex items-center justify-between h-full px-3 gap-2">
-                    <span className="font-semibold text-ink text-[1rem] inline-flex items-center gap-1.5">
+                  <span className="relative flex items-center justify-between h-full px-4 gap-2">
+                    <span className="font-semibold text-ink text-[1rem] inline-flex items-center gap-2">
                       {active && (
                         <span aria-hidden="true" className="text-accent-strong">
                           ✓
@@ -98,7 +98,7 @@ export default function MarketVote() {
           })}
         </ul>
 
-        <p className="mt-3 text-[1rem] text-muted" role="status">
+        <p className="mt-4 text-[1rem] text-muted" role="status">
           {mine
             ? `Danke! Du hast für ${mine} gestimmt – tippe eine andere Option, um zu wechseln.`
             : "Deine Stimme zählt anonym, eine pro Gerät."}

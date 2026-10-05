@@ -28,7 +28,7 @@ export default function ReferralCard() {
   if (!ready) return null;
 
   const wrap = (children: React.ReactNode) => (
-    <section className={`${WRAP} mt-9`} aria-labelledby="referral-title">
+    <section className={`${WRAP} mt-8`} aria-labelledby="referral-title">
       <div className="rounded-card p-6 border-[3px] border-border-strong shadow-card bg-accent-tint">{children}</div>
     </section>
   );
@@ -74,8 +74,8 @@ export default function ReferralCard() {
   }
 
   return wrap(
-    <div className="flex flex-col gap-3">
-      <div className="flex items-center gap-3 flex-wrap">
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center gap-4 flex-wrap">
         <span aria-hidden="true" className="text-[1.4rem]">
           🎁
         </span>
@@ -102,7 +102,7 @@ export default function ReferralCard() {
           value={url}
           onFocus={(e) => e.currentTarget.select()}
           aria-label="Dein Einladungslink"
-          className="flex-1 min-w-[12.5rem] h-10 px-3 text-[1rem] font-mono bg-surface text-ink border border-border-strong rounded-lg outline-none"
+          className="flex-1 min-w-[12.5rem] h-10 px-4 text-[1rem] font-mono bg-surface text-ink border border-border-strong rounded-lg outline-none"
         />
         <button
           type="button"
@@ -117,7 +117,7 @@ export default function ReferralCard() {
             text={shareText}
             url={url}
             ariaLabel="Einladungslink teilen"
-            className="flex-none h-10 px-4 inline-flex items-center gap-1.5 rounded-lg bg-fill text-on-fill text-[1rem] font-semibold cursor-pointer hover:opacity-90"
+            className="flex-none h-10 px-4 inline-flex items-center gap-2 rounded-lg bg-fill text-on-fill text-[1rem] font-semibold cursor-pointer hover:opacity-90"
           >
             <Share2 size={14} strokeWidth={2.2} aria-hidden />
             Teilen

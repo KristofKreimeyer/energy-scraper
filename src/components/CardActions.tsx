@@ -58,7 +58,7 @@ export function CardActions({ offer, votes }: { offer: GroupedOffer; votes?: Vot
   // per Hover bekommen sie die Akzentfarbe. Bewusst leichter als der CTA –
   // das senkt das Gewicht (Dichte), ohne die Entdeckbarkeit zu opfern.
   const chip = (active: boolean) =>
-    `inline-flex items-center gap-1 h-7 px-1.5 rounded-md text-[1rem] font-medium cursor-pointer transition-colors duration-150 ${
+    `inline-flex items-center gap-2 h-7 px-2 rounded-md text-[1rem] font-medium cursor-pointer transition-colors duration-150 ${
       active ? "text-accent-strong" : "text-muted hover:text-ink"
     }`;
 
@@ -69,7 +69,7 @@ export function CardActions({ offer, votes }: { offer: GroupedOffer; votes?: Vot
         <AvailabilityVote offer={offer} tally={votes} />
 
         {/* Immer sichtbare, leise Aktions-Leiste. */}
-        <div className="flex items-center gap-0.5 flex-wrap -ml-0.5">
+        <div className="flex items-center gap-0 flex-wrap ">
           <button type="button" className={chip(panel === "alarm")} aria-expanded={panel === "alarm"} onClick={() => toggle("alarm")}>
             <Bell size={13} strokeWidth={2} aria-hidden />
             Alarm

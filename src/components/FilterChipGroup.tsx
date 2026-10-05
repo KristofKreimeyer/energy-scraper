@@ -6,7 +6,7 @@ import type { ReactNode } from "react";
 const LABEL = "font-mono text-[1rem] tracking-[0.04em] uppercase text-muted";
 
 const chip =
-  "group inline-flex items-center gap-[0.4375rem] min-h-[2.375rem] px-3.5 bg-surface text-ink border border-border-strong " +
+  "group inline-flex items-center gap-2 min-h-[2.375rem] px-4 bg-surface text-ink border border-border-strong " +
   "rounded-full text-[1rem] font-semibold cursor-pointer transition-colors duration-150 enabled:aria-[pressed=false]:hover:bg-surface-2 " +
   "aria-pressed:bg-fill aria-pressed:text-on-fill aria-pressed:border-fill " +
   "aria-pressed:hover:opacity-90 " +

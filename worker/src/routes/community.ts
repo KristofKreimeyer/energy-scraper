@@ -2,12 +2,9 @@ import { Hono, type Context } from 'hono'
 import Stripe from 'stripe'
 import { type Env, sendEmail, confirmEmail, loginEmail, statusPage } from '../email'
 import { sendTelegram } from '../telegram'
-import {
-  EMAIL_RE, now, parseTarget, isPro, grantEntitlement, grantReferralMonth,
-  getOrCreateReferralCode, recordPendingReferral, rewardReferralOnConfirm,
-  revokeEntitlement, consumeRedeemCode, handleBrandSubscribe, sha256Hex,
-  REPORT_RATE_MAX, clip, VOTE_RATE_MAX, VOTE_WINDOW_DAYS, randomToken, sessionUserId,
-} from '../helpers'
+import { DAY_MS } from '../../../shared/core.mjs'
+import { now, sha256Hex, REPORT_RATE_MAX, clip, VOTE_RATE_MAX, VOTE_WINDOW_DAYS } from '../helpers'
+import { randomToken, sessionUserId } from '../auth'
 
 export function registerCommunity(app: Hono<{ Bindings: Env }>) {
   // Nutzer meldet einen (günstigeren) Preis für ein bestehendes Angebot.
@@ -51,20 +48,48 @@ export function registerCommunity(app: Hono<{ Bindings: Env }>) {
         'INSERT INTO price_reports (id, created_at, status, product_key, brand, title, market, reported_price, store_location, note, ip_hash, user_id) ' +
           "VALUES (?, ?, 'pending', ?, ?, ?, ?, ?, ?, ?, ?, ?)",
       )
-      .bind(crypto.randomUUID(), now(), productKey, brand, title, market, Math.round(price * 100) / 100, clip(body.storeLocation, 80) || null, clip(body.note, 200) || null, ipHash, userId)
+      .bind(
+        crypto.randomUUID(),
+        now(),
+        productKey,
+        brand,
+        title,
+        market,
+        Math.round(price * 100) / 100,
+        clip(body.storeLocation, 80) || null,
+        clip(body.note, 200) || null,
+        ipHash,
+        userId,
+      )
       .run()
     return c.json({ ok: true, message: 'Danke für deine Meldung! Wir prüfen sie und zeigen sie dann an.' })
   })
 
   app.get('/api/reports/approved', async (c) => {
     const rows = (
-      await c.env.DB
-        .prepare("SELECT product_key, reported_price, market, store_location, note, created_at FROM price_reports WHERE status='approved' ORDER BY created_at DESC")
-        .all<{ product_key: string; reported_price: number; market: string; store_location: string | null; note: string | null; created_at: string }>()
+      await c.env.DB.prepare(
+        "SELECT product_key, reported_price, market, store_location, note, created_at FROM price_reports WHERE status='approved' ORDER BY created_at DESC",
+      ).all<{
+        product_key: string
+        reported_price: number
+        market: string
+        store_location: string | null
+        note: string | null
+        created_at: string
+      }>()
     ).results
-    const byProduct: Record<string, { price: number; market: string; storeLocation: string | null; note: string | null; createdAt: string }[]> = {}
+    const byProduct: Record<
+      string,
+      { price: number; market: string; storeLocation: string | null; note: string | null; createdAt: string }[]
+    > = {}
     for (const r of rows) {
-      ;(byProduct[r.product_key] ??= []).push({ price: r.reported_price, market: r.market, storeLocation: r.store_location, note: r.note, createdAt: r.created_at })
+      ;(byProduct[r.product_key] ??= []).push({
+        price: r.reported_price,
+        market: r.market,
+        storeLocation: r.store_location,
+        note: r.note,
+        createdAt: r.created_at,
+      })
     }
     return c.json({ reports: byProduct }, 200, { 'cache-control': 'public, max-age=120' })
   })
@@ -81,7 +106,10 @@ export function registerCommunity(app: Hono<{ Bindings: Env }>) {
     const db = c.env.DB
     const ipHash = await sha256Hex('energyhunt-vote:' + (c.req.header('cf-connecting-ip') ?? 'unknown'))
     const since = new Date(Date.now() - 3_600_000).toISOString()
-    const recent = await db.prepare('SELECT COUNT(*) AS n FROM availability_votes WHERE ip_hash=? AND created_at>?').bind(ipHash, since).first<{ n: number }>()
+    const recent = await db
+      .prepare('SELECT COUNT(*) AS n FROM availability_votes WHERE ip_hash=? AND created_at>?')
+      .bind(ipHash, since)
+      .first<{ n: number }>()
     if ((recent?.n ?? 0) >= VOTE_RATE_MAX) return c.json({ error: 'rate_limited', message: 'Zu viele Stimmen – bitte später.' }, 429)
 
     // Eine Stimme je (Produkt, Browser); Meinungsänderung aktualisiert sie.
@@ -97,15 +125,14 @@ export function registerCommunity(app: Hono<{ Bindings: Env }>) {
   })
 
   app.get('/api/votes', async (c) => {
-    const since = new Date(Date.now() - VOTE_WINDOW_DAYS * 86_400_000).toISOString()
+    const since = new Date(Date.now() - VOTE_WINDOW_DAYS * DAY_MS).toISOString()
     const rows = (
-      await c.env.DB
-        .prepare(
-          'SELECT product_key, ' +
-            'SUM(CASE WHEN vote=1 THEN 1 ELSE 0 END) AS up, ' +
-            'SUM(CASE WHEN vote=-1 THEN 1 ELSE 0 END) AS down ' +
-            'FROM availability_votes WHERE created_at>? GROUP BY product_key',
-        )
+      await c.env.DB.prepare(
+        'SELECT product_key, ' +
+          'SUM(CASE WHEN vote=1 THEN 1 ELSE 0 END) AS up, ' +
+          'SUM(CASE WHEN vote=-1 THEN 1 ELSE 0 END) AS down ' +
+          'FROM availability_votes WHERE created_at>? GROUP BY product_key',
+      )
         .bind(since)
         .all<{ product_key: string; up: number; down: number }>()
     ).results
@@ -116,15 +143,29 @@ export function registerCommunity(app: Hono<{ Bindings: Env }>) {
 
   app.get('/api/community/summary', async (c) => {
     const db = c.env.DB
-    const since = new Date(Date.now() - VOTE_WINDOW_DAYS * 86_400_000).toISOString()
-    const conf = await db.prepare("SELECT COUNT(*) AS n FROM availability_votes WHERE vote=1 AND created_at>?").bind(since).first<{ n: number }>()
+    const since = new Date(Date.now() - VOTE_WINDOW_DAYS * DAY_MS).toISOString()
+    const conf = await db
+      .prepare('SELECT COUNT(*) AS n FROM availability_votes WHERE vote=1 AND created_at>?')
+      .bind(since)
+      .first<{ n: number }>()
     const fund = await db
-      .prepare("SELECT brand, title, market, reported_price, store_location, note FROM price_reports WHERE status='approved' ORDER BY created_at DESC LIMIT 1")
+      .prepare(
+        "SELECT brand, title, market, reported_price, store_location, note FROM price_reports WHERE status='approved' ORDER BY created_at DESC LIMIT 1",
+      )
       .first<{ brand: string; title: string; market: string; reported_price: number; store_location: string | null; note: string | null }>()
     return c.json(
       {
         confirmed: conf?.n ?? 0,
-        fund: fund ? { brand: fund.brand, title: fund.title, market: fund.market, price: fund.reported_price, storeLocation: fund.store_location, note: fund.note } : null,
+        fund: fund
+          ? {
+              brand: fund.brand,
+              title: fund.title,
+              market: fund.market,
+              price: fund.reported_price,
+              storeLocation: fund.store_location,
+              note: fund.note,
+            }
+          : null,
       },
       200,
       { 'cache-control': 'public, max-age=120' },
@@ -147,7 +188,7 @@ export function registerCommunity(app: Hono<{ Bindings: Env }>) {
     if (!existing) {
       await db
         .prepare(
-          "INSERT INTO subscriptions (id, channel, destination, product_key, product_label, status, token, created_at, confirmed_at, scope) " +
+          'INSERT INTO subscriptions (id, channel, destination, product_key, product_label, status, token, created_at, confirmed_at, scope) ' +
             "VALUES (?, 'push', ?, '__weekly__', 'Wöchentliche Deal-Erinnerung', 'confirmed', ?, ?, ?, 'weekly')",
         )
         .bind(crypto.randomUUID(), JSON.stringify(sub), randomToken(), now(), now())
@@ -160,8 +201,7 @@ export function registerCommunity(app: Hono<{ Bindings: Env }>) {
     const body = (await c.req.json().catch(() => ({}))) as { subscription?: { endpoint?: string } }
     const endpoint = body.subscription?.endpoint
     if (!endpoint) return c.json({ error: 'invalid_subscription' }, 400)
-    await c.env.DB
-      .prepare("DELETE FROM subscriptions WHERE channel='push' AND scope='weekly' AND json_extract(destination,'$.endpoint')=?")
+    await c.env.DB.prepare("DELETE FROM subscriptions WHERE channel='push' AND scope='weekly' AND json_extract(destination,'$.endpoint')=?")
       .bind(endpoint)
       .run()
     return c.json({ status: 'ok' })
@@ -179,7 +219,10 @@ export function registerCommunity(app: Hono<{ Bindings: Env }>) {
     const db = c.env.DB
     const ipHash = await sha256Hex('energyhunt-market-vote:' + (c.req.header('cf-connecting-ip') ?? 'unknown'))
     const since = new Date(Date.now() - 3_600_000).toISOString()
-    const recent = await db.prepare('SELECT COUNT(*) AS n FROM market_votes WHERE ip_hash=? AND created_at>?').bind(ipHash, since).first<{ n: number }>()
+    const recent = await db
+      .prepare('SELECT COUNT(*) AS n FROM market_votes WHERE ip_hash=? AND created_at>?')
+      .bind(ipHash, since)
+      .first<{ n: number }>()
     if ((recent?.n ?? 0) >= VOTE_RATE_MAX) return c.json({ error: 'rate_limited', message: 'Zu viele Stimmen – bitte später.' }, 429)
 
     await db
@@ -209,14 +252,12 @@ export function registerCommunity(app: Hono<{ Bindings: Env }>) {
 
   app.get('/api/leaderboard', async (c) => {
     const rows = (
-      await c.env.DB
-        .prepare(
-          `SELECT u.email AS email,
+      await c.env.DB.prepare(
+        `SELECT u.email AS email,
              (SELECT COUNT(*) FROM price_reports r WHERE r.user_id=u.id AND r.status='approved') AS approved,
              (SELECT COUNT(*) FROM availability_votes v WHERE v.user_id=u.id) AS votes
            FROM users u`,
-        )
-        .all<{ email: string; approved: number; votes: number }>()
+      ).all<{ email: string; approved: number; votes: number }>()
     ).results
     const board = rows
       .map((r) => ({

@@ -1,0 +1,12 @@
+node_modules
+dist
+public
+src/data
+scrapers/captured
+scrapers/node_modules
+worker/node_modules
+package-lock.json
+*.json
+*.md
+*.css
+*.html

@@ -1,29 +1,21 @@
 @import 'tailwindcss';
 
-/* ---- Display-Schrift (self-hosted, kein Google-Fonts-Link) ----------------
-   Space Grotesk: geometrisch, leicht eigenwillig – trägt den Dark-Tech-/
-   Jagd-Ton der Marke, ohne die Lesbarkeit der System-Sans im Fließtext zu
-   opfern. Nur für Überschriften & Wortmarke. */
+/* ---- Schriften (self-hosted, kein Google-Fonts-Link) ----------------------
+   Barlow Condensed 600: die EINE Display-Schrift (Überschriften, Wortmarke,
+   große Preise). Hanken Grotesk (variabel 400–700): Fließtext und Labels. */
 @font-face {
-  font-family: 'Space Grotesk';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url('/fonts/space-grotesk-500.woff2') format('woff2');
-}
-@font-face {
-  font-family: 'Space Grotesk';
+  font-family: 'Barlow Condensed';
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url('/fonts/space-grotesk-600.woff2') format('woff2');
+  src: url('/fonts/barlow-condensed-600.woff2') format('woff2');
 }
 @font-face {
-  font-family: 'Space Grotesk';
+  font-family: 'Hanken Grotesk';
   font-style: normal;
-  font-weight: 700;
+  font-weight: 400 700;
   font-display: swap;
-  src: url('/fonts/space-grotesk-700.woff2') format('woff2');
+  src: url('/fonts/hanken-grotesk-var.woff2') format('woff2');
 }
 
 /* ---- Design-Tokens (WCAG 2.2 AA) ----------------------------------------
@@ -33,85 +25,94 @@
    dark:-Variante, die den „System-Default, bis manuell umgeschaltet“-Fall
    nicht sauber abbildet. */
 :root {
-  --ground: #edf0f3;
+  --ground: #ffffff;
   --surface: #ffffff;
-  --surface-2: #f4f6f8;
-  --ink: #10151b;
-  --muted: #5b6772;
-  --border: #dbe1e7;
-  --border-strong: #c3ccd5;
-  --accent: #e24a08; /* Signal-Orange: nur groß oder als Fläche mit weißem Text */
-  --accent-strong: #b23c07; /* Text/Links auf hellem Grund */
-  --accent-tint: #fbeae1;
-  --fill: #b23c07; /* gefüllte Akzentfläche (aktive Segmente/Chips), AA mit --on-fill */
-  --on-fill: #ffffff;
-  --good: #0a7a42; /* semantisch: bester Grundpreis */
-  --good-tint: #e1f1e8;
-  --warn-ink: #7a4b00;
-  --warn-tint: #f6ecd6;
-  --focus: #1155dd;
+  --surface-2: #f4f4f4;
+  --ink: #000000;
+  --muted: #3d3d3d;
+  --border: #8c8c8c;
+  --border-strong: #000000;
+  --accent: #ff38d0; /* Magenta: Fläche mit schwarzem Text */
+  --accent-strong: #c4009a; /* Text/Links auf hellem Grund (AA) */
+  --accent-tint: #f4f4f4;
+  --fill: #ff38d0; /* gefüllte Akzentfläche, AA mit --on-fill */
+  --on-fill: #000000;
+  --blue: #38c6ff; /* Himmelblau: Fläche mit schwarzem Text */
+  --good: #0b6e99; /* Blau als Text auf hellem Grund (AA) */
+  --good-tint: #e3f4fb;
+  --warn-ink: #000000;
+  --warn-tint: #f4f4f4;
+  --focus: #0b6e99;
+  --sun: #ffd60a; /* Blitzgelb: Highlights auf Nachtblau */
+  --night: #1b0f5c; /* Dunkles Indigo: Kino-Bühnen */
+  --night-deep: #14094a;
 
-  --radius: 18px;
-  --radius-sm: 12px;
-  --shadow: 0 1px 2px rgba(16, 21, 27, 0.05), 0 10px 30px rgba(16, 21, 27, 0.10);
-  --maxw: 1160px;
+  --radius: 0.375rem;
+  --radius-sm: 0.25rem;
+  --shadow: 0.375rem 0.375rem 0 #000000;
+  --maxw: 72.5rem;
 
   color-scheme: light dark;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --ground: #0d1116;
-    --surface: #151b22;
-    --surface-2: #1b222b;
-    --ink: #e8edf2;
-    --muted: #9aa6b1;
-    --border: #29323c;
-    --border-strong: #3a4653;
-    --accent: #ff6a33;
-    --accent-strong: #ff7a45;
-    --accent-tint: #2a1810;
-    --fill: #ff6a33;
-    --on-fill: #10151b;
-    --good: #35c978;
-    --good-tint: #10281c;
-    --warn-ink: #e6b65c;
-    --warn-tint: #2a2213;
-    --focus: #6fa8ff;
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 14px 34px rgba(0, 0, 0, 0.4);
+    --ground: var(--night-deep);
+    --surface: #1f1370;
+    --surface-2: #2a1d85;
+    --ink: #ffffff;
+    --muted: #d6d6d6;
+    --border: #6a5fc4;
+    --border-strong: #ffffff;
+    --accent: #ff38d0;
+    --accent-strong: #ff5ad8;
+    --accent-tint: #2a1d85;
+    --fill: #ff38d0;
+    --on-fill: #000000;
+    --good: #38c6ff;
+    --good-tint: #123a78;
+    --warn-ink: #ffffff;
+    --warn-tint: #2a1d85;
+    --focus: #38c6ff;
+    --shadow: 0.375rem 0.375rem 0 #ff38d0;
   }
 }
 
 /* Explizite Theme-Umschaltung überschreibt die Systemvorgabe in beide Richtungen */
 :root[data-theme='light'] {
-  --ground: #edf0f3; --surface: #ffffff; --surface-2: #f4f6f8;
-  --ink: #10151b; --muted: #5b6772; --border: #dbe1e7; --border-strong: #c3ccd5;
-  --accent: #e24a08; --accent-strong: #b23c07; --accent-tint: #fbeae1; --fill: #b23c07; --on-fill: #ffffff;
-  --good: #0a7a42; --good-tint: #e1f1e8; --warn-ink: #7a4b00; --warn-tint: #f6ecd6;
-  --focus: #1155dd; --shadow: 0 1px 2px rgba(16, 21, 27, 0.05), 0 10px 30px rgba(16, 21, 27, 0.10);
+  --ground: #ffffff; --surface: #ffffff; --surface-2: #f4f4f4;
+  --ink: #000000; --muted: #3d3d3d; --border: #8c8c8c; --border-strong: #000000;
+  --accent: #ff38d0; --accent-strong: #c4009a; --accent-tint: #f4f4f4; --fill: #ff38d0; --on-fill: #000000;
+  --good: #0b6e99; --good-tint: #e3f4fb; --warn-ink: #000000; --warn-tint: #f4f4f4;
+  --focus: #0b6e99; --shadow: 0.375rem 0.375rem 0 #000000;
 }
 :root[data-theme='dark'] {
-  --ground: #0d1116; --surface: #151b22; --surface-2: #1b222b;
-  --ink: #e8edf2; --muted: #9aa6b1; --border: #29323c; --border-strong: #3a4653;
-  --accent: #ff6a33; --accent-strong: #ff7a45; --accent-tint: #2a1810; --fill: #ff6a33; --on-fill: #10151b;
-  --good: #35c978; --good-tint: #10281c; --warn-ink: #e6b65c; --warn-tint: #2a2213;
-  --focus: #6fa8ff; --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 14px 34px rgba(0, 0, 0, 0.4);
+  --ground: var(--night-deep); --surface: #1f1370; --surface-2: #2a1d85;
+  --ink: #ffffff; --muted: #d6d6d6; --border: #6a5fc4; --border-strong: #ffffff;
+  --accent: #ff38d0; --accent-strong: #ff5ad8; --accent-tint: #2a1d85; --fill: #ff38d0; --on-fill: #000000;
+  --good: #38c6ff; --good-tint: #123a78; --warn-ink: #ffffff; --warn-tint: #2a1d85;
+  --focus: #38c6ff; --shadow: 0.375rem 0.375rem 0 #ff38d0;
 }
 
 /* ---- Tokens für Tailwind-Utilities verfügbar machen --------------------- */
 @theme {
-  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'Roboto Mono', Menlo, Consolas, monospace;
-  --font-display: 'Space Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-sans: 'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Barlow Condensed', 'Arial Narrow', system-ui, sans-serif;
 }
 
 /* Überschriften & Wortmarke tragen die Display-Schrift (Basis-Regel, damit
    Komponenten nichts wissen müssen). */
 h1,
 h2,
-h3,
 .font-display {
   font-family: var(--font-display);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+h3 {
+  font-weight: 700;
 }
 
 /* Dezente Hero-Einblendung – zieht den Blick beim Laden auf die Kernaussage.
@@ -119,7 +120,7 @@ h3,
 @keyframes hero-rise {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(0.75rem);
   }
   to {
     opacity: 1;
@@ -143,6 +144,10 @@ h3,
   --color-border: var(--border);
   --color-border-strong: var(--border-strong);
   --color-accent: var(--accent);
+  --color-blue: var(--blue);
+  --color-sun: var(--sun);
+  --color-night: var(--night);
+  --color-night-deep: var(--night-deep);
   --color-accent-strong: var(--accent-strong);
   --color-accent-tint: var(--accent-tint);
   --color-fill: var(--fill);
@@ -162,15 +167,12 @@ h3,
 @layer base {
   body {
     margin: 0;
-    background:
-      radial-gradient(72% 55% at 88% -8%, color-mix(in srgb, var(--accent) 11%, transparent), transparent 55%),
-      radial-gradient(65% 60% at 3% 108%, color-mix(in srgb, var(--accent) 6%, transparent), transparent 55%),
-      var(--ground);
-    background-attachment: fixed;
+    background: var(--ground);
     color: var(--ink);
     font-family: var(--font-sans);
-    font-size: 16px;
-    line-height: 1.5;
+    font-size: 1.125rem;
+    line-height: 1.55;
+    font-variant-numeric: tabular-nums;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -187,7 +189,7 @@ h3,
   :where(a, button, select, input, [tabindex]):focus-visible {
     outline: 3px solid var(--focus);
     outline-offset: 2px;
-    border-radius: 6px;
+    border-radius: 0.375rem;
   }
 
   .visually-hidden {
@@ -217,17 +219,10 @@ h3,
   /* Frosted-Glass-Fläche: halbtransparent + Blur, damit der ambiente
      Hintergrund-Verlauf durchscheint. Fallback für reduzierte Transparenz. */
   .glass-card {
-    background: color-mix(in srgb, var(--surface) 68%, transparent);
-    backdrop-filter: blur(16px) saturate(1.25);
-    border: 1px solid color-mix(in srgb, var(--ink) 9%, transparent);
-  }
-  @supports (prefers-reduced-transparency: reduce) {
-    @media (prefers-reduced-transparency: reduce) {
-      .glass-card {
-        background: var(--surface);
-        backdrop-filter: none;
-      }
-    }
+    background: var(--surface);
+    color: var(--ink);
+    border: 3px solid var(--border-strong);
+    box-shadow: var(--shadow);
   }
 
   /* Eigener Dropdown-Pfeil (appearance:none) für die Sortier-Auswahl */
@@ -235,7 +230,7 @@ h3,
     appearance: none;
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235B6772' stroke-width='2.4' stroke-linecap='round'><path d='M6 9l6 6 6-6'/></svg>");
     background-repeat: no-repeat;
-    background-position: right 11px center;
+    background-position: right 0.6875rem center;
   }
 
   /* Stretched-Link: der Fokus des unsichtbar über die Karte gelegten CTA soll
@@ -264,8 +259,8 @@ h3,
 
 /* ---- Top-Deal-Reticle: pulsierender Live-Punkt -------------------------- */
 .pulse-dot {
-  width: 8px;
-  height: 8px;
+  width: 0.5rem;
+  height: 0.5rem;
   flex: none;
   border-radius: 50%;
   background: var(--accent);
@@ -273,9 +268,93 @@ h3,
 }
 @keyframes pulse-ring {
   0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 50%, transparent); }
-  70% { box-shadow: 0 0 0 9px transparent; }
+  70% { box-shadow: 0 0 0 0.5625rem transparent; }
   100% { box-shadow: 0 0 0 0 transparent; }
 }
 @media (prefers-reduced-motion: no-preference) {
   .pulse-dot { animation: pulse-ring 2.2s ease-out infinite; }
+}
+
+/* ---- Hero: Text bleibt stehen, nächster Abschnitt schiebt sich darüber --- */
+/* Titel: schmale Display-Schrift, sehr groß, eng gesetzt */
+.hero-title {
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+/* Ticker: Magenta-Band mit schwarzem Text */
+.ticker-band {
+  background: var(--accent);
+  color: #000000;
+  border-block: 0.125rem solid var(--border-strong);
+}
+
+/* ---- Kino-Hero: Scroll steuert die Szene (Variablen setzt useCinematicScroll) --- */
+.cine {
+  height: 340vh;
+}
+.cine-stage {
+  position: sticky;
+  top: 3.875rem;
+  height: calc(100svh - 3.875rem);
+  overflow: hidden;
+  color: #ffffff;
+  background:
+    radial-gradient(ellipse 70% 60% at 70% 55%, #2e1b94 0%, var(--night) 45%, var(--night-deep) 100%);
+}
+.cine-flash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 60% 30%, rgb(255 236 150 / 0.75), rgb(255 214 10 / 0.2) 55%, transparent 80%);
+  opacity: calc(var(--flash, 0) * 0.55);
+}
+.cine-bolt {
+  position: absolute;
+  will-change: transform;
+}
+.cine-title {
+  opacity: calc(1 - var(--title-out, 0));
+  transform: translateY(calc(var(--title-out, 0) * -10vh)) scale(calc(1 + var(--title-out, 0) * 0.12));
+  transform-origin: left center;
+}
+.cine-can {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: clamp(5rem, 10vw, 10rem);
+  will-change: transform;
+  filter: drop-shadow(0 0 2.5rem rgb(255 56 208 / 0.55)) drop-shadow(0 0 6rem rgb(255 214 10 / 0.25));
+  transform: translate3d(calc(var(--can-x, 70) * 1vw - 50%), calc(var(--can-y, 90) * 1vh - 50%), 0) rotate(calc(var(--can-r, 8) * 1deg)) scale(var(--can-s, 1));
+}
+.cine-copy {
+  opacity: var(--copy, 0);
+  transform: translateY(calc((1 - var(--copy, 0)) * 4rem));
+}
+.cine-progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 0.5rem;
+  width: calc(var(--p, 0) * 100%);
+  background: var(--sun);
+}
+.cine-hint {
+  opacity: calc(1 - var(--p, 0) * 12);
+}
+@keyframes cine-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(0.5rem); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cine-hint-arrow { animation: cine-bob 1.6s ease-in-out infinite; }
+}
+/* Reduzierte Bewegung: keine Scroll-Choreografie, statische Komposition */
+@media (prefers-reduced-motion: reduce) {
+  .cine { height: auto; }
+  .cine-stage { position: relative; height: auto; min-height: 80svh; }
+  .cine-title { opacity: 1; transform: none; }
+  .cine-copy { opacity: 1; transform: none; }
+  .cine-can { --can-x: 78; --can-y: 50; --can-s: 1; --can-r: 8; }
+  .cine-hint, .cine-progress, .cine-flash { display: none; }
 }

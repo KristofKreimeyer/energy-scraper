@@ -2,6 +2,8 @@
 // Ohne BREVO_API_KEY läuft ein Dev-Fallback, der die Mail in die Konsole loggt –
 // so lässt sich der komplette Double-Opt-In-Flow lokal ohne Account testen.
 
+import { ctaButton, emailShell } from '../../shared/email-shell.mjs'
+
 export interface Env {
   DB: D1Database
   BREVO_API_KEY?: string
@@ -57,17 +59,9 @@ export async function sendEmail(env: Env, mail: OutgoingEmail): Promise<void> {
   }
 }
 
-const shell = (heading: string, body: string) => `<!doctype html>
-<html lang="de"><body style="margin:0;background:#edf0f3;font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:#10151b">
-  <div style="max-width:520px;margin:0 auto;padding:32px 20px">
-    <div style="font-weight:750;font-size:1.1rem;margin-bottom:20px">⚡ Energy<span style="color:#b23c07">Hunt</span></div>
-    <div style="background:#fff;border:1px solid #dbe1e7;border-radius:14px;padding:24px">
-      <h1 style="font-size:1.25rem;margin:0 0 12px">${heading}</h1>
-      ${body}
-    </div>
-    <p style="color:#5b6772;font-size:0.78rem;margin-top:18px">EnergyHunt · Bestpreis-Alarm für Energy-Drinks</p>
-  </div>
-</body></html>`
+/** Standard-Mail: Überschrift + Inhalt in der gemeinsamen Hülle. */
+const shell = (heading: string, body: string) =>
+  emailShell({ card: `<h1 style="font-size:1.25rem;margin:0 0 12px">${heading}</h1>\n      ${body}` })
 
 /** Double-Opt-In-Bestätigungsmail (DE-Pflicht vor dem ersten Alarm). */
 export function confirmEmail(productLabel: string, confirmLink: string): Omit<OutgoingEmail, 'to'> {
@@ -79,7 +73,7 @@ export function confirmEmail(productLabel: string, confirmLink: string): Omit<Ou
     'Bestätige deinen Bestpreis-Alarm',
     `<p style="margin:0 0 16px;color:#5b6772">Du erhältst künftig eine Nachricht, sobald <strong style="color:#10151b">${productLabel}</strong> ein neues Preistief erreicht.</p>
      <p style="margin:0 0 20px;color:#5b6772">Zum Aktivieren bitte einmal bestätigen:</p>
-     <a href="${confirmLink}" style="display:inline-block;background:#e24a08;color:#fff;text-decoration:none;font-weight:650;padding:11px 20px;border-radius:10px">Alarm bestätigen</a>
+     ${ctaButton(confirmLink, 'Alarm bestätigen')}
      <p style="margin:18px 0 0;color:#9aa6b1;font-size:0.8rem">Nicht angemeldet? Dann ignoriere diese Mail – ohne Klick passiert nichts.</p>`,
   )
   return { subject: 'Bitte bestätige deinen Bestpreis-Alarm', html, text }
@@ -94,7 +88,7 @@ export function loginEmail(loginLink: string): Omit<OutgoingEmail, 'to'> {
   const html = shell(
     'Bei EnergyHunt anmelden',
     `<p style="margin:0 0 20px;color:#5b6772">Klicke zum Anmelden auf den Button. Der Link ist <strong style="color:#10151b">15 Minuten</strong> gültig und nur einmal verwendbar.</p>
-     <a href="${loginLink}" style="display:inline-block;background:#e24a08;color:#fff;text-decoration:none;font-weight:650;padding:11px 20px;border-radius:10px">Jetzt anmelden</a>
+     ${ctaButton(loginLink, 'Jetzt anmelden')}
      <p style="margin:18px 0 0;color:#9aa6b1;font-size:0.8rem">Nicht angefordert? Dann ignoriere diese Mail – ohne Klick passiert nichts.</p>`,
   )
   return { subject: 'Dein Anmeldelink für EnergyHunt', html, text }
@@ -105,7 +99,7 @@ export function statusPage(env: Env, heading: string, message: string): Response
   const html = shell(
     heading,
     `<p style="margin:0 0 20px;color:#5b6772">${message}</p>
-     <a href="${env.PUBLIC_SITE_URL}" style="display:inline-block;background:#e24a08;color:#fff;text-decoration:none;font-weight:650;padding:11px 20px;border-radius:10px">Zu EnergyHunt</a>`,
+     ${ctaButton(env.PUBLIC_SITE_URL, 'Zu EnergyHunt')}`,
   )
   return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8' } })
 }

@@ -14,24 +14,27 @@ export default function AuthCallback() {
       const success = token ? await verifyToken(token) : false;
       setOk(success);
       // URL säubern und zurück zur Übersicht (erfolgreich schneller).
-      setTimeout(() => {
-        window.location.hash = "";
-      }, success ? 900 : 2600);
+      setTimeout(
+        () => {
+          window.location.hash = "";
+        },
+        success ? 900 : 2600,
+      );
     })();
     // Nur beim Mount ausführen.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <div className="min-h-[60vh] grid place-items-center px-5 text-center">
+    <div className="min-h-[60vh] grid place-items-start px-4 sm:px-8 lg:pl-24 pt-16">
       <div>
-        <div className="text-2xl mb-3" aria-hidden="true">
+        <div className="text-2xl mb-4" aria-hidden="true">
           {ok === null ? "⏳" : ok ? "✅" : "⚠️"}
         </div>
         <p className="text-ink font-semibold">
           {ok === null ? "Anmeldung wird abgeschlossen …" : ok ? "Angemeldet! Weiter geht’s …" : "Anmeldelink ungültig oder abgelaufen."}
         </p>
-        {ok === false && <p className="text-muted text-[0.85rem] mt-1">Fordere auf der Startseite einen neuen Link an.</p>}
+        {ok === false && <p className="text-muted text-[1rem] mt-2">Fordere auf der Startseite einen neuen Link an.</p>}
       </div>
     </div>
   );

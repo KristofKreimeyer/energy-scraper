@@ -9,69 +9,18 @@
  *   node aldi-nord-scraper.js "https://www.aldi-nord.de/angebote.html"
  */
 
-const { chromium } = require('playwright');
-const fs = require('fs');
-const path = require('path');
+const { matchBrand, writeOffers, openPage, acceptConsent, autoScroll } = require('./lib/common');
 
 const TARGET_URL = process.argv[2] || 'https://www.aldi-nord.de/angebote.html';
 const BASE_URL = 'https://www.aldi-nord.de';
 
-const OUT_DIR = path.join(__dirname, 'captured');
-if (!fs.existsSync(OUT_DIR)) fs.mkdirSync(OUT_DIR);
-
-// Gleiche Markenerkennung wie beim Rewe-Scraper, damit beide Quellen
-// später zu identischem JSON-Schema zusammengeführt werden können.
-const BRAND_PATTERNS = [
-  { brand: 'Monster', pattern: /monster/i },
-  { brand: 'Red Bull', pattern: /red\s*bull/i },
-  { brand: 'Rockstar', pattern: /rockstar/i },
-  { brand: 'Gönnergy', pattern: /g[öo]nnergy|g[öo]nrgy|montana\s*black/i },
-];
-
-function matchBrand(text) {
-  const hit = BRAND_PATTERNS.find((b) => b.pattern.test(text));
-  return hit ? hit.brand : null;
-}
-
 (async () => {
-  const browser = await chromium.launch({ headless: true });
-  const context = await browser.newContext({
-    userAgent:
-      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36',
-    locale: 'de-DE',
-  });
-  const page = await context.newPage();
-
-  console.log(`Lade: ${TARGET_URL}`);
-  await page.goto(TARGET_URL, { waitUntil: 'networkidle', timeout: 30000 }).catch(() => {
-    console.warn('Timeout - fahre trotzdem fort.');
-  });
-
-  const consentSelectors = [
-    'button:has-text("Alle akzeptieren")',
-    'button:has-text("Akzeptieren")',
-    'button:has-text("Zustimmen")',
-  ];
-  for (const sel of consentSelectors) {
-    try {
-      const btn = await page.$(sel);
-      if (btn) {
-        await btn.click({ timeout: 2000 });
-        await page.waitForTimeout(2000);
-        break;
-      }
-    } catch (e) {}
-  }
+  const { browser, page } = await openPage(TARGET_URL);
+  await acceptConsent(page);
 
   // Gründlich scrollen, damit auch spät ladende Produktkarten
   // (Lazy-Loading) sicher gerendert sind.
-  await page.evaluate(async () => {
-    for (let i = 0; i < 25; i++) {
-      window.scrollBy(0, 700);
-      await new Promise((r) => setTimeout(r, 300));
-    }
-    window.scrollTo(0, 0);
-  });
+  await autoScroll(page, { steps: 25, delayMs: 300, toTop: true });
   await page.waitForTimeout(2000);
 
   const rawOffers = await page.evaluate(() => {
@@ -89,9 +38,7 @@ function matchBrand(text) {
       const priceEl = tile.querySelector('[data-testid$="tag-current-price-amount"]');
       let priceRaw = null;
       if (priceEl) {
-        const textNode = Array.from(priceEl.childNodes).find(
-          (n) => n.nodeType === Node.TEXT_NODE
-        );
+        const textNode = Array.from(priceEl.childNodes).find((n) => n.nodeType === Node.TEXT_NODE);
         priceRaw = textNode ? textNode.textContent.trim() : priceEl.textContent.trim();
       }
 
@@ -121,8 +68,7 @@ function matchBrand(text) {
       // Preis normalisieren: "0.55" -> Zahl 0.55, UND ein deutsches
       // Anzeigeformat "0,55 €" für Lesbarkeit/Konsistenz mit Rewe.
       const priceNumber = offer.priceRaw ? parseFloat(offer.priceRaw.replace(',', '.')) : null;
-      const priceDisplay =
-        priceNumber !== null ? `${priceNumber.toFixed(2).replace('.', ',')} €` : null;
+      const priceDisplay = priceNumber !== null ? `${priceNumber.toFixed(2).replace('.', ',')} €` : null;
 
       return {
         brand,
@@ -135,34 +81,23 @@ function matchBrand(text) {
         // Aldi Nord liefert den Link mal relativ, mal absolut - BASE_URL nur
         // voranstellen, wenn er nicht schon selbst eine volle URL ist
         // (sonst "https://www.aldi-nord.dehttps://www.aldi-nord.de/...").
-        productUrl: offer.link
-          ? /^https?:\/\//i.test(offer.link)
-            ? offer.link
-            : BASE_URL + offer.link
-          : null,
+        productUrl: offer.link ? (/^https?:\/\//i.test(offer.link) ? offer.link : BASE_URL + offer.link) : null,
         sourceUrl: TARGET_URL,
         scrapedAt: new Date().toISOString(),
       };
     })
     .filter(Boolean);
 
-  console.log(
-    `Davon ${energyDrinkOffers.length} Energy-Drink-Angebot(e) (Monster/Red Bull/Rockstar/Gönnergy).\n`
-  );
+  console.log(`Davon ${energyDrinkOffers.length} Energy-Drink-Angebot(e) (Monster/Red Bull/Rockstar/Gönnergy).\n`);
 
   energyDrinkOffers.forEach((o) => {
     console.log(`  [${o.brand}] ${o.title} – ${o.price} (${o.salesUnit || 'keine Mengenangabe'})`);
   });
 
-  const outPath = path.join(OUT_DIR, 'aldi-nord-offers.json');
-  fs.writeFileSync(outPath, JSON.stringify(energyDrinkOffers, null, 2));
-  console.log(`\nGespeichert: captured/aldi-nord-offers.json`);
+  writeOffers('aldi-nord-offers.json', energyDrinkOffers);
 
   if (energyDrinkOffers.length === 0 && rawOffers.length > 0) {
-    console.log(
-      '\nHinweis: Angebote gefunden, aber keine unserer 4 Marken. ' +
-        'Erste 5 gefundene Titel zur Kontrolle:'
-    );
+    console.log('\nHinweis: Angebote gefunden, aber keine unserer 4 Marken. ' + 'Erste 5 gefundene Titel zur Kontrolle:');
     rawOffers.slice(0, 5).forEach((o) => console.log(`  - ${o.title} (Marke: ${o.brandLabel || '–'})`));
   }
 

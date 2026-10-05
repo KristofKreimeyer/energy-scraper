@@ -10,7 +10,7 @@ name: Worker deployen
 on:
   push:
     branches: [live]
-    paths: ['worker/**']
+    paths: ['worker/**', 'shared/**']
   workflow_dispatch:
 
 permissions:

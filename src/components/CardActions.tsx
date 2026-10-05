@@ -14,16 +14,9 @@ import type { VoteTally } from "../hooks/useCommunityVotes";
 // darunter auf – nur eines gleichzeitig, gesteuert von hier. Kein Hover-Gate,
 // damit alles auf Touch-Geräten erreichbar bleibt.
 
-
 // Sanftes Auf-/Zuklappen ohne Animations-Lib: grid-template-rows 0fr↔1fr
 // animiert die Höhe, der Inhalt bleibt für die Schließ-Animation gemountet.
-function Collapse({
-  open,
-  children,
-}: {
-  open: boolean;
-  children: React.ReactNode;
-}) {
+function Collapse({ open, children }: { open: boolean; children: React.ReactNode }) {
   return (
     <div
       className="grid transition-[grid-template-rows] duration-500 ease-out motion-reduce:transition-none"
@@ -40,13 +33,7 @@ function Collapse({
   );
 }
 
-export function CardActions({
-  offer,
-  votes,
-}: {
-  offer: GroupedOffer;
-  votes?: VoteTally;
-}) {
+export function CardActions({ offer, votes }: { offer: GroupedOffer; votes?: VoteTally }) {
   const [panel, setPanel] = useState<null | "alarm" | "report">(null);
   // Einmal geöffnete Panels bleiben gemountet, damit auch das Schließen animiert.
   const [mounted, setMounted] = useState({ alarm: false, report: false });
@@ -63,54 +50,35 @@ export function CardActions({
     }
   };
 
-  const shareUrl =
-    typeof window !== "undefined"
-      ? window.location.origin + "/"
-      : "https://energyhunt.pages.dev/";
-  const perLiter =
-    offer.perLiter != null ? ` (${formatEuro(offer.perLiter)}/L)` : "";
+  const shareUrl = typeof window !== "undefined" ? window.location.origin + "/" : "https://energyhunt.pages.dev/";
+  const perLiter = offer.perLiter != null ? ` (${formatEuro(offer.perLiter)}/L)` : "";
   const shareText = `${offer.brand} ${offer.title} bei ${offer.market} für ${formatEuro(offer.perUnit)}${perLiter} – gefunden auf EnergyHunt`;
 
   // Leise Ghost-Chips: randlos, gedämpft, klare Klartext-Labels. Aktiv oder
   // per Hover bekommen sie die Akzentfarbe. Bewusst leichter als der CTA –
   // das senkt das Gewicht (Dichte), ohne die Entdeckbarkeit zu opfern.
   const chip = (active: boolean) =>
-    `inline-flex items-center gap-1 h-7 px-1.5 rounded-md text-[0.74rem] font-medium cursor-pointer transition-colors duration-150 ${
+    `inline-flex items-center gap-2 h-10 px-2 rounded-md text-[1rem] font-medium cursor-pointer transition-colors duration-150 ${
       active ? "text-accent-strong" : "text-muted hover:text-ink"
     }`;
 
   return (
     <div className="relative z-10" onClick={(e) => e.stopPropagation()}>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-4">
         {/* Vote inkl. „bestätigt"-Beweis – bleibt immer sichtbar. */}
         <AvailabilityVote offer={offer} tally={votes} />
 
         {/* Immer sichtbare, leise Aktions-Leiste. */}
-        <div className="flex items-center gap-0.5 flex-wrap -ml-0.5">
-          <button
-            type="button"
-            className={chip(panel === "alarm")}
-            aria-expanded={panel === "alarm"}
-            onClick={() => toggle("alarm")}
-          >
+        <div className="flex items-center gap-2 flex-wrap">
+          <button type="button" className={chip(panel === "alarm")} aria-expanded={panel === "alarm"} onClick={() => toggle("alarm")}>
             <Bell size={13} strokeWidth={2} aria-hidden />
             Alarm
           </button>
-          <button
-            type="button"
-            className={chip(panel === "report")}
-            aria-expanded={panel === "report"}
-            onClick={() => toggle("report")}
-          >
+          <button type="button" className={chip(panel === "report")} aria-expanded={panel === "report"} onClick={() => toggle("report")}>
             <Tag size={13} strokeWidth={2} aria-hidden />
             Günstiger gesehen?
           </button>
-          <ShareButton
-            text={shareText}
-            url={shareUrl}
-            ariaLabel={`${offer.brand} ${offer.title} teilen`}
-            className={chip(false)}
-          >
+          <ShareButton text={shareText} url={shareUrl} ariaLabel={`${offer.brand} ${offer.title} teilen`} className={chip(false)}>
             <Share2 size={13} strokeWidth={2.2} aria-hidden />
             Teilen
           </ShareButton>
@@ -124,11 +92,7 @@ export function CardActions({
       )}
       {mounted.report && (
         <Collapse open={panel === "report"}>
-          <ReportPriceButton
-            offer={offer}
-            embedded
-            onClose={() => setPanel(null)}
-          />
+          <ReportPriceButton offer={offer} embedded onClose={() => setPanel(null)} />
         </Collapse>
       )}
     </div>

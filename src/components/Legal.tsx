@@ -19,7 +19,7 @@ import { Datenschutz } from "./legal/Datenschutz";
 import { AGB } from "./legal/Agb";
 import { Widerruf } from "./legal/Widerruf";
 
-const WRAP = "mx-auto w-full max-w-[760px] px-5";
+const WRAP = "w-full max-w-[47.5rem] px-4 sm:px-8 lg:pl-24";
 
 const CONTENT: Record<LegalRoute, () => ReactElement> = {
   "#/impressum": Impressum,
@@ -33,15 +33,10 @@ export function LegalPage({ route }: { route: LegalRoute }) {
   return (
     <main id="main" className="py-8">
       <div className={WRAP}>
-        <a
-          href="#"
-          className="inline-flex items-center gap-1.5 text-[0.85rem] font-semibold text-accent-strong hover:text-accent mb-4"
-        >
+        <a href="#" className="inline-flex items-center gap-2 text-[1rem] font-semibold text-accent-strong hover:text-accent mb-4">
           <span aria-hidden="true">←</span> Zurück zur Übersicht
         </a>
-        <h1 className="text-[1.7rem] font-bold text-ink tracking-[-0.02em] mb-1">
-          {LEGAL_ROUTES[route]}
-        </h1>
+        <h1 className="text-[1.7rem] font-bold text-ink tracking-[-0.02em] mb-2">{LEGAL_ROUTES[route]}</h1>
         <Body />
       </div>
     </main>

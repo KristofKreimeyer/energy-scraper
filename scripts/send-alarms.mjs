@@ -11,78 +11,24 @@
 // verhindert zusätzlich Doppel-Mails am selben Tag.
 //
 // Ohne Cloudflare-/Brevo-Secrets läuft ein Trockenlauf (nur Log), damit die
-// Erkennung auch ohne Cloud testbar ist. `node send-alarms.mjs --selftest`
-// prüft die Erkennungslogik gegen synthetische Daten.
+// Erkennung auch ohne Cloud testbar ist. Die Logik steckt in scripts/lib/
+// (alarm-logic.mjs, alarm-messages.mjs) und wird per `npm test` geprüft.
 
 import { readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { brandKey, productKey } from '../shared/core.mjs'
+import { detectNewBestPrices, storeMatches, weckerDecision } from './lib/alarm-logic.mjs'
+import { createMessages } from './lib/alarm-messages.mjs'
+
+// Re-Exporte: Tests & Aufrufer importieren die Logik weiterhin von hier.
+export { brandKey, productKey, detectNewBestPrices, storeMatches, weckerDecision }
+
 const scriptDir = dirname(fileURLToPath(import.meta.url))
 const dataDir = resolve(scriptDir, '../src/data')
 
-/** Derselbe preisunabhängige Schlüssel wie in prepare-data.mjs / offers.ts. */
-function productKey(o) {
-  return [o.market, o.brand, o.title, o.unitLabel]
-    .map((s) => String(s ?? '').trim().toLowerCase())
-    .join('|')
-}
-
-/**
- * Produkte, die am jüngsten Tag ein neues Allzeit-Tief (€/L) erreicht haben.
- * Rein & seiteneffektfrei – Kern der Alarm-Logik, per --selftest geprüft.
- */
-export function detectNewBestPrices(history) {
-  const products = history?.products ?? {}
-  // „Lauf-Tag“ = jüngster Datenpunkt über alle Produkte.
-  let runDay = ''
-  for (const p of Object.values(products)) {
-    for (const pt of p.points) if (pt.date > runDay) runDay = pt.date
-  }
-  if (!runDay) return []
-
-  const events = []
-  for (const [key, p] of Object.entries(products)) {
-    // ein €/L-Wert je Tag
-    const byDay = new Map()
-    for (const pt of p.points) if (pt.perLiter != null) byDay.set(pt.date, pt.perLiter)
-    const days = [...byDay.entries()].sort((a, b) => a[0].localeCompare(b[0]))
-    if (days.length < 2) continue
-
-    const [lastDay, lastVal] = days[days.length - 1]
-    if (lastDay !== runDay) continue // Produkt war in diesem Lauf nicht dabei
-    const prevMin = Math.min(...days.slice(0, -1).map(([, v]) => v))
-    if (lastVal < prevMin) {
-      events.push({ productKey: key, label: `${p.brand} ${p.title} (${p.market})`, perLiter: lastVal, market: p.market, prevMin })
-    }
-  }
-  return events
-}
-
-/**
- * Preiswecker-Entscheidung (Pro): 'fire', sobald der aktuelle Preis <= Ziel und
- * noch nicht benachrichtigt; 'reset', wenn der Preis wieder über dem Ziel liegt
- * (damit die nächste Unterschreitung erneut alarmiert); sonst 'none'.
- */
-export function weckerDecision(price, target, notifiedAt) {
-  if (price == null) return 'none'
-  if (price <= target) return notifiedAt ? 'none' : 'fire'
-  return notifiedAt ? 'reset' : 'none'
-}
-
-/** Normalisierte Marke für den Match (identisch zur Speicherung im Worker). */
-export function brandKey(brand) {
-  return String(brand ?? '').trim().toLowerCase()
-}
-
-/** Passt ein Markt zum Store-Filter eines Marken-Weckers? */
-export function storeMatches(market, mode, stores) {
-  if (mode === 'only') return stores.includes(market)
-  if (mode === 'except') return !stores.includes(market)
-  return true // 'all'
-}
-
-// --- ab hier: I/O & Versand (in der Action) --------------------------------
+// --- I/O & Versand (in der Action) -----------------------------------------
 
 const ACCOUNT = process.env.CLOUDFLARE_ACCOUNT_ID
 const DB_ID = process.env.CLOUDFLARE_D1_DATABASE_ID
@@ -107,62 +53,7 @@ async function d1Query(sql, params = []) {
   if (!json.success) throw new Error(`D1-Fehler: ${JSON.stringify(json.errors)}`)
   return json.result[0].results
 }
-
-export function alarmEmail(event, offer, unsubToken) {
-  const perLiter = event.perLiter.toFixed(2).replace('.', ',')
-  const priceLine = offer ? `${offer.priceText ?? ''} · ` : ''
-  const unsubLink = API_BASE ? `${API_BASE}/api/unsubscribe?token=${unsubToken}` : SITE_URL
-  const url = offer?.url || SITE_URL
-  const text =
-    `Neues Preistief! ${event.label} ist gerade so günstig wie nie erfasst: ${perLiter} €/L.\n\n` +
-    `Zum Angebot: ${url}\n\nAbmelden: ${unsubLink}`
-  const html = `<!doctype html><html lang="de"><body style="margin:0;background:#edf0f3;font-family:system-ui,sans-serif;color:#10151b">
-    <div style="max-width:520px;margin:0 auto;padding:32px 20px">
-      <div style="font-weight:750;font-size:1.1rem;margin-bottom:20px">⚡ Energy<span style="color:#b23c07">Hunt</span></div>
-      <div style="background:#fff;border:1px solid #dbe1e7;border-radius:14px;padding:24px">
-        <div style="display:inline-block;background:#e24a08;color:#fff;font-weight:700;font-size:0.8rem;padding:4px 10px;border-radius:7px;margin-bottom:12px">⚡ Bestpreis</div>
-        <h1 style="font-size:1.25rem;margin:0 0 8px">${event.label}</h1>
-        <p style="margin:0 0 16px;color:#5b6772">${priceLine}<strong style="color:#10151b">${perLiter} €/L</strong> – so günstig wie nie erfasst.</p>
-        <a href="${url}" style="display:inline-block;background:#e24a08;color:#fff;text-decoration:none;font-weight:650;padding:11px 20px;border-radius:10px">Zum Angebot</a>
-      </div>
-      <p style="color:#5b6772;font-size:0.78rem;margin-top:18px">Du bekommst diese Mail, weil du einen Bestpreis-Alarm aktiviert hast. <a href="${unsubLink}" style="color:#5b6772">Abmelden</a></p>
-    </div></body></html>`
-  return { subject: `⚡ Bestpreis: ${event.label} – ${perLiter} €/L`, html, text }
-}
-
-/** Preiswecker-Mail: aktueller Preis hat den Zielwert erreicht. */
-export function weckerEmail(sub, offer, price) {
-  const unit = sub.target_metric === 'liter' ? '/L' : ''
-  const cur = price.toFixed(2).replace('.', ',')
-  const target = sub.target_price.toFixed(2).replace('.', ',')
-  const url = offer?.url || SITE_URL
-  const text =
-    `Dein Preiswecker: ${sub.product_label} liegt jetzt bei ${cur} €${unit} ` +
-    `(dein Ziel: ${target} €${unit}).\n\nZum Angebot: ${url}`
-  const html = `<!doctype html><html lang="de"><body style="margin:0;background:#edf0f3;font-family:system-ui,sans-serif;color:#10151b">
-    <div style="max-width:520px;margin:0 auto;padding:32px 20px">
-      <div style="font-weight:750;font-size:1.1rem;margin-bottom:20px">⚡ Energy<span style="color:#b23c07">Hunt</span></div>
-      <div style="background:#fff;border:1px solid #dbe1e7;border-radius:14px;padding:24px">
-        <div style="display:inline-block;background:#0a7a42;color:#fff;font-weight:700;font-size:0.8rem;padding:4px 10px;border-radius:7px;margin-bottom:12px">🔔 Preiswecker</div>
-        <h1 style="font-size:1.25rem;margin:0 0 8px">${sub.product_label}</h1>
-        <p style="margin:0 0 16px;color:#5b6772">Jetzt <strong style="color:#10151b">${cur} €${unit}</strong> – dein Zielpreis von ${target} €${unit} ist erreicht.</p>
-        <a href="${url}" style="display:inline-block;background:#e24a08;color:#fff;text-decoration:none;font-weight:650;padding:11px 20px;border-radius:10px">Zum Angebot</a>
-      </div>
-    </div></body></html>`
-  return { subject: `🔔 Preiswecker erreicht: ${sub.product_label} – ${cur} €${unit}`, html, text }
-}
-
-/** Telegram-Alarmtext (HTML). */
-export function telegramMessage(event, offer) {
-  const perLiter = event.perLiter.toFixed(2).replace('.', ',')
-  const url = offer?.url || SITE_URL
-  const price = offer?.priceText ? `${offer.priceText} · ` : ''
-  return (
-    `⚡ <b>Bestpreis!</b>\n${event.label}\n` +
-    `${price}<b>${perLiter} €/L</b> – so günstig wie nie erfasst.\n${url}\n\n` +
-    `<i>/stop zum Abmelden</i>`
-  )
-}
+const msg = createMessages({ siteUrl: SITE_URL, apiBase: API_BASE })
 
 async function sendTelegram(chatId, text) {
   if (!TELEGRAM_BOT_TOKEN) {
@@ -187,17 +78,6 @@ async function getWebpush() {
     _webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY)
   }
   return _webpush
-}
-
-function bestPricePush(event, offer) {
-  const perLiter = event.perLiter.toFixed(2).replace('.', ',')
-  return { title: `⚡ Bestpreis: ${event.label}`, body: `${perLiter} €/L – so günstig wie nie erfasst.`, url: offer?.url || SITE_URL, tag: event.productKey }
-}
-
-function weckerPush(sub, offer, price) {
-  const unit = sub.target_metric === 'liter' ? '€/L' : '€'
-  const cur = price.toFixed(2).replace('.', ',')
-  return { title: `🔔 Preiswecker: ${sub.product_label}`, body: `Jetzt ${cur} ${unit} – dein Ziel ist erreicht.`, url: offer?.url || SITE_URL, tag: sub.product_key }
 }
 
 /** Sendet eine Push-Nachricht; Rückgabe 'expired' bei toter Subscription (404/410). */
@@ -237,6 +117,113 @@ async function sendEmail(to, mail) {
   if (!res.ok) throw new Error(`Brevo ${res.status}: ${await res.text()}`)
 }
 
+/**
+ * Versendet über den Kanal des Abos und verbucht das Ergebnis: tote
+ * Push-Subscription -> abmelden (false), sonst notified_at setzen (true).
+ * `send` liefert 'expired' bei toter Push-Subscription, sonst beliebig.
+ */
+async function deliver(sub, send) {
+  if ((await send()) === 'expired') {
+    await d1Query("UPDATE subscriptions SET status='unsubscribed' WHERE id=?", [sub.id])
+    return false
+  }
+  await d1Query('UPDATE subscriptions SET notified_at=? WHERE id=?', [new Date().toISOString(), sub.id])
+  return true
+}
+
+const resetNotified = (sub) => d1Query('UPDATE subscriptions SET notified_at=NULL WHERE id=?', [sub.id])
+
+/** Wert des Angebots nach Wecker-Metrik ('liter' = €/L, sonst Stückpreis). */
+const metricValue = (o, metric) => (metric === 'liter' ? o.perLiter : o.perUnit)
+
+/** Bestpreis-Alarme: je neuem Preistief alle bestätigten Abos des Produkts. */
+async function runBestPriceAlarms(events, offerByKey, today) {
+  let sent = 0
+  for (const event of events) {
+    const subs = await d1Query(
+      "SELECT id, channel, destination, token FROM subscriptions WHERE status='confirmed' AND product_key=? AND (notified_at IS NULL OR notified_at < ?)",
+      [event.productKey, today],
+    )
+    const offer = offerByKey.get(event.productKey)
+    for (const sub of subs) {
+      const ok = await deliver(sub, async () => {
+        if (sub.channel === 'push') return pushSend(sub.destination, msg.bestPricePush(event, offer))
+        if (sub.channel === 'telegram') return sendTelegram(sub.destination, msg.telegramMessage(event, offer))
+        return sendEmail(sub.destination, msg.alarmEmail(event, offer, sub.token))
+      })
+      if (ok) sent++
+    }
+  }
+  return sent
+}
+
+/** Preiswecker (Pro): aktueller Preis vs. Zielwert je PRODUKT-Abo. */
+async function runProductWeckers(offerByKey) {
+  const targetSubs = await d1Query(
+    "SELECT id, channel, destination, token, product_key, product_label, target_price, target_metric, notified_at FROM subscriptions WHERE status='confirmed' AND scope='product' AND target_price IS NOT NULL",
+  )
+  let sent = 0
+  for (const sub of targetSubs) {
+    const offer = offerByKey.get(sub.product_key)
+    const price = offer ? metricValue(offer, sub.target_metric) : null
+    const decision = weckerDecision(price, sub.target_price, sub.notified_at)
+    if (decision === 'reset') {
+      await resetNotified(sub)
+    } else if (decision === 'fire') {
+      const ok = await deliver(sub, async () => {
+        if (sub.channel === 'push') return pushSend(sub.destination, msg.weckerPush(sub, offer, price))
+        const mail = msg.weckerEmail(sub, offer, price)
+        if (sub.channel === 'telegram') return sendTelegram(sub.destination, mail.text)
+        return sendEmail(sub.destination, mail)
+      })
+      if (ok) sent++
+    }
+  }
+  return sent
+}
+
+/** Marken-Wecker: gegen ALLE Angebote der Marke (Store-gefiltert). */
+async function runBrandWeckers(offers, events, today) {
+  const brandSubs = await d1Query(
+    "SELECT id, channel, destination, token, brand, product_label, store_mode, stores, target_price, target_metric, notified_at FROM subscriptions WHERE status='confirmed' AND scope='brand'",
+  )
+  const newLowKeys = new Set(events.map((e) => e.productKey))
+  let sent = 0
+  for (const sub of brandSubs) {
+    const stores = sub.stores ? JSON.parse(sub.stores) : []
+    const matching = offers.filter((o) => brandKey(o.brand) === sub.brand && storeMatches(o.market, sub.store_mode, stores))
+    if (matching.length === 0) continue
+
+    let offer = null
+    let payload = null
+    if (sub.target_price != null) {
+      // Pro-Wecker: günstigstes passendes Angebot nach Metrik
+      const priced = matching
+        .map((o) => ({ o, p: metricValue(o, sub.target_metric) }))
+        .filter((x) => x.p != null)
+        .sort((a, b) => a.p - b.p)
+      if (priced.length === 0) continue
+      const best = priced[0]
+      const decision = weckerDecision(best.p, sub.target_price, sub.notified_at)
+      if (decision === 'reset') await resetNotified(sub)
+      if (decision !== 'fire') continue
+      offer = best.o
+      payload = msg.weckerPush(sub, best.o, best.p)
+    } else {
+      // Free: hat ein passendes Produkt heute ein neues Tief erreicht?
+      const dropped = matching.find((o) => newLowKeys.has(productKey(o)))
+      if (!dropped || (sub.notified_at && sub.notified_at >= today)) continue
+      offer = dropped
+      payload = msg.bestPricePush(
+        { label: `${sub.product_label} bei ${dropped.market}`, perLiter: dropped.perLiter, productKey: sub.brand },
+        dropped,
+      )
+    }
+    if (await deliver(sub, () => dispatchBrand(sub, offer, payload))) sent++
+  }
+  return sent
+}
+
 async function main() {
   const history = JSON.parse(readFileSync(resolve(dataDir, 'price-history.json'), 'utf8'))
   const offersData = JSON.parse(readFileSync(resolve(dataDir, 'offers.json'), 'utf8'))
@@ -257,103 +244,9 @@ async function main() {
   }
 
   const today = new Date().toISOString().slice(0, 10)
-  let sent = 0
-  for (const event of events) {
-    const subs = await d1Query(
-      "SELECT id, channel, destination, token FROM subscriptions WHERE status='confirmed' AND product_key=? AND (notified_at IS NULL OR notified_at < ?)",
-      [event.productKey, today],
-    )
-    const offer = offerByKey.get(event.productKey)
-    for (const sub of subs) {
-      if (sub.channel === 'push') {
-        const result = await pushSend(sub.destination, bestPricePush(event, offer))
-        if (result === 'expired') {
-          // Tote Subscription abmelden, nicht als versendet zählen.
-          await d1Query("UPDATE subscriptions SET status='unsubscribed' WHERE id=?", [sub.id])
-          continue
-        }
-      } else if (sub.channel === 'telegram') {
-        await sendTelegram(sub.destination, telegramMessage(event, offer))
-      } else {
-        await sendEmail(sub.destination, alarmEmail(event, offer, sub.token))
-      }
-      await d1Query('UPDATE subscriptions SET notified_at=? WHERE id=?', [new Date().toISOString(), sub.id])
-      sent++
-    }
-  }
-
-  // --- Preiswecker (Pro): aktueller Preis vs. Zielwert je PRODUKT-Abo -------
-  const targetSubs = await d1Query(
-    "SELECT id, channel, destination, token, product_key, product_label, target_price, target_metric, notified_at FROM subscriptions WHERE status='confirmed' AND scope='product' AND target_price IS NOT NULL",
-  )
-  let weckerSent = 0
-  for (const sub of targetSubs) {
-    const offer = offerByKey.get(sub.product_key)
-    const price = offer ? (sub.target_metric === 'liter' ? offer.perLiter : offer.perUnit) : null
-    const decision = weckerDecision(price, sub.target_price, sub.notified_at)
-    if (decision === 'fire') {
-      if (sub.channel === 'push') {
-        const r = await pushSend(sub.destination, weckerPush(sub, offer, price))
-        if (r === 'expired') {
-          await d1Query("UPDATE subscriptions SET status='unsubscribed' WHERE id=?", [sub.id])
-          continue
-        }
-      } else if (sub.channel === 'telegram') {
-        await sendTelegram(sub.destination, weckerEmail(sub, offer, price).text)
-      } else {
-        await sendEmail(sub.destination, weckerEmail(sub, offer, price))
-      }
-      await d1Query('UPDATE subscriptions SET notified_at=? WHERE id=?', [new Date().toISOString(), sub.id])
-      weckerSent++
-    } else if (decision === 'reset') {
-      await d1Query('UPDATE subscriptions SET notified_at=NULL WHERE id=?', [sub.id])
-    }
-  }
-  // --- Marken-Wecker: gegen ALLE Angebote der Marke (Store-gefiltert) -------
-  const brandSubs = await d1Query(
-    "SELECT id, channel, destination, token, brand, product_label, store_mode, stores, target_price, target_metric, notified_at FROM subscriptions WHERE status='confirmed' AND scope='brand'",
-  )
-  const newLowKeys = new Set(events.map((e) => e.productKey))
-  let brandSent = 0
-  for (const sub of brandSubs) {
-    const stores = sub.stores ? JSON.parse(sub.stores) : []
-    const matching = offersData.offers.filter((o) => brandKey(o.brand) === sub.brand && storeMatches(o.market, sub.store_mode, stores))
-    if (matching.length === 0) continue
-
-    if (sub.target_price != null) {
-      // Pro-Wecker: günstigstes passendes Angebot nach Metrik
-      const priced = matching
-        .map((o) => ({ o, p: sub.target_metric === 'liter' ? o.perLiter : o.perUnit }))
-        .filter((x) => x.p != null)
-        .sort((a, b) => a.p - b.p)
-      if (priced.length === 0) continue
-      const best = priced[0]
-      const decision = weckerDecision(best.p, sub.target_price, sub.notified_at)
-      if (decision === 'fire') {
-        const ok = await dispatchBrand(sub, best.o, weckerPush(sub, best.o, best.p))
-        if (ok === 'expired') {
-          await d1Query("UPDATE subscriptions SET status='unsubscribed' WHERE id=?", [sub.id])
-          continue
-        }
-        await d1Query('UPDATE subscriptions SET notified_at=? WHERE id=?', [new Date().toISOString(), sub.id])
-        brandSent++
-      } else if (decision === 'reset') {
-        await d1Query('UPDATE subscriptions SET notified_at=NULL WHERE id=?', [sub.id])
-      }
-    } else {
-      // Free: hat ein passendes Produkt heute ein neues Tief erreicht?
-      const dropped = matching.find((o) => newLowKeys.has(productKey(o)))
-      if (dropped && (!sub.notified_at || sub.notified_at < today)) {
-        const ok = await dispatchBrand(sub, dropped, bestPricePush({ label: `${sub.product_label} bei ${dropped.market}`, perLiter: dropped.perLiter, productKey: sub.brand }, dropped))
-        if (ok === 'expired') {
-          await d1Query("UPDATE subscriptions SET status='unsubscribed' WHERE id=?", [sub.id])
-          continue
-        }
-        await d1Query('UPDATE subscriptions SET notified_at=? WHERE id=?', [new Date().toISOString(), sub.id])
-        brandSent++
-      }
-    }
-  }
+  const sent = await runBestPriceAlarms(events, offerByKey, today)
+  const weckerSent = await runProductWeckers(offerByKey)
+  const brandSent = await runBrandWeckers(offersData.offers, events, today)
 
   console.log(`[send-alarms] ${sent} Bestpreis-Alarm(e), ${weckerSent} Preiswecker, ${brandSent} Marken-Wecker versendet.`)
 }
@@ -365,75 +258,15 @@ async function main() {
  */
 async function dispatchBrand(sub, offer, pushPayload) {
   if (sub.channel === 'push') return pushSend(sub.destination, pushPayload)
-  const url = offer?.url || SITE_URL
-  if (sub.channel === 'telegram') {
-    await sendTelegram(sub.destination, `⚡ <b>${pushPayload.title}</b>\n${pushPayload.body}\n${url}\n\n<i>/stop zum Abmelden</i>`)
-    return 'ok'
-  }
-  const html = `<!doctype html><html lang="de"><body style="margin:0;background:#edf0f3;font-family:system-ui,sans-serif;color:#10151b">
-    <div style="max-width:520px;margin:0 auto;padding:32px 20px">
-      <div style="font-weight:750;font-size:1.1rem;margin-bottom:20px">⚡ Energy<span style="color:#b23c07">Hunt</span></div>
-      <div style="background:#fff;border:1px solid #dbe1e7;border-radius:14px;padding:24px">
-        <h1 style="font-size:1.2rem;margin:0 0 8px">${pushPayload.title}</h1>
-        <p style="margin:0 0 16px;color:#5b6772">${pushPayload.body}</p>
-        <a href="${url}" style="display:inline-block;background:#e24a08;color:#fff;text-decoration:none;font-weight:650;padding:11px 20px;border-radius:10px">Zum Angebot</a>
-      </div>
-    </div></body></html>`
-  await sendEmail(sub.destination, { subject: pushPayload.title, html, text: `${pushPayload.title}\n${pushPayload.body}\n${url}` })
-  return 'ok'
-}
-
-// --- Selbsttest der Erkennungslogik (ohne Cloud) ---------------------------
-function selftest() {
-  const mk = (points) => ({ brand: 'X', title: 'Y', market: 'M', unitLabel: 'U', points })
-  const history = {
-    products: {
-      // neues Tief am jüngsten Tag -> Event
-      'a': mk([{ date: '2026-07-01', perLiter: 1.8 }, { date: '2026-07-08', perLiter: 1.5 }]),
-      // gleichbleibend niedrig -> KEIN Event
-      'b': mk([{ date: '2026-07-01', perLiter: 1.5 }, { date: '2026-07-08', perLiter: 1.5 }]),
-      // Tief lag in der Vergangenheit, heute teurer -> KEIN Event
-      'c': mk([{ date: '2026-07-01', perLiter: 1.4 }, { date: '2026-07-08', perLiter: 1.6 }]),
-      // nur ein Tag -> KEIN Event
-      'd': mk([{ date: '2026-07-08', perLiter: 1.2 }]),
-      // jüngster Tag != runDay (Produkt war im Lauf nicht dabei) -> KEIN Event
-      'e': mk([{ date: '2026-06-01', perLiter: 1.9 }, { date: '2026-06-08', perLiter: 1.1 }]),
-    },
-  }
-  const events = detectNewBestPrices(history)
-  const keys = events.map((e) => e.productKey).sort()
-  const detectOk = keys.length === 1 && keys[0] === 'a'
-
-  // Preiswecker: fire (unter Ziel, ungemeldet), none (unter Ziel, gemeldet),
-  // reset (wieder über Ziel, war gemeldet), none (über Ziel, ungemeldet).
-  const weckerOk =
-    weckerDecision(0.7, 0.79, null) === 'fire' &&
-    weckerDecision(0.7, 0.79, '2026-07-01') === 'none' &&
-    weckerDecision(0.9, 0.79, '2026-07-01') === 'reset' &&
-    weckerDecision(0.9, 0.79, null) === 'none' &&
-    weckerDecision(null, 0.79, null) === 'none'
-
-  // Store-Filter: all (immer), only (nur Liste), except (alles außer Liste).
-  const storeOk =
-    storeMatches('Kaufland', 'all', []) === true &&
-    storeMatches('Kaufland', 'only', ['Kaufland']) === true &&
-    storeMatches('Lidl', 'only', ['Kaufland']) === false &&
-    storeMatches('Kaufland', 'except', ['Kaufland']) === false &&
-    storeMatches('Lidl', 'except', ['Kaufland']) === true &&
-    brandKey('  Red Bull ') === 'red bull'
-
-  const ok = detectOk && weckerOk && storeOk
-  console.log(
-    ok
-      ? '✓ selftest bestanden (Erkennung + Preiswecker + Store-Filter)'
-      : `✗ selftest FEHLGESCHLAGEN: detect=${detectOk} wecker=${weckerOk} store=${storeOk}`,
-  )
-  process.exit(ok ? 0 : 1)
+  if (sub.channel === 'telegram') return sendTelegram(sub.destination, msg.brandTelegram(offer, pushPayload))
+  return sendEmail(sub.destination, msg.brandEmail(offer, pushPayload))
 }
 
 // Nur beim direkten Aufruf ausführen – Import (z. B. für Tests) bleibt seiteneffektfrei.
 const isMain = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)
 if (isMain) {
-  if (process.argv.includes('--selftest')) selftest()
-  else main().catch((err) => { console.error('[send-alarms]', err); process.exit(1) })
+  main().catch((err) => {
+    console.error('[send-alarms]', err)
+    process.exit(1)
+  })
 }

@@ -10,8 +10,10 @@ import Footer from "./components/Footer";
 import Header from "./components/Header";
 import ControlsBar from "./components/ControlsBar";
 import FilterOverlay from "./components/FilterOverlay";
+import { WRAP } from "./lib/layout";
 import Hero from "./components/Hero";
-import OfferList from "./components/OfferList";
+import PromoVideo from "./components/PromoVideo";
+import OfferResults from "./components/OfferResults";
 import Ticker from "./components/Ticker";
 import TrustCards from "./components/TrustCards";
 import Leaderboard from "./components/Leaderboard";
@@ -101,51 +103,51 @@ function App() {
       <Ticker offers={offers} />
 
       <main id="main">
-        <Hero
-          timeframe={timeframe}
-          deal={deal}
-          dealSaving={dealSaving}
-          stats={stats}
-        />
+        <Hero timeframe={timeframe} deal={deal} dealSaving={dealSaving} stats={stats} />
 
-        <ControlsBar
-          timeframe={timeframe}
-          onTimeframeChange={setTimeframe}
-          timeframeCounts={timeframeCounts}
-          market={market}
-          brand={brand}
-          query={query}
-          onQueryChange={setQuery}
-          onOpenFilters={() => setShowFilters(true)}
-          favoritesOnly={favoritesOnly}
-          onFavoritesOnlyChange={setFavoritesOnly}
-          favoriteCount={favoriteCount}
-          view={view}
-          onViewChange={setView}
-        />
+        <PromoVideo />
 
-        <OfferList
-          offers={visible}
-          sort={sort}
-          filtersActive={filtersActive}
-          onReset={resetFilters}
-          view={view}
-          bestId={bestId}
-          communityReports={communityReports}
-          communityVotes={communityVotes}
-        />
+        <div className="bg-blue pb-16">
+          <ControlsBar
+            timeframe={timeframe}
+            onTimeframeChange={setTimeframe}
+            timeframeCounts={timeframeCounts}
+            market={market}
+            brand={brand}
+            query={query}
+            onQueryChange={setQuery}
+            onOpenFilters={() => setShowFilters(true)}
+            favoritesOnly={favoritesOnly}
+            onFavoritesOnlyChange={setFavoritesOnly}
+            favoriteCount={favoriteCount}
+            view={view}
+            onViewChange={setView}
+          />
 
-        <TrustCards />
+          <OfferResults
+            offers={visible}
+            sort={sort}
+            filtersActive={filtersActive}
+            onReset={resetFilters}
+            view={view}
+            bestId={bestId}
+            communityReports={communityReports}
+            communityVotes={communityVotes}
+          />
 
-        <Leaderboard />
+          <TrustCards />
 
-        <MarketVote />
+          <Leaderboard />
 
-        <WeeklyReminder />
+          <MarketVote />
 
-        <ReferralCard />
+          <div className={`${WRAP} mt-16 grid gap-8 md:grid-cols-2 md:[&>*:only-child]:col-span-2`}>
+            <WeeklyReminder />
+            <ReferralCard />
+          </div>
 
-        <ProTeaser onOpenCreator={() => setShowCreator(true)} />
+          <ProTeaser onOpenCreator={() => setShowCreator(true)} />
+        </div>
       </main>
 
       <Footer />

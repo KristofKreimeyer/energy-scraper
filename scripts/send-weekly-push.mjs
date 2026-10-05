@@ -12,6 +12,8 @@ import { readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { utcDay } from '../shared/core.mjs'
+
 const scriptDir = dirname(fileURLToPath(import.meta.url))
 const dataDir = resolve(scriptDir, '../src/data')
 
@@ -68,8 +70,8 @@ function bestDeal() {
   } catch {
     return null
   }
-  const today = Math.floor(Date.now() / 86_400_000)
-  const day = (s) => Math.floor(new Date(s).getTime() / 86_400_000)
+  const today = utcDay(new Date())
+  const day = (s) => utcDay(new Date(s))
   const live = offers.filter((o) => {
     if (o.perLiter == null) return false
     if (o.validTo && day(o.validTo) < today) return false
@@ -83,9 +85,7 @@ function weeklyPayload(deal) {
   const price = deal ? deal.perLiter.toFixed(2).replace('.', ',') : null
   return {
     title: '⚡ Neue Energy-Deals sind da!',
-    body: deal
-      ? `Bester Preis diese Woche: ${price} €/L – ${deal.brand} bei ${deal.market}.`
-      : 'Die frischen Wochenangebote sind online.',
+    body: deal ? `Bester Preis diese Woche: ${price} €/L – ${deal.brand} bei ${deal.market}.` : 'Die frischen Wochenangebote sind online.',
     url: '/',
     tag: 'weekly-deals',
   }
@@ -99,9 +99,7 @@ async function main() {
   const deal = bestDeal()
   const payload = weeklyPayload(deal)
 
-  const subs = await d1Query(
-    "SELECT id, destination FROM subscriptions WHERE status='confirmed' AND scope='weekly' AND channel='push'",
-  )
+  const subs = await d1Query("SELECT id, destination FROM subscriptions WHERE status='confirmed' AND scope='weekly' AND channel='push'")
   console.log(`[weekly-push] ${subs.length} weekly-Abo(s) · Nachricht: ${payload.body}`)
 
   let sent = 0

@@ -23,12 +23,12 @@
  * sonst 0 (Teilausfälle einzelner Händler sind tolerierbar).
  */
 
-const { spawnSync } = require('node:child_process')
-const path = require('node:path')
+const { spawnSync } = require('node:child_process');
+const path = require('node:path');
 
-const ROOT = __dirname
-const node = process.execPath
-const SCRAPER_TIMEOUT_MS = 5 * 60 * 1000
+const ROOT = __dirname;
+const node = process.execPath;
+const SCRAPER_TIMEOUT_MS = 5 * 60 * 1000;
 
 // Nur produktive Quellen mit verlässlich strukturierten Preisen. Die reinen
 // Explorations-Tools (sniff-network, find-*, inspect-*) sowie kaufland-flyer
@@ -47,37 +47,37 @@ const jobs = [
   { name: 'Penny (nativer Feed)', script: 'penny-native-scraper.js', args: [] },
   { name: 'Netto (kaufda)', script: 'netto-kaufda-scraper.js', args: [] },
   { name: 'Rewe', script: 'rewe-scraper.js', args: [] },
-]
+];
 
-const results = []
+const results = [];
 for (const job of jobs) {
-  console.log(`\n=== ${job.name} :: node ${job.script} ${job.args.join(' ')} ===`)
+  console.log(`\n=== ${job.name} :: node ${job.script} ${job.args.join(' ')} ===`);
   const r = spawnSync(node, [path.join(ROOT, job.script), ...job.args], {
     cwd: ROOT,
     stdio: 'inherit',
     timeout: SCRAPER_TIMEOUT_MS,
-  })
-  const ok = r.status === 0 && !r.error
+  });
+  const ok = r.status === 0 && !r.error;
   if (!ok) {
-    const reason = r.error ? r.error.message : `Exit-Code ${r.status}`
-    console.warn(`[run-all] ${job.name} fehlgeschlagen (${reason}) – weiter mit der nächsten Quelle.`)
+    const reason = r.error ? r.error.message : `Exit-Code ${r.status}`;
+    console.warn(`[run-all] ${job.name} fehlgeschlagen (${reason}) – weiter mit der nächsten Quelle.`);
   }
-  results.push({ name: job.name, ok })
+  results.push({ name: job.name, ok });
 }
 
 // Normalisierung + Historie fortschreiben (liest ../captured relativ zu sich selbst).
-console.log('\n=== Normalisierung (prepare-data.mjs) ===')
+console.log('\n=== Normalisierung (prepare-data.mjs) ===');
 const prep = spawnSync(node, [path.join(ROOT, '..', 'scripts', 'prepare-data.mjs')], {
   cwd: ROOT,
   stdio: 'inherit',
-})
-const prepOk = prep.status === 0 && !prep.error
+});
+const prepOk = prep.status === 0 && !prep.error;
 
 // Zusammenfassung
-const okCount = results.filter((r) => r.ok).length
-console.log('\n=== Lauf-Protokoll ===')
-for (const r of results) console.log(`  ${r.ok ? '✓' : '✗'} ${r.name}`)
-console.log(`  ${prepOk ? '✓' : '✗'} Normalisierung`)
-console.log(`\n${okCount}/${results.length} Scraper erfolgreich · Normalisierung ${prepOk ? 'ok' : 'FEHLGESCHLAGEN'}.`)
+const okCount = results.filter((r) => r.ok).length;
+console.log('\n=== Lauf-Protokoll ===');
+for (const r of results) console.log(`  ${r.ok ? '✓' : '✗'} ${r.name}`);
+console.log(`  ${prepOk ? '✓' : '✗'} Normalisierung`);
+console.log(`\n${okCount}/${results.length} Scraper erfolgreich · Normalisierung ${prepOk ? 'ok' : 'FEHLGESCHLAGEN'}.`);
 
-if (okCount === 0 || !prepOk) process.exit(1)
+if (okCount === 0 || !prepOk) process.exit(1);

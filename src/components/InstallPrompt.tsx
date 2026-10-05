@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { WRAP } from "../utils/helper";
+import { WRAP } from "../lib/layout";
+import { storage } from "../lib/storage";
 
 // Dezenter „App installieren"-Streifen. Erscheint nur, wenn der Browser das
 // Installieren anbietet (Chrome/Edge/Android feuern `beforeinstallprompt`) und
@@ -24,13 +25,7 @@ export default function InstallPrompt() {
       return false;
     }
   });
-  const [dismissed, setDismissed] = useState(() => {
-    try {
-      return localStorage.getItem(DISMISS_KEY) === "1";
-    } catch {
-      return false;
-    }
-  });
+  const [dismissed, setDismissed] = useState(() => storage.get(DISMISS_KEY) === "1");
 
   useEffect(() => {
     const onPrompt = (e: Event) => {
@@ -56,28 +51,23 @@ export default function InstallPrompt() {
   }
 
   function dismiss() {
-    try {
-      localStorage.setItem(DISMISS_KEY, "1");
-    } catch {
-      /* egal */
-    }
+    storage.set(DISMISS_KEY, "1");
     setDismissed(true);
   }
 
   return (
-    <div className="border-b border-border bg-accent-tint">
-      <div className={`${WRAP} flex items-center gap-3 py-2`}>
+    <div className="border-b-4 border-border-strong bg-accent-tint">
+      <div className={`${WRAP} flex items-center gap-4 py-2`}>
         <span aria-hidden="true" className="text-[1.05rem]">
           ⚡
         </span>
-        <p className="flex-1 text-[0.84rem] text-ink font-medium leading-snug">
-          EnergyHunt als App installieren – die Wochendeals mit einem Tipp vom
-          Homescreen.
+        <p className="flex-1 text-[1rem] text-ink font-medium leading-snug">
+          EnergyHunt als App installieren – die Wochendeals mit einem Tipp vom Homescreen.
         </p>
         <button
           type="button"
           onClick={install}
-          className="flex-none h-9 px-3.5 rounded-lg bg-fill text-on-fill text-[0.82rem] font-semibold cursor-pointer hover:opacity-90"
+          className="flex-none h-9 px-4 rounded-lg bg-fill text-on-fill text-[1rem] font-semibold cursor-pointer hover:opacity-90"
         >
           Installieren
         </button>

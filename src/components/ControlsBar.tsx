@@ -1,7 +1,7 @@
 import FilterBar from "./FilterBar";
 import ViewToggle from "./ViewToggle";
 import type { Timeframe } from "../lib/offers";
-import { WRAP } from "../utils/helper";
+import { WRAP } from "../lib/layout";
 
 // Sticky Steuerleiste: Zeitraum-Umschalter (diese/nächste Woche) + FilterBar
 // (Suche, Filtern-Button, Kachel/Liste). Reine Präsentation; State aus App.
@@ -69,11 +69,7 @@ export default function ControlsBar({
         {/* Mobil + Tablet: Ansicht-Umschalter in die erste Reihe (rechts) –
             so bleibt die FilterBar einzeilig. Erst ab lg (Desktop) steckt er
             in der FilterBar. */}
-        <ViewToggle
-          view={view}
-          onViewChange={onViewChange}
-          className="ml-auto lg:hidden"
-        />
+        <ViewToggle view={view} onViewChange={onViewChange} className="ml-auto lg:hidden" />
 
         {favoriteCount > 0 && (
           <button

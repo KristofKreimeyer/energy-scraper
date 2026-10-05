@@ -6,8 +6,7 @@ import FilterChipGroup from "./FilterChipGroup";
 // Filter-Overlay-Inhalt (Sortieren / Markt / Zucker / Marke) im barrierefreien
 // Modal. Reine Präsentations-Komponente: aller State kommt per Props aus App.
 
-const EYEBROW =
-  "font-mono text-[0.72rem] tracking-[0.14em] uppercase text-muted";
+const EYEBROW = "font-mono text-[0.72rem] tracking-[0.14em] uppercase text-muted";
 
 interface FilterOverlayProps {
   sort: SortKey;
@@ -65,10 +64,7 @@ export default function FilterOverlay({
       </div>
 
       <div className="flex flex-col gap-2">
-        <span
-          id="sort-label"
-          className={`${EYEBROW} !text-[0.68rem] !tracking-[0.1em]`}
-        >
+        <span id="sort-label" className={`${EYEBROW} !text-[0.68rem] !tracking-[0.1em]`}>
           Sortieren
         </span>
         <select
@@ -111,8 +107,7 @@ export default function FilterOverlay({
         ]}
         footer={
           <p className="text-[0.72rem] text-muted">
-            Sortenbündel („versch. Sorten“) enthalten beide Varianten und zählen
-            zu beiden Optionen.
+            Sortenbündel („versch. Sorten“) enthalten beide Varianten und zählen zu beiden Optionen.
           </p>
         }
       />

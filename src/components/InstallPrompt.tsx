@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { WRAP } from "../utils/helper";
+import { WRAP } from "../lib/layout";
+import { storage } from "../lib/storage";
 
 // Dezenter „App installieren"-Streifen. Erscheint nur, wenn der Browser das
 // Installieren anbietet (Chrome/Edge/Android feuern `beforeinstallprompt`) und
@@ -24,13 +25,7 @@ export default function InstallPrompt() {
       return false;
     }
   });
-  const [dismissed, setDismissed] = useState(() => {
-    try {
-      return localStorage.getItem(DISMISS_KEY) === "1";
-    } catch {
-      return false;
-    }
-  });
+  const [dismissed, setDismissed] = useState(() => storage.get(DISMISS_KEY) === "1");
 
   useEffect(() => {
     const onPrompt = (e: Event) => {
@@ -56,11 +51,7 @@ export default function InstallPrompt() {
   }
 
   function dismiss() {
-    try {
-      localStorage.setItem(DISMISS_KEY, "1");
-    } catch {
-      /* egal */
-    }
+    storage.set(DISMISS_KEY, "1");
     setDismissed(true);
   }
 
@@ -71,8 +62,7 @@ export default function InstallPrompt() {
           ⚡
         </span>
         <p className="flex-1 text-[0.84rem] text-ink font-medium leading-snug">
-          EnergyHunt als App installieren – die Wochendeals mit einem Tipp vom
-          Homescreen.
+          EnergyHunt als App installieren – die Wochendeals mit einem Tipp vom Homescreen.
         </p>
         <button
           type="button"

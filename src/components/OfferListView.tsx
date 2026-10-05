@@ -1,13 +1,6 @@
 import { formatEuro, savings, type GroupedOffer } from "../lib/offers";
 import { CardActions } from "./CardActions";
-import {
-  BrandLine,
-  BestTag,
-  FavButton,
-  InsightBlock,
-  ValidBadge,
-  CommunityBlock,
-} from "./offerParts";
+import { BrandLine, BestTag, FavButton, InsightBlock, ValidBadge, CommunityBlock } from "./offerParts";
 import { ArrowRight } from "lucide-react";
 import type { CommunityReport } from "../hooks/useCommunityReports";
 import type { VoteTally } from "../hooks/useCommunityVotes";
@@ -29,9 +22,7 @@ export function OfferListView({ offer, isBest, reports, votes }: Props) {
     <li>
       <article
         className={`offer-card glass-card group relative flex flex-col gap-2 rounded-card p-3 shadow-card transition-[border-color] duration-150 hover:border-border-strong focus-within:border-focus ${
-          isBest
-            ? "border-[color-mix(in_srgb,var(--good)_45%,var(--border))]"
-            : ""
+          isBest ? "border-[color-mix(in_srgb,var(--good)_45%,var(--border))]" : ""
         }`}
         aria-label={alt}
       >
@@ -42,9 +33,7 @@ export function OfferListView({ offer, isBest, reports, votes }: Props) {
               <BestTag isBest={isBest} />
               <FavButton offer={offer} />
             </div>
-            <h3 className="text-[0.95rem] leading-tight truncate mt-0.5">
-              {offer.title}
-            </h3>
+            <h3 className="text-[0.95rem] leading-tight truncate mt-0.5">{offer.title}</h3>
             <div className="flex items-center gap-2 mt-1 flex-wrap">
               <ValidBadge offer={offer} />
               {saved && (
@@ -58,10 +47,7 @@ export function OfferListView({ offer, isBest, reports, votes }: Props) {
           <div className="flex-none text-right">
             <div className="font-mono text-[1.1rem] font-bold tracking-[-0.02em] tabular-nums text-ink whitespace-nowrap">
               {formatEuro(offer.perUnit)}
-              <span className="text-[0.62rem] font-medium text-muted">
-                {" "}
-                {isMulti ? "/ Dose" : ""}
-              </span>
+              <span className="text-[0.62rem] font-medium text-muted"> {isMulti ? "/ Dose" : ""}</span>
             </div>
             <div
               className={`font-mono text-[0.82rem] font-bold tabular-nums whitespace-nowrap ${isBest ? "text-good" : "text-accent-strong"}`}

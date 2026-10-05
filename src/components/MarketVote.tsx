@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { WRAP } from "../utils/helper";
+import { WRAP } from "../lib/layout";
 import { MARKET_CANDIDATES, getMyMarketVote, voteMarket } from "../lib/marketVote";
-import { API_BASE } from "../lib/api";
+import { apiFetch } from "../lib/api";
 
 // Community-Roadmap: Nutzer stimmen ab, welchen Supermarkt wir als Nächstes
 // aufnehmen. Bindet die Community ein UND liefert echte Priorisierungs-Daten.
@@ -14,7 +14,7 @@ export default function MarketVote() {
 
   useEffect(() => {
     let alive = true;
-    fetch(`${API_BASE}/api/market-votes`)
+    apiFetch("/api/market-votes")
       .then((r) => (r.ok ? r.json() : null))
       .then((d: { candidates?: string[]; votes?: Record<string, number> } | null) => {
         if (!alive || !d) return;
@@ -48,10 +48,7 @@ export default function MarketVote() {
     <section className={`${WRAP} mt-9`} aria-labelledby="market-vote-title">
       <div className="glass-card rounded-card p-5 shadow-card">
         <div className="flex items-baseline justify-between gap-3 flex-wrap">
-          <h2
-            id="market-vote-title"
-            className="text-[0.7rem] font-semibold uppercase tracking-[0.1em] text-accent-strong"
-          >
+          <h2 id="market-vote-title" className="text-[0.7rem] font-semibold uppercase tracking-[0.1em] text-accent-strong">
             🗳 Welcher Markt als Nächstes?
           </h2>
           <span className="text-[0.75rem] text-muted">
@@ -59,8 +56,7 @@ export default function MarketVote() {
           </span>
         </div>
         <p className="mt-1 text-[0.85rem] text-muted">
-          Stimm ab, welchen Supermarkt wir als Nächstes aufnehmen – die
-          meistgewählten kommen zuerst dran.
+          Stimm ab, welchen Supermarkt wir als Nächstes aufnehmen – die meistgewählten kommen zuerst dran.
         </p>
 
         <ul className="mt-3 flex flex-col gap-2">
@@ -75,9 +71,7 @@ export default function MarketVote() {
                   onClick={() => pick(market)}
                   aria-pressed={active}
                   className={`relative w-full h-11 rounded-lg border overflow-hidden text-left cursor-pointer transition-colors duration-150 ${
-                    active
-                      ? "border-accent-strong"
-                      : "border-border-strong hover:border-accent"
+                    active ? "border-accent-strong" : "border-border-strong hover:border-accent"
                   }`}
                 >
                   <span
@@ -87,7 +81,11 @@ export default function MarketVote() {
                   />
                   <span className="relative flex items-center justify-between h-full px-3 gap-2">
                     <span className="font-semibold text-ink text-[0.9rem] inline-flex items-center gap-1.5">
-                      {active && <span aria-hidden="true" className="text-accent-strong">✓</span>}
+                      {active && (
+                        <span aria-hidden="true" className="text-accent-strong">
+                          ✓
+                        </span>
+                      )}
                       {market}
                     </span>
                     <span className="font-mono text-[0.8rem] tabular-nums text-muted">

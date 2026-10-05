@@ -2,12 +2,10 @@ import { Hono, type Context } from 'hono'
 import Stripe from 'stripe'
 import { type Env, sendEmail, confirmEmail, loginEmail, statusPage } from '../email'
 import { sendTelegram } from '../telegram'
-import {
-  EMAIL_RE, now, parseTarget, isPro, grantEntitlement, grantReferralMonth,
-  getOrCreateReferralCode, recordPendingReferral, rewardReferralOnConfirm,
-  revokeEntitlement, consumeRedeemCode, handleBrandSubscribe, sha256Hex,
-  REPORT_RATE_MAX, clip, VOTE_RATE_MAX, VOTE_WINDOW_DAYS, randomToken, sessionUserId,
-} from '../helpers'
+import { EMAIL_RE, now, parseTarget } from '../helpers'
+import { isPro, consumeRedeemCode } from '../entitlements'
+import { rewardReferralOnConfirm } from '../referrals'
+import { handleBrandSubscribe } from '../subscribe'
 
 export function registerAlarms(app: Hono<{ Bindings: Env }>) {
   app.get('/api/health', (c) => c.json({ ok: true }))
@@ -79,15 +77,22 @@ export function registerAlarms(app: Hono<{ Bindings: Env }>) {
 
       const t = parseTarget(body)
       if (t.invalid) return c.json({ error: 'invalid_target', message: 'Bitte gib einen gültigen Zielpreis an.' }, 400)
-      if (t.price != null && !pushPro) return c.json({ error: 'pro_required', message: 'Der Preiswecker ist eine Pro-Funktion. Löse einen Pro-Code ein.' }, 402)
+      if (t.price != null && !pushPro)
+        return c.json({ error: 'pro_required', message: 'Der Preiswecker ist eine Pro-Funktion. Löse einen Pro-Code ein.' }, 402)
 
       const existing = await db
         .prepare("SELECT id FROM subscriptions WHERE channel='push' AND destination=? AND product_key=?")
         .bind(dest, productKey)
         .first<{ id: string }>()
       if (existing) {
-        await db.prepare('UPDATE subscriptions SET target_price=?, target_metric=?, notified_at=NULL WHERE id=?').bind(t.price, t.metric, existing.id).run()
-        return c.json({ status: 'confirmed', message: t.price != null ? 'Preiswecker aktualisiert.' : 'Für dieses Produkt ist dein Push-Alarm bereits aktiv.' })
+        await db
+          .prepare('UPDATE subscriptions SET target_price=?, target_metric=?, notified_at=NULL WHERE id=?')
+          .bind(t.price, t.metric, existing.id)
+          .run()
+        return c.json({
+          status: 'confirmed',
+          message: t.price != null ? 'Preiswecker aktualisiert.' : 'Für dieses Produkt ist dein Push-Alarm bereits aktiv.',
+        })
       }
 
       if (!pushPro) {
@@ -97,7 +102,10 @@ export function registerAlarms(app: Hono<{ Bindings: Env }>) {
           .first<{ n: number }>()
         if ((active?.n ?? 0) >= freeMax) {
           return c.json(
-            { error: 'free_limit', message: `Im kostenlosen Tarif kannst du ${freeMax === 1 ? 'ein Produkt' : `${freeMax} Produkte`} beobachten. Mit Pro sind es beliebig viele.` },
+            {
+              error: 'free_limit',
+              message: `Im kostenlosen Tarif kannst du ${freeMax === 1 ? 'ein Produkt' : `${freeMax} Produkte`} beobachten. Mit Pro sind es beliebig viele.`,
+            },
             409,
           )
         }
@@ -123,7 +131,8 @@ export function registerAlarms(app: Hono<{ Bindings: Env }>) {
     // Preiswecker (Pro): Zielpreis + Metrik. Ohne Ziel => Free-Verhalten (neues Tief).
     const t = parseTarget(body)
     if (t.invalid) return c.json({ error: 'invalid_target', message: 'Bitte gib einen gültigen Zielpreis an.' }, 400)
-    if (t.price != null && !pro) return c.json({ error: 'pro_required', message: 'Der Preiswecker ist eine Pro-Funktion. Löse einen Pro-Code ein.' }, 402)
+    if (t.price != null && !pro)
+      return c.json({ error: 'pro_required', message: 'Der Preiswecker ist eine Pro-Funktion. Löse einen Pro-Code ein.' }, 402)
     const targetPrice = t.price
     const targetMetric = t.metric
 
@@ -143,7 +152,10 @@ export function registerAlarms(app: Hono<{ Bindings: Env }>) {
         .bind(targetPrice, targetMetric, existing.id)
         .run()
       if (existing.status === 'confirmed') {
-        return c.json({ status: 'confirmed', message: targetPrice != null ? 'Preiswecker aktualisiert.' : 'Für dieses Produkt ist dein Alarm bereits aktiv.' })
+        return c.json({
+          status: 'confirmed',
+          message: targetPrice != null ? 'Preiswecker aktualisiert.' : 'Für dieses Produkt ist dein Alarm bereits aktiv.',
+        })
       }
       await db.prepare("UPDATE subscriptions SET status='pending', created_at=? WHERE id=?").bind(now(), existing.id).run()
       await sendEmail(c.env, { to: email, ...confirmEmail(productLabel, confirmLink(existing.token)) })
@@ -158,7 +170,10 @@ export function registerAlarms(app: Hono<{ Bindings: Env }>) {
         .first<{ n: number }>()
       if ((active?.n ?? 0) >= freeMax) {
         return c.json(
-          { error: 'free_limit', message: `Im kostenlosen Tarif kannst du ${freeMax === 1 ? 'ein Produkt' : `${freeMax} Produkte`} beobachten. Mit Pro sind es beliebig viele.` },
+          {
+            error: 'free_limit',
+            message: `Im kostenlosen Tarif kannst du ${freeMax === 1 ? 'ein Produkt' : `${freeMax} Produkte`} beobachten. Mit Pro sind es beliebig viele.`,
+          },
           409,
         )
       }
@@ -179,14 +194,12 @@ export function registerAlarms(app: Hono<{ Bindings: Env }>) {
   app.get('/api/confirm', async (c) => {
     const token = c.req.query('token') ?? ''
     if (!token) return statusPage(c.env, 'Ungültiger Link', 'Dieser Bestätigungslink ist unvollständig.')
-    const res = await c.env.DB
-      .prepare("UPDATE subscriptions SET status='confirmed', confirmed_at=? WHERE token=? AND status='pending'")
+    const res = await c.env.DB.prepare("UPDATE subscriptions SET status='confirmed', confirmed_at=? WHERE token=? AND status='pending'")
       .bind(now(), token)
       .run()
     if (res.meta.changes > 0) {
       // Wurde dieser Nutzer geworben? Dann zweiseitige Belohnung auslösen.
-      const row = await c.env.DB
-        .prepare("SELECT destination FROM subscriptions WHERE token=? AND channel='email'")
+      const row = await c.env.DB.prepare("SELECT destination FROM subscriptions WHERE token=? AND channel='email'")
         .bind(token)
         .first<{ destination: string }>()
       const rewarded = row ? await rewardReferralOnConfirm(c.env.DB, row.destination) : false
@@ -197,7 +210,11 @@ export function registerAlarms(app: Hono<{ Bindings: Env }>) {
           'Dein Bestpreis-Alarm ist bestätigt. Weil dich jemand eingeladen hat, haben wir dir (und deinem Einlader) je einen Monat Pro gutgeschrieben.',
         )
       }
-      return statusPage(c.env, 'Alarm aktiv ✅', 'Dein Bestpreis-Alarm ist bestätigt. Wir melden uns, sobald dein Produkt ein neues Preistief erreicht.')
+      return statusPage(
+        c.env,
+        'Alarm aktiv ✅',
+        'Dein Bestpreis-Alarm ist bestätigt. Wir melden uns, sobald dein Produkt ein neues Preistief erreicht.',
+      )
     }
     const sub = await c.env.DB.prepare('SELECT status FROM subscriptions WHERE token=?').bind(token).first<{ status: string }>()
     if (sub?.status === 'confirmed') return statusPage(c.env, 'Bereits bestätigt', 'Dieser Alarm war schon aktiv – alles gut.')
@@ -276,7 +293,9 @@ export function registerAlarms(app: Hono<{ Bindings: Env }>) {
       // Ein Token kann mehrere pending-Abos umfassen (Marken-Batch).
       const subs = (
         await db
-          .prepare("SELECT id, product_key, product_label, target_price FROM subscriptions WHERE channel='telegram' AND token=? AND destination LIKE 'pending:%'")
+          .prepare(
+            "SELECT id, product_key, product_label, target_price FROM subscriptions WHERE channel='telegram' AND token=? AND destination LIKE 'pending:%'",
+          )
           .bind(token)
           .all<{ id: string; product_key: string; product_label: string; target_price: number | null }>()
       ).results
@@ -345,7 +364,10 @@ export function registerAlarms(app: Hono<{ Bindings: Env }>) {
     }
 
     if (text.startsWith('/stop')) {
-      await db.prepare("UPDATE subscriptions SET status='unsubscribed' WHERE channel='telegram' AND destination=? AND status='confirmed'").bind(chatId).run()
+      await db
+        .prepare("UPDATE subscriptions SET status='unsubscribed' WHERE channel='telegram' AND destination=? AND status='confirmed'")
+        .bind(chatId)
+        .run()
       await sendTelegram(c.env, chatId, 'Du bist abgemeldet – keine Bestpreis-Alarme mehr.')
       return c.json({ ok: true })
     }

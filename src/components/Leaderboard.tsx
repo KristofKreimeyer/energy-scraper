@@ -1,4 +1,4 @@
-import { WRAP } from "../utils/helper";
+import { WRAP } from "../lib/layout";
 import { useLeaderboard } from "../hooks/useLeaderboard";
 import { COMMUNITY_URL, COMMUNITY_LABEL, DISCORD_URL, DISCORD_LABEL } from "../lib/community-config";
 
@@ -17,33 +17,21 @@ export default function Leaderboard() {
     <section className={`${WRAP} mt-9`} aria-labelledby="leaderboard-title">
       <div className="glass-card rounded-card p-5 shadow-card">
         <div className="flex items-baseline justify-between gap-3 flex-wrap">
-          <h2
-            id="leaderboard-title"
-            className="text-[0.7rem] font-semibold uppercase tracking-[0.1em] text-accent-strong"
-          >
+          <h2 id="leaderboard-title" className="text-[0.7rem] font-semibold uppercase tracking-[0.1em] text-accent-strong">
             🏆 Top-Hunter der Woche
           </h2>
-          <span className="text-[0.75rem] text-muted">
-            Punkte: freigegebene Meldung ×3 · Bestätigung ×1
-          </span>
+          <span className="text-[0.75rem] text-muted">Punkte: freigegebene Meldung ×3 · Bestätigung ×1</span>
         </div>
 
         <ol className="mt-3 flex flex-col divide-y divide-border">
           {board.map((e) => (
-            <li
-              key={e.rank}
-              className="flex items-center gap-3 py-2 text-[0.9rem]"
-            >
-              <span className="w-6 flex-none text-center font-mono font-bold tabular-nums">
-                {MEDALS[e.rank - 1] ?? e.rank}
-              </span>
+            <li key={e.rank} className="flex items-center gap-3 py-2 text-[0.9rem]">
+              <span className="w-6 flex-none text-center font-mono font-bold tabular-nums">{MEDALS[e.rank - 1] ?? e.rank}</span>
               <span className="flex-1 font-semibold text-ink">{e.handle}</span>
               <span className="text-[0.78rem] text-muted tabular-nums">
                 {e.approved}&nbsp;Funde · {e.votes}&nbsp;Checks
               </span>
-              <span className="font-mono font-bold text-good tabular-nums w-12 text-right">
-                {e.score}
-              </span>
+              <span className="font-mono font-bold text-good tabular-nums w-12 text-right">{e.score}</span>
             </li>
           ))}
         </ol>

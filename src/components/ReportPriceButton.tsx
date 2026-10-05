@@ -1,19 +1,14 @@
 import { useState } from "react";
 import { productKey, type GroupedOffer } from "../lib/offers";
-import { authHeader } from "../auth/session";
 import { Tag } from "lucide-react";
-import { API_BASE } from "../lib/api";
+import { apiFetch } from "../lib/api";
 
 // „Günstiger gesehen?" – anonyme Community-Preismeldung für ein bestehendes
 // Angebot. Meldung geht als 'pending' an den Worker und wird erst nach
 // Moderation als Community-Hinweis angezeigt.
 
 type State =
-  | { kind: "idle" }
-  | { kind: "open" }
-  | { kind: "submitting" }
-  | { kind: "done"; message: string }
-  | { kind: "error"; message: string };
+  { kind: "idle" } | { kind: "open" } | { kind: "submitting" } | { kind: "done"; message: string } | { kind: "error"; message: string };
 
 export function ReportPriceButton({ offer, embedded = false, onClose }: { offer: GroupedOffer; embedded?: boolean; onClose?: () => void }) {
   // Eingebettet startet das Formular direkt; „Abbrechen“ schließt das Panel.
@@ -25,10 +20,9 @@ export function ReportPriceButton({ offer, embedded = false, onClose }: { offer:
   async function submit() {
     setState({ kind: "submitting" });
     try {
-      const res = await fetch(`${API_BASE}/api/report-price`, {
+      const res = await apiFetch("/api/report-price", {
         method: "POST",
-        headers: { "content-type": "application/json", ...authHeader() },
-        body: JSON.stringify({
+        body: {
           productKey: productKey(offer),
           brand: offer.brand,
           title: offer.title,
@@ -36,7 +30,8 @@ export function ReportPriceButton({ offer, embedded = false, onClose }: { offer:
           price,
           storeLocation: store,
           note,
-        }),
+        },
+        auth: true,
       });
       const data = (await res.json()) as { message?: string };
       if (res.ok) {

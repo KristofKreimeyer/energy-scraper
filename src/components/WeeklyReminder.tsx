@@ -1,12 +1,7 @@
 import { useState } from "react";
-import { WRAP } from "../utils/helper";
+import { WRAP } from "../lib/layout";
 import { PushError } from "../lib/push";
-import {
-  pushSupported,
-  isWeeklyOn,
-  enableWeekly,
-  disableWeekly,
-} from "../lib/weeklyPush";
+import { pushSupported, isWeeklyOn, enableWeekly, disableWeekly } from "../lib/weeklyPush";
 
 // „Neue Woche"-Erinnerung: eigener Push-Opt-in, meldet sich einmal wöchentlich,
 // sobald frische Deals live sind. Blendet sich aus, wo Push nicht unterstützt
@@ -51,15 +46,9 @@ export default function WeeklyReminder() {
           <h2 id="weekly-title" className="font-semibold text-ink leading-snug">
             Neue Woche, neue Deals?
           </h2>
-          <p className="text-[0.85rem] text-muted">
-            Eine Push pro Woche, sobald die frischen Angebote live sind – ohne
-            Marke, ohne Konto.
-          </p>
+          <p className="text-[0.85rem] text-muted">Eine Push pro Woche, sobald die frischen Angebote live sind – ohne Marke, ohne Konto.</p>
           {msg && (
-            <p
-              className={`mt-1 text-[0.8rem] ${msg.ok ? "text-good" : "text-warn-ink"}`}
-              role="status"
-            >
+            <p className={`mt-1 text-[0.8rem] ${msg.ok ? "text-good" : "text-warn-ink"}`} role="status">
               {msg.text}
             </p>
           )}
@@ -70,9 +59,7 @@ export default function WeeklyReminder() {
           disabled={busy}
           aria-pressed={on}
           className={`flex-none h-10 px-4 rounded-lg text-[0.85rem] font-semibold cursor-pointer transition-colors duration-150 disabled:opacity-60 ${
-            on
-              ? "bg-surface text-ink border border-border-strong hover:bg-surface-2"
-              : "bg-fill text-on-fill hover:opacity-90"
+            on ? "bg-surface text-ink border border-border-strong hover:bg-surface-2" : "bg-fill text-on-fill hover:opacity-90"
           }`}
         >
           {busy ? "…" : on ? "Erinnerung aus" : "Wöchentlich erinnern"}

@@ -4,15 +4,15 @@
  * Nutzung: node scripts/generate-og.mjs   (nutzt Chromium aus scrapers/)
  */
 
-import { fileURLToPath } from "node:url";
-import { dirname, join } from "node:path";
-import { createRequire } from "node:module";
+import { fileURLToPath } from 'node:url'
+import { dirname, join } from 'node:path'
+import { createRequire } from 'node:module'
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const root = join(__dirname, "..");
+const __dirname = dirname(fileURLToPath(import.meta.url))
+const root = join(__dirname, '..')
 // Playwright liegt im Sub-Paket scrapers/.
-const require = createRequire(join(root, "scrapers", "package.json"));
-const { chromium } = require("playwright");
+const require = createRequire(join(root, 'scrapers', 'package.json'))
+const { chromium } = require('playwright')
 
 const html = `<!doctype html><html><head><meta charset="utf-8"><style>
   * { margin:0; box-sizing:border-box; }
@@ -41,12 +41,12 @@ const html = `<!doctype html><html><head><meta charset="utf-8"><style>
     <span class="pill">Aldi</span><span class="pill">Kaufland</span><span class="pill">Lidl</span>
     <span class="pill">Netto</span><span class="pill">Penny</span><span class="pill">Rewe</span>
   </div>
-</body></html>`;
+</body></html>`
 
-const browser = await chromium.launch();
-const page = await browser.newPage({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 1 });
-await page.setContent(html, { waitUntil: "networkidle" });
-const out = join(root, "public", "og.png");
-await page.screenshot({ path: out, type: "png" });
-await browser.close();
-console.log("[og] geschrieben:", out);
+const browser = await chromium.launch()
+const page = await browser.newPage({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 1 })
+await page.setContent(html, { waitUntil: 'networkidle' })
+const out = join(root, 'public', 'og.png')
+await page.screenshot({ path: out, type: 'png' })
+await browser.close()
+console.log('[og] geschrieben:', out)

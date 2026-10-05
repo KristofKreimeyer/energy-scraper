@@ -14,9 +14,12 @@ export default function AuthCallback() {
       const success = token ? await verifyToken(token) : false;
       setOk(success);
       // URL säubern und zurück zur Übersicht (erfolgreich schneller).
-      setTimeout(() => {
-        window.location.hash = "";
-      }, success ? 900 : 2600);
+      setTimeout(
+        () => {
+          window.location.hash = "";
+        },
+        success ? 900 : 2600,
+      );
     })();
     // Nur beim Mount ausführen.
     // eslint-disable-next-line react-hooks/exhaustive-deps

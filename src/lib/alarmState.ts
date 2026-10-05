@@ -15,74 +15,67 @@
  *   clearAlarmMemo()
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react'
+import { storage } from './storage'
 
-const KEY = "energyhunt:alarm:v1";
-const EVENT = "energyhunt:alarm-changed";
+const KEY = 'energyhunt:alarm:v1'
+const EVENT = 'energyhunt:alarm-changed'
 
-export type AlarmChannel = "email" | "telegram" | "push";
+export type AlarmChannel = 'email' | 'telegram' | 'push'
 
 export interface AlarmMemo {
   /** Marke in Original-Schreibweise (Anzeige). */
-  brand: string;
+  brand: string
   /** Was zuletzt angelegt wurde – Produkt- oder Markenname, für die Meldung. */
-  label: string;
+  label: string
   /** Über welche Kanäle bereits angelegt wurde. */
-  channels: AlarmChannel[];
+  channels: AlarmChannel[]
   /** Pro freigeschaltet? Dann greift die 1-Marken-Sperre nicht mehr. */
-  pro: boolean;
+  pro: boolean
 }
 
 /** Marken vergleichbar machen (Groß-/Kleinschreibung, Randleerzeichen). */
-export const normBrand = (b: string) => b.trim().toLowerCase();
+export const normBrand = (b: string) => b.trim().toLowerCase()
 
 function read(): AlarmMemo | null {
-  try {
-    const raw = localStorage.getItem(KEY);
-    if (!raw) return null;
-    const v = JSON.parse(raw) as Partial<AlarmMemo>;
-    if (!v || typeof v.brand !== "string" || !v.brand) return null;
-    return {
-      brand: v.brand,
-      label: typeof v.label === "string" ? v.label : v.brand,
-      channels: Array.isArray(v.channels) ? (v.channels as AlarmChannel[]) : [],
-      pro: v.pro === true,
-    };
-  } catch {
-    return null; // z. B. privater Modus ohne Storage – dann eben keine Sperre
+  // Ohne Storage (z. B. privater Modus) -> null, dann eben keine Sperre.
+  const v = storage.getJSON<Partial<AlarmMemo> | null>(KEY, null)
+  if (!v || typeof v.brand !== 'string' || !v.brand) return null
+  return {
+    brand: v.brand,
+    label: typeof v.label === 'string' ? v.label : v.brand,
+    channels: Array.isArray(v.channels) ? (v.channels as AlarmChannel[]) : [],
+    pro: v.pro === true,
   }
 }
 
 function write(memo: AlarmMemo | null) {
-  try {
-    if (memo) localStorage.setItem(KEY, JSON.stringify(memo));
-    else localStorage.removeItem(KEY);
-  } catch {
-    /* Storage nicht verfügbar – Merker entfällt, Server bremst weiterhin. */
-  }
-  window.dispatchEvent(new Event(EVENT));
+  // Storage nicht verfügbar -> Merker entfällt, der Server bremst weiterhin.
+  if (memo) storage.setJSON(KEY, memo)
+  else storage.remove(KEY)
+  window.dispatchEvent(new Event(EVENT))
 }
 
 /** Nach erfolgreicher Anmeldung merken. Gleiche Marke → Kanal ergänzen. */
 export function rememberAlarm(brand: string, label: string, channel: AlarmChannel) {
-  const prev = read();
-  const same = prev && normBrand(prev.brand) === normBrand(brand);
+  const prev = read()
+  const same = prev && normBrand(prev.brand) === normBrand(brand)
   write({
     brand,
     label,
     channels: same ? [...new Set([...prev.channels, channel])] : [channel],
     pro: prev?.pro ?? false,
-  });
+  })
 }
 
 /** Pro freigeschaltet (Kauf oder Code) – hebt die 1-Marken-Sperre auf. */
 export function markPro() {
-  const prev = read();
-  write(prev ? { ...prev, pro: true } : { brand: "", label: "", channels: [], pro: true });
+  const prev = read()
+  write(prev ? { ...prev, pro: true } : { brand: '', label: '', channels: [], pro: true })
 }
 
 export function clearAlarmMemo() {
-  write(null);
+  write(null)
 }
 
 /**
@@ -90,21 +83,21 @@ export function clearAlarmMemo() {
  * wird? Gleiche Marke bleibt erlaubt (anderer Kanal ist ausdrücklich gewünscht).
  */
 export function isBrandBlocked(memo: AlarmMemo | null, brand: string): boolean {
-  if (!memo || memo.pro || !memo.brand) return false;
-  return normBrand(memo.brand) !== normBrand(brand);
+  if (!memo || memo.pro || !memo.brand) return false
+  return normBrand(memo.brand) !== normBrand(brand)
 }
 
 /** Reaktiver Zugriff – aktualisiert sich auch über Tabs hinweg. */
 export function useAlarmMemo(): AlarmMemo | null {
-  const [memo, setMemo] = useState<AlarmMemo | null>(() => read());
+  const [memo, setMemo] = useState<AlarmMemo | null>(() => read())
   useEffect(() => {
-    const sync = () => setMemo(read());
-    window.addEventListener(EVENT, sync);
-    window.addEventListener("storage", sync);
+    const sync = () => setMemo(read())
+    window.addEventListener(EVENT, sync)
+    window.addEventListener('storage', sync)
     return () => {
-      window.removeEventListener(EVENT, sync);
-      window.removeEventListener("storage", sync);
-    };
-  }, []);
-  return memo;
+      window.removeEventListener(EVENT, sync)
+      window.removeEventListener('storage', sync)
+    }
+  }, [])
+  return memo
 }

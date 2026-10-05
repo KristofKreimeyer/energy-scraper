@@ -13,17 +13,8 @@ interface FilterBarProps {
   onViewChange: (view: View) => void;
 }
 
-export default function FilterBar({
-  market,
-  brand,
-  query,
-  onQueryChange,
-  onOpenFilters,
-  view,
-  onViewChange,
-}: FilterBarProps) {
-  const activeFilterCount =
-    (market !== "all" ? 1 : 0) + (brand !== "all" ? 1 : 0);
+export default function FilterBar({ market, brand, query, onQueryChange, onOpenFilters, view, onViewChange }: FilterBarProps) {
+  const activeFilterCount = (market !== "all" ? 1 : 0) + (brand !== "all" ? 1 : 0);
   return (
     <div className="flex flex-wrap items-center gap-3">
       <div className="flex items-center gap-2 flex-1 basis-[220px] min-w-[180px] bg-surface border border-border-strong rounded-[14px] px-3 h-11">
@@ -64,11 +55,7 @@ export default function FilterBar({
       </button>
       {/* Ansicht-Umschalter: ab lg hier rechts; auf Mobil/Tablet in der ersten Reihe
           der ControlsBar (siehe ControlsBar). */}
-      <ViewToggle
-        view={view}
-        onViewChange={onViewChange}
-        className="ml-auto hidden lg:flex"
-      />
+      <ViewToggle view={view} onViewChange={onViewChange} className="ml-auto hidden lg:flex" />
     </div>
   );
 }

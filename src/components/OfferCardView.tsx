@@ -1,13 +1,6 @@
 import { formatEuro, savings, type GroupedOffer } from "../lib/offers";
 import { CardActions } from "./CardActions";
-import {
-  BrandLine,
-  BestTag,
-  FavButton,
-  InsightBlock,
-  ValidBadge,
-  CommunityBlock,
-} from "./offerParts";
+import { BrandLine, BestTag, FavButton, InsightBlock, ValidBadge, CommunityBlock } from "./offerParts";
 import { ArrowRight } from "lucide-react";
 import type { CommunityReport } from "../hooks/useCommunityReports";
 import type { VoteTally } from "../hooks/useCommunityVotes";
@@ -22,13 +15,7 @@ interface Props {
 }
 
 // Kachelansicht eines Angebots.
-export function OfferCardView({
-  offer,
-  isBest,
-  rowHasVariant = false,
-  reports,
-  votes,
-}: Props) {
+export function OfferCardView({ offer, isBest, rowHasVariant = false, reports, votes }: Props) {
   const saved = savings(offer);
   const extraVariants = offer.variantCount - 1;
   const isMulti = offer.unitCount > 1;
@@ -38,9 +25,7 @@ export function OfferCardView({
     <li className="flex">
       <article
         className={`offer-card glass-card group relative flex flex-col h-full w-full rounded-card overflow-hidden shadow-card p-[18px] transition-[transform,border-color] duration-150 hover:-translate-y-[3px] hover:border-border-strong focus-within:border-focus ${
-          isBest
-            ? "border-[color-mix(in_srgb,var(--good)_45%,var(--border))]"
-            : ""
+          isBest ? "border-[color-mix(in_srgb,var(--good)_45%,var(--border))]" : ""
         }`}
         aria-label={alt}
       >
@@ -50,9 +35,7 @@ export function OfferCardView({
             <BestTag isBest={isBest} />
             <FavButton offer={offer} />
           </div>
-          <h3 className="text-base leading-[1.25] tracking-[-0.01em]">
-            {offer.title}
-          </h3>
+          <h3 className="text-base leading-[1.25] tracking-[-0.01em]">{offer.title}</h3>
           {extraVariants > 0 && (
             <span
               className="self-start mt-[5px] text-[0.76rem] text-muted cursor-default"
@@ -66,10 +49,7 @@ export function OfferCardView({
             // Platzhalter reserviert die Höhe der „X Sorten"-Zeile, wenn
             // irgendein Angebot der Liste eine hat – so fluchten die Preisblöcke
             // reihenweise (2- und 3-Spalter). Erst ab md, mobil (1 Spalte) unnötig.
-            <span
-              className="hidden md:block self-start mt-[5px] text-[0.76rem]"
-              aria-hidden="true"
-            >
+            <span className="hidden md:block self-start mt-[5px] text-[0.76rem]" aria-hidden="true">
               {" "}
             </span>
           )}
@@ -102,15 +82,10 @@ export function OfferCardView({
                 </>
               ) : (
                 <>
-                  <span
-                    className="font-mono text-[1.7rem] font-bold tabular-nums text-ink"
-                    aria-label="unbekannt"
-                  >
+                  <span className="font-mono text-[1.7rem] font-bold tabular-nums text-ink" aria-label="unbekannt">
                     —
                   </span>
-                  <span className="font-mono text-[0.66rem] tracking-[0.06em] uppercase text-muted">
-                    Grundpreis
-                  </span>
+                  <span className="font-mono text-[0.66rem] tracking-[0.06em] uppercase text-muted">Grundpreis</span>
                 </>
               )}
             </span>
@@ -129,16 +104,11 @@ export function OfferCardView({
               <span className="text-muted font-mono tabular-nums">
                 <span aria-hidden="true">
                   {formatEuro(offer.appPrice)}
-                  {offer.appPerLiter != null
-                    ? ` · ${formatEuro(offer.appPerLiter)}/L`
-                    : ""}
+                  {offer.appPerLiter != null ? ` · ${formatEuro(offer.appPerLiter)}/L` : ""}
                 </span>
                 <span className="visually-hidden">
                   Mit Kundenkarte oder App {formatEuro(offer.appPrice)}
-                  {offer.appPerLiter != null
-                    ? `, ${formatEuro(offer.appPerLiter)} pro Liter`
-                    : ""}
-                  . Der angezeigte Preis gilt ohne App.
+                  {offer.appPerLiter != null ? `, ${formatEuro(offer.appPerLiter)} pro Liter` : ""}. Der angezeigte Preis gilt ohne App.
                 </span>
               </span>
             </p>
@@ -148,18 +118,14 @@ export function OfferCardView({
             <p className="flex items-center gap-2 mt-2.5 text-[0.8rem]">
               <span className="flex-none font-mono font-bold tabular-nums text-good bg-good-tint border border-[color-mix(in_srgb,var(--good)_30%,transparent)] rounded-[7px] px-2 py-[3px]">
                 <span aria-hidden="true">−{saved.percent}&nbsp;%</span>
-                <span className="visually-hidden">
-                  {saved.percent} Prozent gespart
-                </span>
+                <span className="visually-hidden">{saved.percent} Prozent gespart</span>
               </span>
               <span className="text-muted font-mono tabular-nums">
                 <span className="visually-hidden">
-                  Sie sparen {formatEuro(saved.amount)} gegenüber vorher{" "}
-                  {formatEuro(offer.oldPrice!)}
+                  Sie sparen {formatEuro(saved.amount)} gegenüber vorher {formatEuro(offer.oldPrice!)}
                 </span>
                 <span aria-hidden="true">
-                  {formatEuro(saved.amount)} gespart ·{" "}
-                  <s className="text-muted">{formatEuro(offer.oldPrice!)}</s>
+                  {formatEuro(saved.amount)} gespart · <s className="text-muted">{formatEuro(offer.oldPrice!)}</s>
                 </span>
               </span>
             </p>

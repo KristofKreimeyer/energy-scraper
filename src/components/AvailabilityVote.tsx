@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { productKey, type GroupedOffer } from "../lib/offers";
-import { getVoterId, getMyVote, setMyVote, type VoteChoice } from "../utils/community";
-import { authHeader } from "../auth/session";
+import { getVoterId, getMyVote, setMyVote, type VoteChoice } from "../lib/voter";
 import type { VoteTally } from "../hooks/useCommunityVotes";
-import { API_BASE } from "../lib/api";
+import { apiFetch } from "../lib/api";
 
 // „Noch verfügbar?" – anonymes Daumen-hoch/runter je Angebot. Eine Stimme je
 // Browser (localStorage-Voter-ID); optimistisches Update, Server bestätigt.
@@ -28,27 +27,18 @@ export function AvailabilityVote({ offer, tally, hideBadge = false }: { offer: G
     }));
     setMine(choice);
     setMyVote(pk, choice);
-    fetch(`${API_BASE}/api/vote`, {
-      method: "POST",
-      headers: { "content-type": "application/json", ...authHeader() },
-      body: JSON.stringify({ productKey: pk, vote: choice, voterId: getVoterId() }),
-    }).catch(() => {
+    apiFetch("/api/vote", { method: "POST", body: { productKey: pk, vote: choice, voterId: getVoterId() }, auth: true }).catch(() => {
       /* Netzfehler ignorieren – die optimistische Anzeige bleibt, nicht kritisch. */
     });
   }
 
   const btn = (active: boolean) =>
     `inline-flex items-center gap-1 h-7 px-2 rounded-md border text-[0.76rem] font-semibold cursor-pointer ${
-      active
-        ? "bg-fill text-on-fill border-fill"
-        : "bg-surface text-muted border-border-strong hover:text-ink"
+      active ? "bg-fill text-on-fill border-fill" : "bg-surface text-muted border-border-strong hover:text-ink"
     }`;
 
   return (
-    <div
-      className="relative z-10 flex flex-col gap-1"
-      onClick={(e) => e.stopPropagation()}
-    >
+    <div className="relative z-10 flex flex-col gap-1" onClick={(e) => e.stopPropagation()}>
       {!hideBadge && counts.up >= CONFIRM_THRESHOLD && (
         <span className="text-[0.75rem] font-semibold text-good">
           🔥 von {counts.up} {counts.up === 1 ? "Hunter" : "Huntern"} bestätigt

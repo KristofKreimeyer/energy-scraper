@@ -21,20 +21,7 @@
  * als Notausstieg, falls Aldi Süd das URL-Schema mal ändert.
  */
 
-const fs = require('fs');
-const path = require('path');
-
-/** ISO-8601-Kalenderwoche (gleiche, mehrfach verifizierte Logik wie im Penny-Scraper). */
-function isoYearWeek(date) {
-  const t = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
-  const day = (t.getUTCDay() + 6) % 7; // Mo=0 … So=6
-  t.setUTCDate(t.getUTCDate() - day + 3); // auf den Donnerstag der Woche
-  const firstThursday = new Date(Date.UTC(t.getUTCFullYear(), 0, 4));
-  const week =
-    1 +
-    Math.round(((t - firstThursday) / 86400000 - 3 + ((firstThursday.getUTCDay() + 6) % 7)) / 7);
-  return { year: t.getUTCFullYear(), week };
-}
+const { matchBrand, writeOffers, isoYearWeek } = require('./lib/common');
 
 function deriveCurrentSlug() {
   const { year, week } = isoYearWeek(new Date());
@@ -44,20 +31,6 @@ function deriveCurrentSlug() {
 const PUBLICATION_SLUG = process.argv[2] || process.env.ALDI_SUED_SLUG || deriveCurrentSlug();
 
 const BASE_URL = `https://prospekt.aldi-sued.de/${PUBLICATION_SLUG}/page`;
-const OUT_DIR = path.join(__dirname, 'captured');
-if (!fs.existsSync(OUT_DIR)) fs.mkdirSync(OUT_DIR);
-
-const BRAND_PATTERNS = [
-  { brand: 'Monster', pattern: /monster/i },
-  { brand: 'Red Bull', pattern: /red\s*bull/i },
-  { brand: 'Rockstar', pattern: /rockstar/i },
-  { brand: 'Gönnergy', pattern: /g[öo]nnergy|g[öo]nrgy|montana\s*black/i },
-];
-
-function matchBrand(text) {
-  const hit = BRAND_PATTERNS.find((b) => b.pattern.test(text));
-  return hit ? hit.brand : null;
-}
 
 // Node 18+ hat global fetch(). Falls du eine ältere Node-Version
 // nutzt, gib Bescheid - dann brauchen wir node-fetch als Dependency.
@@ -90,9 +63,7 @@ async function fetchPage(pageRange) {
 
     if (result) {
       console.log(`  [OK] Seite ${pageRange}: ${result.data.length} Hotspot(s)`);
-      allHotspots.push(
-        ...result.data.map((h) => ({ ...h, _sourcePage: pageRange }))
-      );
+      allHotspots.push(...result.data.map((h) => ({ ...h, _sourcePage: pageRange })));
       consecutiveMisses = 0;
     } else {
       console.log(`  [---] Seite ${pageRange}: nicht gefunden`);
@@ -141,26 +112,16 @@ async function fetchPage(pageRange) {
     })
     .filter(Boolean);
 
-  console.log(
-    `Davon ${energyDrinkOffers.length} Energy-Drink-Angebot(e) (Monster/Red Bull/Rockstar/Gönnergy).\n`
-  );
+  console.log(`Davon ${energyDrinkOffers.length} Energy-Drink-Angebot(e) (Monster/Red Bull/Rockstar/Gönnergy).\n`);
 
   energyDrinkOffers.forEach((o) => {
-    console.log(
-      `  [${o.brand}] ${o.title} – ${o.price || 'kein Preis'} (Seite ${o.sourcePage})`
-    );
+    console.log(`  [${o.brand}] ${o.title} – ${o.price || 'kein Preis'} (Seite ${o.sourcePage})`);
   });
 
-  const outPath = path.join(OUT_DIR, 'aldi-sued-offers.json');
-  fs.writeFileSync(outPath, JSON.stringify(energyDrinkOffers, null, 2));
-  console.log(`\nGespeichert: captured/aldi-sued-offers.json`);
+  writeOffers('aldi-sued-offers.json', energyDrinkOffers);
 
   if (energyDrinkOffers.length === 0 && allProducts.length > 0) {
-    console.log(
-      '\nHinweis: Keine unserer 4 Marken gefunden. Erste 10 gefundene Marken/Titel zur Kontrolle:'
-    );
-    allProducts.slice(0, 10).forEach((p) =>
-      console.log(`  - ${p.title} (Marke: ${p.brand || '–'})`)
-    );
+    console.log('\nHinweis: Keine unserer 4 Marken gefunden. Erste 10 gefundene Marken/Titel zur Kontrolle:');
+    allProducts.slice(0, 10).forEach((p) => console.log(`  - ${p.title} (Marke: ${p.brand || '–'})`));
   }
 })();

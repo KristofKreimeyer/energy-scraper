@@ -40,6 +40,9 @@ jobs:
       - name: Abhängigkeiten
         run: npm ci
 
+      - name: Tests
+        run: npm test
+
       - name: Bauen
         env:
           VITE_API_BASE: ${{ vars.VITE_API_BASE }}

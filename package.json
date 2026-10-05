@@ -11,7 +11,10 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "sync-main": "bash scripts/sync-main.sh"
+    "sync-main": "bash scripts/sync-main.sh",
+    "test": "vitest run",
+    "format": "prettier --write \"{src,worker/src,scripts,shared,tests,scrapers}/**/*.{ts,tsx,js,mjs,mts}\" \"*.ts\"",
+    "format:check": "prettier --check \"{src,worker/src,scripts,shared,tests,scrapers}/**/*.{ts,tsx,js,mjs,mts}\" \"*.ts\""
   },
   "dependencies": {
     "lucide-react": "^1.28.0",
@@ -30,10 +33,12 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
     "globals": "^17.7.0",
+    "prettier": "^3.9.9",
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.62.0",
     "vite": "^8.1.1",
+    "vitest": "^5.0.3",
     "wrangler": "^4.113.0"
   }
 }

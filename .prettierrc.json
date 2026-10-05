@@ -1,0 +1,12 @@
+{
+  "printWidth": 140,
+  "trailingComma": "all",
+  "overrides": [
+    { "files": "src/**/*.{ts,tsx}", "options": { "semi": true, "singleQuote": false } },
+    { "files": "scrapers/**/*.js", "options": { "semi": true, "singleQuote": true } },
+    {
+      "files": ["worker/**/*.ts", "scripts/**/*.{mjs,mts}", "shared/**/*.{mjs,mts}", "tests/**/*.mjs", "*.ts"],
+      "options": { "semi": false, "singleQuote": true }
+    }
+  ]
+}

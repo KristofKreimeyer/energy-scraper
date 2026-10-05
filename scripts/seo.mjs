@@ -12,6 +12,8 @@
 //
 // Aufruf: importiert, nicht direkt via CLI.
 
+import { DAY_MS, utcDay } from '../shared/core.mjs'
+
 export const SITE_ORIGIN = 'https://energyhunt.pages.dev'
 export const SITE_NAME = 'EnergyHunt'
 
@@ -21,7 +23,10 @@ export const SITE_NAME = 'EnergyHunt'
 export function slugify(str) {
   return String(str)
     .toLowerCase()
-    .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
+    .replace(/ä/g, 'ae')
+    .replace(/ö/g, 'oe')
+    .replace(/ü/g, 'ue')
+    .replace(/ß/g, 'ss')
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
 }
@@ -37,7 +42,7 @@ export function isoWeek(date = new Date()) {
   const day = d.getUTCDay() || 7
   d.setUTCDate(d.getUTCDate() + 4 - day)
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1))
-  return Math.ceil(((d - yearStart) / 86_400_000 + 1) / 7)
+  return Math.ceil(((d - yearStart) / DAY_MS + 1) / 7)
 }
 
 /** "0,79 €" – deutsche Preisformatierung. */
@@ -46,17 +51,15 @@ export function euro(value) {
 }
 
 function escapeHtml(str) {
-  return String(str)
-    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 }
 
 // --- Angebots-Aufbereitung -------------------------------------------------
 
 /** Nur aktuell/laufend gültige Angebote (abgelaufene raus) – Tagesebene, UTC. */
 function isLive(offer, now = new Date()) {
-  const today = Math.floor(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()) / 86_400_000)
-  const day = (s) => Math.floor(new Date(s).getTime() / 86_400_000)
+  const today = utcDay(now)
+  const day = (s) => utcDay(new Date(s))
   if (offer.validTo && day(offer.validTo) < today) return false
   if (offer.validFrom && day(offer.validFrom) > today + 14) return false
   return true
@@ -87,13 +90,7 @@ export function byBrand(offers) {
 // --- robots.txt / sitemap.xml ----------------------------------------------
 
 export function buildRobots() {
-  return [
-    'User-agent: *',
-    'Allow: /',
-    '',
-    `Sitemap: ${SITE_ORIGIN}/sitemap.xml`,
-    '',
-  ].join('\n')
+  return ['User-agent: *', 'Allow: /', '', `Sitemap: ${SITE_ORIGIN}/sitemap.xml`, ''].join('\n')
 }
 
 export function buildSitemap(offers, now = new Date()) {

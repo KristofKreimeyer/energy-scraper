@@ -2,12 +2,10 @@ import { Hono, type Context } from 'hono'
 import Stripe from 'stripe'
 import { type Env, sendEmail, confirmEmail, loginEmail, statusPage } from '../email'
 import { sendTelegram } from '../telegram'
-import {
-  EMAIL_RE, now, parseTarget, isPro, grantEntitlement, grantReferralMonth,
-  getOrCreateReferralCode, recordPendingReferral, rewardReferralOnConfirm,
-  revokeEntitlement, consumeRedeemCode, handleBrandSubscribe, sha256Hex,
-  REPORT_RATE_MAX, clip, VOTE_RATE_MAX, VOTE_WINDOW_DAYS, randomToken, sessionUserId,
-} from '../helpers'
+import { DAY_MS } from '../../../shared/core.mjs'
+import { EMAIL_RE, now } from '../helpers'
+import { isPro, grantEntitlement, revokeEntitlement, consumeRedeemCode } from '../entitlements'
+import { sessionUserId } from '../auth'
 
 export function registerPro(app: Hono<{ Bindings: Env }>) {
   app.get('/api/entitlement', async (c) => {
@@ -31,7 +29,8 @@ export function registerPro(app: Hono<{ Bindings: Env }>) {
     let destination: string
     if (channel === 'push') {
       const sub = body.subscription
-      if (!sub?.endpoint || !sub.keys?.p256dh || !sub.keys?.auth) return c.json({ error: 'invalid_subscription', message: 'Push-Anmeldung unvollständig.' }, 400)
+      if (!sub?.endpoint || !sub.keys?.p256dh || !sub.keys?.auth)
+        return c.json({ error: 'invalid_subscription', message: 'Push-Anmeldung unvollständig.' }, 400)
       destination = JSON.stringify(sub)
     } else if (channel === 'email') {
       const email = (body.email ?? '').trim().toLowerCase()
@@ -122,7 +121,13 @@ export function registerPro(app: Hono<{ Bindings: Env }>) {
     let event: Stripe.Event
     try {
       // In Workers async + WebCrypto (SubtleCryptoProvider), nicht das sync constructEvent.
-      event = await stripe.webhooks.constructEventAsync(raw, sig, c.env.STRIPE_WEBHOOK_SECRET, undefined, Stripe.createSubtleCryptoProvider())
+      event = await stripe.webhooks.constructEventAsync(
+        raw,
+        sig,
+        c.env.STRIPE_WEBHOOK_SECRET,
+        undefined,
+        Stripe.createSubtleCryptoProvider(),
+      )
     } catch {
       return c.json({ error: 'bad_signature' }, 400)
     }
@@ -136,7 +141,7 @@ export function registerPro(app: Hono<{ Bindings: Env }>) {
         items?: { data?: { current_period_end?: number }[] }
       }
       const ts = s.current_period_end ?? s.items?.data?.[0]?.current_period_end
-      return new Date((ts ? ts * 1000 : Date.now() + 32 * 86_400_000)).toISOString()
+      return new Date(ts ? ts * 1000 : Date.now() + 32 * DAY_MS).toISOString()
     }
 
     switch (event.type) {

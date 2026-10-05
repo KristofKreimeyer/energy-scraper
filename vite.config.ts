@@ -4,12 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
-import {
-  buildTitle,
-  buildDescription,
-  buildJsonLd,
-  buildNoscript,
-} from './scripts/seo.mjs'
+import { buildTitle, buildDescription, buildJsonLd, buildNoscript } from './scripts/seo.mjs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 
@@ -28,8 +23,7 @@ function seoHtmlPlugin(): Plugin {
   const beacon = cfToken
     ? `<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"${cfToken}"}'></script>`
     : ''
-  const injectBeacon = (h: string) =>
-    beacon ? h.replace('</head>', `  ${beacon}\n  </head>`) : h
+  const injectBeacon = (h: string) => (beacon ? h.replace('</head>', `  ${beacon}\n  </head>`) : h)
 
   return {
     name: 'energyhunt-seo-html',
@@ -53,10 +47,7 @@ function seoHtmlPlugin(): Plugin {
             /<meta\s+name="description"\s+content=\s*"[\s\S]*?"\s*\/>/,
             `<meta name="description" content="${description.replace(/"/g, '&quot;')}" />`,
           )
-          .replace(
-            '</head>',
-            `  <script type="application/ld+json">${jsonLd}</script>\n  </head>`,
-          )
+          .replace('</head>', `  <script type="application/ld+json">${jsonLd}</script>\n  </head>`)
           .replace('<div id="root"></div>', `<div id="root"></div>\n    ${noscript}`),
       )
     },

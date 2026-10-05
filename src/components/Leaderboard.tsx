@@ -17,7 +17,7 @@ export default function Leaderboard() {
     <section className={`${WRAP} mt-9`} aria-labelledby="leaderboard-title">
       <div className="glass-card rounded-card p-5 shadow-card">
         <div className="flex items-baseline justify-between gap-3 flex-wrap">
-          <h2 id="leaderboard-title" className="text-[1.5rem] leading-none text-accent-strong">
+          <h2 id="leaderboard-title" className="text-[1.5rem] leading-none text-ink">
             🏆 Top-Hunter der Woche
           </h2>
           <span className="text-[1rem] text-muted">Punkte: freigegebene Meldung ×3 · Bestätigung ×1</span>

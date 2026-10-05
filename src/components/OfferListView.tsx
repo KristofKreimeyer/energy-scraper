@@ -49,9 +49,7 @@ export function OfferListView({ offer, isBest, reports, votes }: Props) {
               {formatEuro(offer.perUnit)}
               <span className="text-[1rem] font-medium text-muted"> {isMulti ? "/ Dose" : ""}</span>
             </div>
-            <div
-              className={`font-mono text-[1rem] font-bold tabular-nums whitespace-nowrap ${isBest ? "text-good" : "text-accent-strong"}`}
-            >
+            <div className={`font-mono text-[1rem] font-bold tabular-nums whitespace-nowrap ${isBest ? "text-accent-strong" : "text-ink"}`}>
               {offer.perLiter != null ? `${formatEuro(offer.perLiter)}/L` : "—"}
             </div>
           </div>

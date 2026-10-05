@@ -17,7 +17,7 @@ export default function TrustCards() {
       <div className="grid gap-4 grid-cols-2 max-[35rem]:grid-cols-1">
         {showFund && fund && (
           <div className="glass-card rounded-card p-5 shadow-card">
-            <div className="text-[1rem] font-semibold uppercase tracking-[0.04em] text-accent-strong">🏷 Community-Fund der Woche</div>
+            <div className="text-[1rem] font-semibold uppercase tracking-[0.04em] text-muted">🏷 Community-Fund der Woche</div>
             <p className="mt-2 font-semibold text-ink leading-snug">
               {fund.note ? `„${fund.note}"` : `${formatEuro(fund.price)} bei ${fund.market}`}
             </p>

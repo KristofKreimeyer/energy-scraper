@@ -16,7 +16,7 @@ export default function ProTeaser({ onOpenCreator }: { onOpenCreator: () => void
     <section className={`${WRAP} mt-9`} aria-labelledby="pro-teaser-title">
       <div className="rounded-card p-6 border-[3px] border-border-strong shadow-card bg-accent-tint flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="flex-1">
-          <div className="text-[1rem] font-semibold uppercase tracking-[0.04em] text-accent-strong">EnergyHunt Pro</div>
+          <div className="text-[1rem] font-semibold uppercase tracking-[0.04em] text-muted">EnergyHunt Pro</div>
           <h2 id="pro-teaser-title" className="mt-1 text-[1.75rem] text-ink leading-snug">
             Nie wieder ein Angebot verpassen.
           </h2>

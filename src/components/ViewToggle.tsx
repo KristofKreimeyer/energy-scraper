@@ -19,7 +19,7 @@ export default function ViewToggle({
     }`;
   return (
     <div
-      className={`flex items-center gap-1 p-1 bg-surface-2 border border-border rounded-[0.875rem] ${className}`}
+      className={`flex items-center gap-2 p-2 bg-surface-2 border border-border rounded-[0.875rem] ${className}`}
       role="group"
       aria-label="Ansicht wählen"
     >

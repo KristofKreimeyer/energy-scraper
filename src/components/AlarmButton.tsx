@@ -111,9 +111,7 @@ export function AlarmButton({ offer, embedded = false }: { offer: GroupedOffer; 
   if (state.kind === "pending" || state.kind === "done") {
     return (
       <p
-        className={`relative z-10 mt-3 flex items-start gap-1.5 text-[1rem] ${
-          state.kind === "pending" ? "text-accent-strong" : "text-good"
-        }`}
+        className={`relative z-10 mt-4 flex items-start gap-2 text-[1rem] ${state.kind === "pending" ? "text-accent-strong" : "text-good"}`}
         role="status"
       >
         <span aria-hidden="true">{state.kind === "pending" ? "✉️" : "✅"}</span>
@@ -127,7 +125,7 @@ export function AlarmButton({ offer, embedded = false }: { offer: GroupedOffer; 
       <button
         type="button"
         // z-10 hebt den Button über das Stretched-Link-Overlay der Karte.
-        className="relative z-10 mt-3 self-start inline-flex items-center gap-1.5 text-[1rem] font-semibold text-muted hover:text-accent-strong cursor-pointer"
+        className="relative z-10 mt-4 self-start inline-flex items-center gap-2 text-[1rem] font-semibold text-muted hover:text-accent-strong cursor-pointer"
         onClick={(e) => {
           e.stopPropagation();
           setState({ kind: "open", channel: "email" });
@@ -149,14 +147,14 @@ export function AlarmButton({ offer, embedded = false }: { offer: GroupedOffer; 
 
   return (
     <form
-      className="relative z-10 mt-3 flex flex-col gap-3"
+      className="relative z-10 mt-4 flex flex-col gap-4"
       onClick={(e) => e.stopPropagation()}
       onSubmit={(e) => {
         e.preventDefault();
         subscribe(channel);
       }}
     >
-      <span className="flex items-center gap-1.5 text-[1rem] font-semibold text-ink">
+      <span className="flex items-center gap-2 text-[1rem] font-semibold text-ink">
         <Bell size={14} strokeWidth={2} aria-hidden />
         Bestpreis-Alarm für {offer.brand}
       </span>
@@ -164,7 +162,7 @@ export function AlarmButton({ offer, embedded = false }: { offer: GroupedOffer; 
       {/* Free-Tarif: bereits eine ANDERE Marke aktiv -> gar nicht erst anbieten. */}
       {blocked ? (
         <div
-          className="flex flex-col gap-2 rounded-lg border border-[color-mix(in_srgb,var(--warn-ink)_35%,transparent)] bg-warn-tint p-2.5"
+          className="flex flex-col gap-2 rounded-lg border border-[color-mix(in_srgb,var(--warn-ink)_35%,transparent)] bg-warn-tint p-2"
           role="note"
         >
           <span className="text-[1rem] font-semibold text-ink">Im kostenlosen Tarif ist eine Marke drin</span>
@@ -182,7 +180,7 @@ export function AlarmButton({ offer, embedded = false }: { offer: GroupedOffer; 
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="du@example.com"
-            className="w-full min-w-0 h-9 px-2.5 text-[1rem] bg-surface text-ink border border-border-strong rounded-lg outline-none"
+            className="w-full min-w-0 h-9 px-2 text-[1rem] bg-surface text-ink border border-border-strong rounded-lg outline-none"
           />
           <button
             type="button"
@@ -199,9 +197,9 @@ export function AlarmButton({ offer, embedded = false }: { offer: GroupedOffer; 
           )}
 
           {/* Kanal */}
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-2">
             <span className="text-[1rem] font-semibold uppercase tracking-[0.04em] text-muted">Wie benachrichtigen?</span>
-            <div className="flex gap-1.5" role="group" aria-label="Benachrichtigungskanal">
+            <div className="flex gap-2" role="group" aria-label="Benachrichtigungskanal">
               {(["email", "telegram", "push"] as const).map((ch) => (
                 <button
                   key={ch}
@@ -219,7 +217,7 @@ export function AlarmButton({ offer, embedded = false }: { offer: GroupedOffer; 
 
           {/* Kanal-Eingabe */}
           {channel === "email" && (
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-2">
               <label htmlFor={`alarm-${offer.id}`} className="text-[1rem] font-semibold uppercase tracking-[0.04em] text-muted">
                 Deine E-Mail-Adresse
               </label>
@@ -231,7 +229,7 @@ export function AlarmButton({ offer, embedded = false }: { offer: GroupedOffer; 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="du@example.com"
-                className="w-full min-w-0 h-9 px-2.5 text-[1rem] bg-surface text-ink border border-border-strong rounded-lg outline-none"
+                className="w-full min-w-0 h-9 px-2 text-[1rem] bg-surface text-ink border border-border-strong rounded-lg outline-none"
               />
             </div>
           )}
@@ -246,7 +244,7 @@ export function AlarmButton({ offer, embedded = false }: { offer: GroupedOffer; 
           )}
 
           {/* Preiswecker (Pro) */}
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-2">
             <button
               type="button"
               className="self-start text-[1rem] font-semibold text-muted hover:text-accent-strong cursor-pointer"
@@ -256,12 +254,12 @@ export function AlarmButton({ offer, embedded = false }: { offer: GroupedOffer; 
               {weckerOn ? "− Preiswecker" : "＋ Preiswecker (Pro)"}
             </button>
             {weckerOn && (
-              <div className="flex flex-col gap-1.5 rounded-lg border border-border p-2">
+              <div className="flex flex-col gap-2 rounded-lg border border-border p-2">
                 <label htmlFor={`target-${offer.id}`} className="text-[1rem] text-muted">
                   Melde dich, sobald der Preis ≤ Zielwert ist:
                 </label>
-                <div className="flex gap-1.5">
-                  <div className="flex items-center gap-1 flex-1 min-w-0 h-8 px-2 bg-surface border border-border-strong rounded-md">
+                <div className="flex gap-2">
+                  <div className="flex items-center gap-2 flex-1 min-w-0 h-8 px-2 bg-surface border border-border-strong rounded-md">
                     <input
                       id={`target-${offer.id}`}
                       type="number"
@@ -275,10 +273,10 @@ export function AlarmButton({ offer, embedded = false }: { offer: GroupedOffer; 
                     />
                     <span className="flex-none text-[1rem] text-muted">{unit}</span>
                   </div>
-                  <div className="flex gap-1" role="group" aria-label="Zielgröße">
+                  <div className="flex gap-2" role="group" aria-label="Zielgröße">
                     <button
                       type="button"
-                      className={seg(targetMetric === "unit") + " !flex-none px-2.5"}
+                      className={seg(targetMetric === "unit") + " !flex-none px-2"}
                       aria-pressed={targetMetric === "unit"}
                       onClick={() => setTargetMetric("unit")}
                     >
@@ -286,7 +284,7 @@ export function AlarmButton({ offer, embedded = false }: { offer: GroupedOffer; 
                     </button>
                     <button
                       type="button"
-                      className={seg(targetMetric === "liter") + " !flex-none px-2.5"}
+                      className={seg(targetMetric === "liter") + " !flex-none px-2"}
                       aria-pressed={targetMetric === "liter"}
                       onClick={() => setTargetMetric("liter")}
                     >

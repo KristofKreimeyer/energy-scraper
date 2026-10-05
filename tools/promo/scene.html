@@ -1,0 +1,260 @@
+<!doctype html>
+<meta charset="utf-8" />
+<style>
+  @font-face { font-family: 'Barlow Condensed'; font-weight: 600; src: url('../../public/fonts/barlow-condensed-600.woff2') format('woff2'); }
+  @font-face { font-family: 'Hanken Grotesk'; font-weight: 400 700; src: url('../../public/fonts/hanken-grotesk-var.woff2') format('woff2'); }
+  html, body { margin: 0; background: #0b0526; }
+  canvas { display: block; }
+</style>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+  // Promo-Szene (15 s): reine Funktion der Zeit t, damit jedes Bild exakt
+  // reproduzierbar gerendert werden kann (scripts/render-promo.mjs).
+  const W = 1920, H = 1080
+  const INDIGO = '#1b0f5c', DEEP = '#0b0526', YELLOW = '#ffd60a', MAGENTA = '#ff38d0', BLUE = '#38c6ff'
+  const ctx = document.getElementById('c').getContext('2d')
+    const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v))
+  const prog = (t, a, b) => clamp((t - a) / (b - a))
+  const easeOut = (x) => 1 - Math.pow(1 - x, 3)
+  const easeInOut = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2)
+  const easeBack = (x) => 1 + 2.70158 * Math.pow(x - 1, 3) + 1.70158 * Math.pow(x - 1, 2)
+  const mulberry = (a) => () => {
+    a |= 0; a = (a + 0x6d2b79f5) | 0
+    let t = Math.imul(a ^ (a >>> 15), 1 | a)
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+  const de = (n) => n.toFixed(2).replace('.', ',')
+
+  // Zackiger Blitzpfad per Mittelpunkt-Verschiebung
+  function boltPath(seed, x0, y0, x1, y1, spread, depth = 6) {
+    const r = mulberry(seed)
+    let pts = [[x0, y0], [x1, y1]]
+    let off = spread
+    for (let d = 0; d < depth; d++) {
+      const next = [pts[0]]
+      for (let i = 0; i < pts.length - 1; i++) {
+        const [ax, ay] = pts[i], [bx, by] = pts[i + 1]
+        const mx = (ax + bx) / 2, my = (ay + by) / 2
+        const dx = bx - ax, dy = by - ay, len = Math.hypot(dx, dy) || 1
+        const o = (r() - 0.5) * 2 * off
+        next.push([mx + (-dy / len) * o, my + (dx / len) * o], pts[i + 1])
+      }
+      pts = next
+      off *= 0.55
+    }
+    return pts
+  }
+  function strokePath(pts, w, color, blur, alpha = 1) {
+    ctx.save()
+    ctx.globalAlpha = alpha
+    ctx.lineJoin = 'round'; ctx.lineCap = 'round'
+    ctx.shadowColor = color; ctx.shadowBlur = blur
+    ctx.strokeStyle = color; ctx.lineWidth = w
+    ctx.beginPath(); pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.stroke()
+    ctx.restore()
+  }
+  /** Blitz mit Glow + weißem Kern + Seitenästen. k = Helligkeit 0..1 */
+  function drawBolt(seed, x0, y0, x1, y1, k, color = YELLOW, scale = 1) {
+    if (k <= 0.01) return
+    const pts = boltPath(seed, x0, y0, x1, y1, 120 * scale)
+    strokePath(pts, 16 * scale, color, 60 * scale, 0.35 * k)
+    strokePath(pts, 7 * scale, color, 30 * scale, k)
+    strokePath(pts, 3 * scale, '#ffffff', 10 * scale, k)
+    const r = mulberry(seed + 99)
+    for (let b = 0; b < 3; b++) {
+      const i = 6 + Math.floor(r() * (pts.length - 14))
+      const [sx, sy] = pts[i]
+      const bp = boltPath(seed + b * 7, sx, sy, sx + (r() - 0.5) * 420 * scale, sy + 220 * scale * (0.6 + r()), 50 * scale, 5)
+      strokePath(bp, 4 * scale, color, 20 * scale, 0.8 * k)
+      strokePath(bp, 1.6 * scale, '#ffffff', 6 * scale, 0.9 * k)
+    }
+  }
+  /** Zeitgesteuerter Einschlag: schnelles Flackern, dann Abklingen */
+  const strike = (t, ts, dur = 0.5) => {
+    const d = t - ts
+    if (d < 0 || d > dur) return 0
+    const flick = 0.55 + 0.45 * Math.abs(Math.sin(d * 55))
+    return Math.exp(-d * 5) * flick
+  }
+
+  function text(str, x, y, size, color, opts = {}) {
+    ctx.save()
+    ctx.font = `${opts.weight || 600} ${size}px ${opts.family || "'Barlow Condensed'"}`
+    ctx.letterSpacing = opts.ls || '0px'
+    ctx.textAlign = opts.align || 'left'
+    ctx.textBaseline = 'alphabetic'
+    ctx.globalAlpha *= opts.alpha ?? 1
+    if (opts.glow) { ctx.shadowColor = opts.glow; ctx.shadowBlur = opts.glowBlur || 40 }
+    ctx.fillStyle = color
+    ctx.fillText(str, x, y)
+    ctx.restore()
+  }
+
+  function rr(x, y, w, h, r) {
+    ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r)
+    ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath()
+  }
+
+  /** Energy-Dose (Foto „Thunder Energy", CC0, Wikimedia Commons). Das Bild setzt
+   *  scripts/render-promo.mjs als window.canImg (Data-URL, sonst wäre das Canvas „tainted"). */
+  function drawCan(cx, cy, h, rot) {
+    const w = h * (960 / 2548)
+    ctx.save()
+    ctx.translate(cx, cy); ctx.rotate(rot)
+    ctx.shadowColor = BLUE; ctx.shadowBlur = 90
+    ctx.drawImage(window.canImg, -w / 2, -h / 2, w, h)
+    ctx.shadowColor = MAGENTA; ctx.shadowBlur = 60
+    ctx.drawImage(window.canImg, -w / 2, -h / 2, w, h)
+    ctx.restore()
+  }
+
+  function background(t, flash) {
+    const g = ctx.createRadialGradient(W / 2, H * 0.55, 80, W / 2, H * 0.55, W * 0.75)
+    g.addColorStop(0, '#2a1a8a'); g.addColorStop(0.55, INDIGO); g.addColorStop(1, DEEP)
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H)
+    // Funken
+    const r = mulberry(7)
+    for (let i = 0; i < 110; i++) {
+      const x0 = r() * W, sp = 40 + r() * 140, sz = 1.5 + r() * 3.5, ph = r() * 10
+      const y = H + 40 - ((t * sp + ph * 200) % (H + 80))
+      const x = x0 + Math.sin(t * 1.3 + ph) * 30
+      ctx.globalAlpha = 0.25 + 0.5 * Math.abs(Math.sin(t * 2 + ph))
+      ctx.fillStyle = i % 5 === 0 ? MAGENTA : YELLOW
+      ctx.shadowColor = YELLOW; ctx.shadowBlur = 12
+      ctx.fillRect(x, y, sz, sz)
+    }
+    ctx.globalAlpha = 1; ctx.shadowBlur = 0
+    if (flash > 0) { ctx.fillStyle = `rgba(255,236,150,${flash * 0.28})`; ctx.fillRect(0, 0, W, H) }
+  }
+
+  // Szenen ----------------------------------------------------------------
+  function sceneA(t) {
+    const out = 1 - easeInOut(prog(t, 3.6, 4.3))
+    const words = [['FÜHL', 0.7, '#ffffff'], ['DEN', 1.15, '#ffffff'], ['STROM.', 1.6, YELLOW]]
+    let x = 150
+    const size = 300
+    ctx.save()
+    ctx.translate(0, (1 - out) * -120)
+    words.forEach(([wd, ts, col], i) => {
+      const k = easeBack(prog(t, ts, ts + 0.3))
+      const y = 560 + i * 0 + (i === 0 ? 0 : 0)
+      const yy = [430, 430, 430][i]
+      ctx.save()
+      const shake = strike(t, ts, 0.25) * 10
+      ctx.translate((Math.random() * 0 + Math.sin(t * 90) * shake), 0)
+      const px = [150, 150, 150][i]
+      const py = 420 + i * 262
+      ctx.globalAlpha = clamp(k) * out
+      ctx.translate(px, py)
+      ctx.scale(0.8 + 0.2 * k, 0.8 + 0.2 * k)
+      text(wd, 0, 0, size, col, { glow: col === YELLOW ? YELLOW : MAGENTA, glowBlur: col === YELLOW ? 70 : 30, ls: '4px' })
+      ctx.restore()
+    })
+    ctx.restore()
+    ctx.globalAlpha = 1
+    text('ENERGYHUNT · DIE SCHNÄPPCHENJAGD', 154, 86, 34, '#ffffffcc', { family: "'Hanken Grotesk'", weight: 700, ls: '6px', alpha: out * prog(t, 0.2, 0.7) })
+    for (const [ts, bx, seed] of [[0.7, 1250, 11], [1.15, 1530, 23], [1.6, 1370, 37]]) {
+      drawBolt(seed, bx, -20, bx + (seed % 3 - 1) * 90, 900, strike(t, ts) * out, YELLOW, 1)
+    }
+  }
+
+  function sceneB(t) {
+    const a = easeInOut(prog(t, 4.0, 4.7)) * (1 - easeInOut(prog(t, 8.6, 9.2)))
+    if (a <= 0) return
+    const rise = easeOut(prog(t, 4.0, 5.4))
+    const cx = 1380, cy = 1500 - rise * (1500 - 560)
+    ctx.save(); ctx.globalAlpha = a
+    // Energie-Ringe
+    for (let i = 0; i < 3; i++) {
+      const p = ((t * 0.5 + i / 3) % 1)
+      ctx.strokeStyle = `rgba(255,214,10,${(1 - p) * 0.5})`; ctx.lineWidth = 4 + (1 - p) * 8
+      ctx.beginPath(); ctx.arc(cx, 560, 200 + p * 520, 0, Math.PI * 2); ctx.stroke()
+    }
+    // orbitierende Blitze hinter der Dose
+    for (let i = 0; i < 4; i++) {
+      const ang = t * 1.6 + (i * Math.PI) / 2
+      const rx = Math.cos(ang) * 420, ry = Math.sin(ang) * 300
+      const flick = 0.5 + 0.5 * Math.abs(Math.sin(t * 9 + i * 2))
+      drawBolt(100 + i + Math.floor(t * 8), cx + rx, 560 + ry - 160, cx + rx * 0.5, 560 + ry * 0.5 + 120, flick * 0.9, i % 2 ? BLUE : YELLOW, 0.6)
+    }
+    drawCan(cx, cy, 800, -0.1 + Math.sin(t * 1.1) * 0.04 + (1 - rise) * 0.5)
+    ctx.restore()
+    // Text links
+    const lines = [['JEDE WOCHE', 4.6, '#ffffff'], ['ALLE PROSPEKTE.', 5.1, '#ffffff'], ['EIN PREIS PRO LITER.', 5.6, YELLOW]]
+    lines.forEach(([s, ts, col], i) => {
+      const k = easeOut(prog(t, ts, ts + 0.5))
+      text(s, 150 - (1 - k) * 160, 400 + i * 150, 132, col, { alpha: k * a, glow: col === YELLOW ? YELLOW : undefined, glowBlur: 40 })
+    })
+    text('Aldi · Lidl · Rewe · Penny · Netto · Kaufland', 154, 400 + 3 * 150 - 40, 34, '#ffffffcc', { family: "'Hanken Grotesk'", weight: 600, ls: '3px', alpha: prog(t, 6.2, 6.8) * a })
+    const s = strike(t, 4.0, 0.4) + strike(t, 8.0, 0.4)
+    drawBolt(55, 900, -20, 860, 1100, s, YELLOW, 1.1)
+  }
+
+  function sceneC(t) {
+    const a = easeInOut(prog(t, 8.8, 9.4)) * (1 - easeInOut(prog(t, 12.2, 12.8)))
+    if (a <= 0) return
+    ctx.save(); ctx.globalAlpha = a
+    const k = easeOut(prog(t, 9.0, 11.2))
+    const price = 6.99 - (6.99 - 3.33) * k
+    text('BESTER GRUNDPREIS', 150, 250, 54, '#ffffffcc', { family: "'Hanken Grotesk'", weight: 700, ls: '8px' })
+    text(de(price) + ' €', 150, 540, 340, k > 0.99 ? YELLOW : '#ffffff', { glow: k > 0.99 ? YELLOW : MAGENTA, glowBlur: 60 })
+    ctx.font = "600 340px 'Barlow Condensed'"; ctx.letterSpacing = '0px'
+    text('/L', 150 + ctx.measureText(de(price) + ' €').width + 24, 540, 120, '#ffffffcc')
+    const pop = easeBack(prog(t, 11.2, 11.6))
+    ctx.save(); ctx.translate(150, 640); ctx.scale(pop, pop)
+    ctx.fillStyle = YELLOW; rr(0, 0, 470, 100, 14); ctx.fill()
+    ctx.fillStyle = '#0b0526'
+    ctx.beginPath(); ctx.moveTo(60, 18); ctx.lineTo(34, 54); ctx.lineTo(54, 54); ctx.lineTo(42, 84); ctx.lineTo(80, 42); ctx.lineTo(58, 42); ctx.lineTo(72, 18); ctx.closePath(); ctx.fill()
+    text('BESTPREIS', 110, 72, 70, '#0b0526', { ls: '3px' })
+    ctx.restore()
+    // Karten
+    const cards = [['RED BULL · ALDI NORD', '3,33 €/L', 9.6, true], ['RED BULL · ALDI SÜD', '3,56 €/L', 9.9, false], ['RED BULL · REWE', '3,96 €/L', 10.2, false]]
+    cards.forEach(([n, p, ts, best], i) => {
+      const e = easeOut(prog(t, ts, ts + 0.6))
+      const x = 1260 + (1 - e) * 700, y = 230 + i * 220
+      ctx.save(); ctx.globalAlpha = e * a
+      ctx.shadowColor = best ? YELLOW : MAGENTA; ctx.shadowBlur = best ? 50 : 0
+      ctx.fillStyle = '#ffffff'; rr(x, y, 560, 180, 18); ctx.fill()
+      ctx.shadowBlur = 0
+      ctx.fillStyle = best ? YELLOW : MAGENTA; ctx.fillRect(x, y + 18, 14, 144)
+      text(n, x + 44, y + 70, 36, '#0b0526', { family: "'Hanken Grotesk'", weight: 700, ls: '2px' })
+      text(p, x + 44, y + 150, 90, best ? '#8a0a63' : '#0b0526')
+      ctx.restore()
+    })
+    ctx.restore()
+    drawBolt(77, 1100, -20, 1180, 520, strike(t, 11.2, 0.45) * a, YELLOW, 1)
+  }
+
+  function sceneD(t) {
+    const a = easeInOut(prog(t, 12.6, 13.2)) * (1 - easeInOut(prog(t, 14.55, 15)))
+    if (a <= 0) return
+    const k = easeBack(prog(t, 12.8, 13.4))
+    ctx.save(); ctx.globalAlpha = a
+    ctx.translate(W / 2, 520); ctx.scale(0.85 + 0.15 * k, 0.85 + 0.15 * k)
+    // Blitz-Emblem
+    ctx.fillStyle = YELLOW; ctx.shadowColor = YELLOW; ctx.shadowBlur = 80
+    ctx.beginPath(); ctx.moveTo(24, -330); ctx.lineTo(-76, -190); ctx.lineTo(-10, -190); ctx.lineTo(-44, -90); ctx.lineTo(76, -214); ctx.lineTo(10, -214); ctx.closePath(); ctx.fill()
+    ctx.shadowBlur = 0
+    text('ENERGY', -6, 190, 250, '#ffffff', { align: 'right', ls: '4px' })
+    text('HUNT', 6, 190, 250, MAGENTA, { align: 'left', ls: '4px', glow: MAGENTA, glowBlur: 50 })
+    ctx.restore()
+    text('Schnäppchenjagd auf Energy-Drinks.', W / 2, 800, 64, '#ffffff', { family: "'Hanken Grotesk'", weight: 700, align: 'center', alpha: prog(t, 13.4, 13.9) * a })
+    const s = strike(t, 12.7, 0.5) + strike(t, 13.9, 0.4) * 0.8
+    drawBolt(5, 300, -20, 420, 1100, s * a, YELLOW, 1)
+    drawBolt(9, 1620, -20, 1500, 1100, s * a, BLUE, 1)
+  }
+
+  window.drawFrame = function (t) {
+    const flash = Math.max(strike(t, 0.7), strike(t, 1.15), strike(t, 1.6), strike(t, 4.0), strike(t, 8.0), strike(t, 11.2), strike(t, 12.7))
+    background(t, flash)
+    sceneA(t); sceneB(t); sceneC(t); sceneD(t)
+    // Vignette + Schluss-Ausblenden für nahtlosen Loop
+    const v = ctx.createRadialGradient(W / 2, H / 2, H * 0.45, W / 2, H / 2, H * 1.0)
+    v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(5,2,20,0.65)')
+    ctx.fillStyle = v; ctx.fillRect(0, 0, W, H)
+    const fade = Math.max(1 - prog(t, 0, 0.4), prog(t, 14.6, 15))
+    if (fade > 0) { ctx.fillStyle = `rgba(11,5,38,${fade})`; ctx.fillRect(0, 0, W, H) }
+  }
+  window.ready = document.fonts.load("600 100px 'Barlow Condensed'").then(() => document.fonts.load("700 40px 'Hanken Grotesk'"))
+</script>

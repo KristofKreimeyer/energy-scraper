@@ -46,7 +46,7 @@ export function ReportPriceButton({ offer, embedded = false, onClose }: { offer:
 
   if (state.kind === "done") {
     return (
-      <p className="relative z-10 mt-2 flex items-start gap-1.5 text-[1rem] text-good" role="status">
+      <p className="relative z-10 mt-2 flex items-start gap-2 text-[1rem] text-good" role="status">
         <span aria-hidden="true">✅</span>
         {state.message}
       </p>
@@ -57,7 +57,7 @@ export function ReportPriceButton({ offer, embedded = false, onClose }: { offer:
     return (
       <button
         type="button"
-        className="relative z-10 mt-2 self-start inline-flex items-center gap-1.5 text-[1rem] font-semibold text-muted hover:text-accent-strong cursor-pointer"
+        className="relative z-10 mt-2 self-start inline-flex items-center gap-2 text-[1rem] font-semibold text-muted hover:text-accent-strong cursor-pointer"
         onClick={(e) => {
           e.stopPropagation();
           setState({ kind: "open" });
@@ -80,16 +80,16 @@ export function ReportPriceButton({ offer, embedded = false, onClose }: { offer:
         submit();
       }}
     >
-      <span className="flex items-center gap-1.5 text-[1rem] font-semibold text-ink">
+      <span className="flex items-center gap-2 text-[1rem] font-semibold text-ink">
         <Tag size={13} strokeWidth={2} aria-hidden />
         Günstiger gesehen bei {offer.market}?
       </span>
 
-      <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-2">
         <label htmlFor={`report-price-${offer.id}`} className="text-[1rem] font-semibold uppercase tracking-[0.04em] text-muted">
           Gesehener Preis (€)
         </label>
-        <div className="flex items-center gap-1 h-9 px-2.5 bg-surface border border-border-strong rounded-lg">
+        <div className="flex items-center gap-2 h-9 px-2 bg-surface border border-border-strong rounded-lg">
           <input
             id={`report-price-${offer.id}`}
             type="number"
@@ -113,7 +113,7 @@ export function ReportPriceButton({ offer, embedded = false, onClose }: { offer:
         onChange={(e) => setStore(e.target.value)}
         placeholder="Filiale / Ort (optional)"
         maxLength={80}
-        className="w-full min-w-0 h-9 px-2.5 text-[1rem] bg-surface text-ink border border-border-strong rounded-lg outline-none"
+        className="w-full min-w-0 h-9 px-2 text-[1rem] bg-surface text-ink border border-border-strong rounded-lg outline-none"
       />
       <input
         type="text"
@@ -121,7 +121,7 @@ export function ReportPriceButton({ offer, embedded = false, onClose }: { offer:
         onChange={(e) => setNote(e.target.value)}
         placeholder="Notiz, z. B. Aktion bis Samstag (optional)"
         maxLength={200}
-        className="w-full min-w-0 h-9 px-2.5 text-[1rem] bg-surface text-ink border border-border-strong rounded-lg outline-none"
+        className="w-full min-w-0 h-9 px-2 text-[1rem] bg-surface text-ink border border-border-strong rounded-lg outline-none"
       />
 
       {state.kind === "error" && (

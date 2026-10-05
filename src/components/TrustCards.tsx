@@ -13,24 +13,24 @@ export default function TrustCards() {
   if (!showConfirmed && !showFund) return null;
 
   return (
-    <section className={`${WRAP} mt-9`} aria-label="Von der Community">
+    <section className={`${WRAP} mt-8`} aria-label="Von der Community">
       <div className="grid gap-4 grid-cols-2 max-[35rem]:grid-cols-1">
         {showFund && fund && (
-          <div className="glass-card rounded-card p-5 shadow-card">
+          <div className="glass-card rounded-card p-6 shadow-card">
             <div className="text-[1rem] font-semibold uppercase tracking-[0.04em] text-muted">🏷 Community-Fund der Woche</div>
             <p className="mt-2 font-semibold text-ink leading-snug">
               {fund.note ? `„${fund.note}"` : `${formatEuro(fund.price)} bei ${fund.market}`}
             </p>
-            <p className="mt-1 text-[1rem] text-muted">
+            <p className="mt-2 text-[1rem] text-muted">
               {fund.brand} {fund.title} · {formatEuro(fund.price)} bei {fund.market}
               {fund.storeLocation ? ` · ${fund.storeLocation}` : ""} · geprüft&nbsp;✓
             </p>
           </div>
         )}
         {showConfirmed && (
-          <div className="glass-card rounded-card p-5 shadow-card">
+          <div className="glass-card rounded-card p-6 shadow-card">
             <div className="text-[1rem] font-semibold uppercase tracking-[0.04em] text-good">✅ Von der Community bestätigt</div>
-            <div className="mt-1 font-mono text-[1.9rem] font-bold text-good tabular-nums leading-tight">
+            <div className="mt-2 font-mono text-[1.9rem] font-bold text-good tabular-nums leading-tight">
               {confirmed.toLocaleString("de-DE")}×
             </div>
             <p className="text-[1rem] text-muted">

@@ -50,11 +50,11 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
     setSet(n);
   };
   const seg = (active: boolean) =>
-    `h-8 px-3 text-[1rem] font-semibold rounded-md cursor-pointer border ${
+    `h-8 px-4 text-[1rem] font-semibold rounded-md cursor-pointer border ${
       active ? "bg-fill text-on-fill border-fill" : "bg-surface text-muted border-border-strong hover:text-ink"
     }`;
   const chip = (active: boolean) =>
-    `h-8 px-3 text-[1rem] font-semibold rounded-full cursor-pointer border ${
+    `h-8 px-4 text-[1rem] font-semibold rounded-full cursor-pointer border ${
       active ? "bg-fill text-on-fill border-fill" : "bg-surface text-ink border-border-strong hover:border-accent"
     }`;
 
@@ -129,10 +129,10 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
 
   return (
     <Modal onClose={onClose} label="Preis-Alarm einrichten">
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-[1.75rem] text-ink leading-tight">Preis-Alarm einrichten</h2>
-          <p className="text-[1rem] text-muted mt-0.5">Wähle Marken – wir melden uns, sobald ein Deal auftaucht.</p>
+          <p className="text-[1rem] text-muted mt-0">Wähle Marken – wir melden uns, sobald ein Deal auftaucht.</p>
         </div>
         <button
           type="button"
@@ -145,9 +145,9 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
       </div>
 
       {/* Kanal */}
-      <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-2">
         <span className="text-[1rem] font-semibold uppercase tracking-[0.04em] text-muted">Wie benachrichtigen?</span>
-        <div className="flex gap-1.5" role="group" aria-label="Kanal">
+        <div className="flex gap-2" role="group" aria-label="Kanal">
           {(["email", "telegram", "push"] as const).map((ch) => (
             <button
               key={ch}
@@ -163,7 +163,7 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
       </div>
 
       {channel === "email" && (
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-2">
           <label htmlFor="creator-email" className="text-[1rem] font-semibold uppercase tracking-[0.04em] text-muted">
             Deine E-Mail-Adresse
           </label>
@@ -173,7 +173,7 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="du@example.com"
-            className="w-full h-9 px-2.5 text-[1rem] bg-surface text-ink border border-border-strong rounded-lg outline-none"
+            className="w-full h-9 px-2 text-[1rem] bg-surface text-ink border border-border-strong rounded-lg outline-none"
           />
         </div>
       )}
@@ -185,9 +185,9 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
       )}
 
       {/* Marken */}
-      <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-2">
         <span className="text-[1rem] font-semibold uppercase tracking-[0.04em] text-muted">Marken</span>
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-2">
           {BRANDS.map((b) => (
             <button
               key={b}
@@ -224,9 +224,9 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
       </div>
 
       {/* Stores */}
-      <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col gap-2">
         <span className="text-[1rem] font-semibold uppercase tracking-[0.04em] text-muted">Welche Stores?</span>
-        <div className="flex gap-1.5" role="group" aria-label="Store-Filter">
+        <div className="flex gap-2" role="group" aria-label="Store-Filter">
           {(
             [
               ["all", "Alle"],
@@ -246,7 +246,7 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
           ))}
         </div>
         {storeMode !== "all" && (
-          <div className="flex flex-wrap gap-1.5 mt-1">
+          <div className="flex flex-wrap gap-2 mt-2">
             {MARKETS.map((m) => (
               <button
                 key={m}
@@ -264,10 +264,10 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
 
       {/* Zielpreis je Marke (optional) */}
       {brands.size > 0 && (
-        <div className="flex flex-col gap-1.5">
+        <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between gap-2">
             <span className="text-[1rem] font-semibold uppercase tracking-[0.04em] text-muted">Nur wenn unter (optional, Pro)</span>
-            <div className="flex gap-1" role="group" aria-label="Zielgröße">
+            <div className="flex gap-2" role="group" aria-label="Zielgröße">
               <button
                 type="button"
                 className={seg(metric === "unit") + " !h-7 px-2"}
@@ -289,7 +289,7 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
           {[...brands].map((b) => (
             <div key={b} className="flex items-center gap-2">
               <span className="flex-none w-24 text-[1rem] text-ink truncate">{b}</span>
-              <div className="flex items-center gap-1 flex-1 h-8 px-2 bg-surface border border-border-strong rounded-md">
+              <div className="flex items-center gap-2 flex-1 h-8 px-2 bg-surface border border-border-strong rounded-md">
                 <input
                   type="number"
                   inputMode="decimal"

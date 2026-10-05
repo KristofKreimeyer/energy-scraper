@@ -57,7 +57,7 @@ export default function InstallPrompt() {
 
   return (
     <div className="border-b-4 border-border-strong bg-accent-tint">
-      <div className={`${WRAP} flex items-center gap-3 py-2`}>
+      <div className={`${WRAP} flex items-center gap-4 py-2`}>
         <span aria-hidden="true" className="text-[1.05rem]">
           ⚡
         </span>
@@ -67,7 +67,7 @@ export default function InstallPrompt() {
         <button
           type="button"
           onClick={install}
-          className="flex-none h-9 px-3.5 rounded-lg bg-fill text-on-fill text-[1rem] font-semibold cursor-pointer hover:opacity-90"
+          className="flex-none h-9 px-4 rounded-lg bg-fill text-on-fill text-[1rem] font-semibold cursor-pointer hover:opacity-90"
         >
           Installieren
         </button>

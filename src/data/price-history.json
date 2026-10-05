@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-28T11:25:08.688Z",
+  "updatedAt": "2026-10-05T12:00:36.886Z",
   "products": {
     "aldi nord|rockstar|energydrink original|0,5-l-dose": {
       "market": "Aldi Nord",
@@ -352,6 +352,12 @@
           "price": 0.89,
           "perUnit": 0.89,
           "perLiter": 1.78
+        },
+        {
+          "date": "2026-10-05",
+          "price": 0.75,
+          "perUnit": 0.75,
+          "perLiter": 1.5
         }
       ]
     },
@@ -410,6 +416,12 @@
           "price": 0.75,
           "perUnit": 0.75,
           "perLiter": 1.5
+        },
+        {
+          "date": "2026-10-05",
+          "price": 0.88,
+          "perUnit": 0.88,
+          "perLiter": 1.76
         }
       ]
     },
@@ -648,6 +660,12 @@
           "price": 0.85,
           "perUnit": 0.85,
           "perLiter": 3.4
+        },
+        {
+          "date": "2026-10-05",
+          "price": 0.85,
+          "perUnit": 0.85,
+          "perLiter": 3.4
         }
       ]
     },
@@ -794,6 +812,12 @@
           "price": 0.99,
           "perUnit": 0.99,
           "perLiter": 1.98
+        },
+        {
+          "date": "2026-10-05",
+          "price": 0.99,
+          "perUnit": 0.99,
+          "perLiter": 1.98
         }
       ]
     },
@@ -889,6 +913,12 @@
       "points": [
         {
           "date": "2026-09-14",
+          "price": 0.99,
+          "perUnit": 0.99,
+          "perLiter": 3.96
+        },
+        {
+          "date": "2026-10-05",
           "price": 0.99,
           "perUnit": 0.99,
           "perLiter": 3.96

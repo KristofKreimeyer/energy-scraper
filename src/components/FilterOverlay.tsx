@@ -6,7 +6,7 @@ import FilterChipGroup from "./FilterChipGroup";
 // Filter-Overlay-Inhalt (Sortieren / Markt / Zucker / Marke) im barrierefreien
 // Modal. Reine Präsentations-Komponente: aller State kommt per Props aus App.
 
-const EYEBROW = "font-mono text-[0.72rem] tracking-[0.14em] uppercase text-muted";
+const EYEBROW = "font-mono text-[1rem] tracking-[0.04em] uppercase text-muted";
 
 interface FilterOverlayProps {
   sort: SortKey;
@@ -52,7 +52,7 @@ export default function FilterOverlay({
   return (
     <Modal onClose={onClose} label="Anzeige anpassen">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-[1.15rem] font-bold text-ink">Anzeige anpassen</h2>
+        <h2 className="text-[1.75rem] text-ink">Anzeige anpassen</h2>
         <button
           type="button"
           onClick={onClose}
@@ -64,12 +64,12 @@ export default function FilterOverlay({
       </div>
 
       <div className="flex flex-col gap-2">
-        <span id="sort-label" className={`${EYEBROW} !text-[0.68rem] !tracking-[0.1em]`}>
+        <span id="sort-label" className={`${EYEBROW} !text-[1rem] !tracking-[0.04em]`}>
           Sortieren
         </span>
         <select
           id="sort"
-          className="select-chevron w-full h-11 pl-3 pr-[34px] text-[0.9rem] text-ink bg-surface border border-border-strong rounded-[10px] cursor-pointer"
+          className="select-chevron w-full h-11 pl-3 pr-[2.125rem] text-[1rem] text-ink bg-surface border border-border-strong rounded-[0.625rem] cursor-pointer"
           aria-labelledby="sort-label"
           value={sort}
           onChange={(e) => onSortChange(e.target.value as SortKey)}
@@ -106,9 +106,7 @@ export default function FilterOverlay({
           { value: "sugar", text: "Mit Zucker", count: sugarTally.get("sugar") ?? 0 },
         ]}
         footer={
-          <p className="text-[0.72rem] text-muted">
-            Sortenbündel („versch. Sorten“) enthalten beide Varianten und zählen zu beiden Optionen.
-          </p>
+          <p className="text-[1rem] text-muted">Sortenbündel („versch. Sorten“) enthalten beide Varianten und zählen zu beiden Optionen.</p>
         }
       />
 
@@ -129,7 +127,7 @@ export default function FilterOverlay({
       <div className="flex items-center justify-between gap-2 pt-1">
         <button
           type="button"
-          className="text-[0.8rem] text-accent-strong hover:text-accent underline underline-offset-2 cursor-pointer disabled:opacity-40 disabled:no-underline"
+          className="text-[1rem] text-accent-strong hover:text-accent underline underline-offset-2 cursor-pointer disabled:opacity-40 disabled:no-underline"
           disabled={!filtersActive}
           onClick={onReset}
         >
@@ -138,7 +136,7 @@ export default function FilterOverlay({
         <button
           type="button"
           onClick={onClose}
-          className="h-10 px-5 text-[0.85rem] font-semibold text-on-fill bg-fill border border-fill rounded-[12px] cursor-pointer hover:opacity-90"
+          className="h-10 px-5 text-[1rem] font-semibold text-on-fill bg-fill border border-fill rounded-[0.75rem] cursor-pointer hover:opacity-90"
         >
           {visibleCount} {visibleCount === 1 ? "Angebot" : "Angebote"} zeigen
         </button>

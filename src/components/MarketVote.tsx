@@ -48,14 +48,14 @@ export default function MarketVote() {
     <section className={`${WRAP} mt-9`} aria-labelledby="market-vote-title">
       <div className="glass-card rounded-card p-5 shadow-card">
         <div className="flex items-baseline justify-between gap-3 flex-wrap">
-          <h2 id="market-vote-title" className="text-[0.7rem] font-semibold uppercase tracking-[0.1em] text-accent-strong">
+          <h2 id="market-vote-title" className="text-[1.5rem] leading-none text-accent-strong">
             🗳 Welcher Markt als Nächstes?
           </h2>
-          <span className="text-[0.75rem] text-muted">
+          <span className="text-[1rem] text-muted">
             {total} {total === 1 ? "Stimme" : "Stimmen"}
           </span>
         </div>
-        <p className="mt-1 text-[0.85rem] text-muted">
+        <p className="mt-1 text-[1rem] text-muted">
           Stimm ab, welchen Supermarkt wir als Nächstes aufnehmen – die meistgewählten kommen zuerst dran.
         </p>
 
@@ -80,7 +80,7 @@ export default function MarketVote() {
                     style={{ width: `${pct}%` }}
                   />
                   <span className="relative flex items-center justify-between h-full px-3 gap-2">
-                    <span className="font-semibold text-ink text-[0.9rem] inline-flex items-center gap-1.5">
+                    <span className="font-semibold text-ink text-[1rem] inline-flex items-center gap-1.5">
                       {active && (
                         <span aria-hidden="true" className="text-accent-strong">
                           ✓
@@ -88,7 +88,7 @@ export default function MarketVote() {
                       )}
                       {market}
                     </span>
-                    <span className="font-mono text-[0.8rem] tabular-nums text-muted">
+                    <span className="font-mono text-[1rem] tabular-nums text-muted">
                       {count} · {pct}%
                     </span>
                   </span>
@@ -98,7 +98,7 @@ export default function MarketVote() {
           })}
         </ul>
 
-        <p className="mt-3 text-[0.8rem] text-muted" role="status">
+        <p className="mt-3 text-[1rem] text-muted" role="status">
           {mine
             ? `Danke! Du hast für ${mine} gestimmt – tippe eine andere Option, um zu wechseln.`
             : "Deine Stimme zählt anonym, eine pro Gerät."}

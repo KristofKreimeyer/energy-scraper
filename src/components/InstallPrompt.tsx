@@ -61,13 +61,13 @@ export default function InstallPrompt() {
         <span aria-hidden="true" className="text-[1.05rem]">
           ⚡
         </span>
-        <p className="flex-1 text-[0.84rem] text-ink font-medium leading-snug">
+        <p className="flex-1 text-[1rem] text-ink font-medium leading-snug">
           EnergyHunt als App installieren – die Wochendeals mit einem Tipp vom Homescreen.
         </p>
         <button
           type="button"
           onClick={install}
-          className="flex-none h-9 px-3.5 rounded-lg bg-fill text-on-fill text-[0.82rem] font-semibold cursor-pointer hover:opacity-90"
+          className="flex-none h-9 px-3.5 rounded-lg bg-fill text-on-fill text-[1rem] font-semibold cursor-pointer hover:opacity-90"
         >
           Installieren
         </button>

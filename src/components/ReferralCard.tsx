@@ -40,18 +40,18 @@ export default function ReferralCard() {
         <span aria-hidden="true" className="text-[1.4rem]">
           🎁
         </span>
-        <div className="flex-1 min-w-[200px]">
-          <h2 id="referral-title" className="font-bold text-ink leading-snug">
+        <div className="flex-1 min-w-[12.5rem]">
+          <h2 id="referral-title" className="text-[1.6rem] text-ink leading-none">
             Freunde einladen, Pro gratis
           </h2>
-          <p className="text-[0.85rem] text-muted">
+          <p className="text-[1rem] text-muted">
             Lade Freunde ein – sobald sie ihren ersten Alarm bestätigen, bekommt ihr <b className="text-ink">beide 1 Monat Pro</b>.
           </p>
         </div>
         <button
           type="button"
           onClick={() => document.getElementById("account-trigger")?.click()}
-          className="flex-none h-10 px-4 rounded-lg bg-fill text-on-fill text-[0.85rem] font-semibold cursor-pointer hover:opacity-90"
+          className="flex-none h-10 px-4 rounded-lg bg-fill text-on-fill text-[1rem] font-semibold cursor-pointer hover:opacity-90"
         >
           Anmelden &amp; einladen
         </button>
@@ -79,16 +79,16 @@ export default function ReferralCard() {
         <span aria-hidden="true" className="text-[1.4rem]">
           🎁
         </span>
-        <div className="flex-1 min-w-[200px]">
-          <h2 id="referral-title" className="font-bold text-ink leading-snug">
+        <div className="flex-1 min-w-[12.5rem]">
+          <h2 id="referral-title" className="text-[1.6rem] text-ink leading-none">
             Freunde einladen, Pro gratis
           </h2>
-          <p className="text-[0.85rem] text-muted">
+          <p className="text-[1rem] text-muted">
             Ihr bekommt <b className="text-ink">beide 1 Monat Pro</b>, sobald ein eingeladener Freund seinen ersten Alarm bestätigt.
           </p>
         </div>
         {info && (
-          <span className="flex-none text-[0.8rem] font-semibold text-accent-strong">
+          <span className="flex-none text-[1rem] font-semibold text-accent-strong">
             {info.rewarded} geworben
             {info.pending > 0 ? ` · ${info.pending} offen` : ""}
           </span>
@@ -102,13 +102,13 @@ export default function ReferralCard() {
           value={url}
           onFocus={(e) => e.currentTarget.select()}
           aria-label="Dein Einladungslink"
-          className="flex-1 min-w-[200px] h-10 px-3 text-[0.82rem] font-mono bg-surface text-ink border border-border-strong rounded-lg outline-none"
+          className="flex-1 min-w-[12.5rem] h-10 px-3 text-[1rem] font-mono bg-surface text-ink border border-border-strong rounded-lg outline-none"
         />
         <button
           type="button"
           onClick={copy}
           disabled={!url}
-          className="flex-none h-10 px-4 rounded-lg bg-surface text-ink border border-border-strong text-[0.82rem] font-semibold cursor-pointer hover:bg-surface-2 disabled:opacity-60"
+          className="flex-none h-10 px-4 rounded-lg bg-surface text-ink border border-border-strong text-[1rem] font-semibold cursor-pointer hover:bg-surface-2 disabled:opacity-60"
         >
           {copied ? "Kopiert ✓" : "Link kopieren"}
         </button>
@@ -117,7 +117,7 @@ export default function ReferralCard() {
             text={shareText}
             url={url}
             ariaLabel="Einladungslink teilen"
-            className="flex-none h-10 px-4 inline-flex items-center gap-1.5 rounded-lg bg-fill text-on-fill text-[0.82rem] font-semibold cursor-pointer hover:opacity-90"
+            className="flex-none h-10 px-4 inline-flex items-center gap-1.5 rounded-lg bg-fill text-on-fill text-[1rem] font-semibold cursor-pointer hover:opacity-90"
           >
             <Share2 size={14} strokeWidth={2.2} aria-hidden />
             Teilen

@@ -43,10 +43,10 @@ export default function ControlsBar({
   onViewChange,
 }: ControlsBarProps) {
   return (
-    <div className="md:sticky md:top-[62px] z-[15] bg-[color-mix(in_srgb,var(--ground)_92%,transparent)] backdrop-blur-[6px] py-4 mt-[30px] border-b-4 border-border-strong">
+    <div className="md:sticky md:top-[3.875rem] z-[15] bg-[color-mix(in_srgb,var(--ground)_92%,transparent)] backdrop-blur-[0.375rem] py-4 mt-[1.875rem] border-b-4 border-border-strong">
       <div className={`${WRAP} flex flex-wrap items-center gap-3`}>
         <div
-          className="inline-flex flex-none gap-1 p-1 bg-surface-2 border border-border rounded-[14px]"
+          className="inline-flex flex-none gap-1 p-1 bg-surface-2 border border-border rounded-[0.875rem]"
           role="group"
           aria-label="Zeitraum wählen"
         >
@@ -54,12 +54,12 @@ export default function ControlsBar({
             <button
               key={t.value}
               type="button"
-              className="group inline-flex items-center gap-2 min-h-10 px-4 bg-transparent text-muted border-0 rounded-[11px] text-[0.9rem] font-[650] cursor-pointer transition-colors duration-150 hover:text-ink aria-pressed:bg-fill aria-pressed:text-on-fill"
+              className="group inline-flex items-center gap-2 min-h-10 px-4 bg-transparent text-muted border-0 rounded-[0.6875rem] text-[1rem] font-[650] cursor-pointer transition-colors duration-150 hover:text-ink aria-pressed:bg-fill aria-pressed:text-on-fill"
               aria-pressed={timeframe === t.value}
               onClick={() => onTimeframeChange(t.value)}
             >
               {t.label}
-              <span className="font-mono text-[0.74rem] tabular-nums text-muted bg-ground rounded-full px-[7px] py-px group-aria-pressed:text-on-fill group-aria-pressed:bg-[color-mix(in_srgb,var(--on-fill)_16%,transparent)]">
+              <span className="font-mono text-[1rem] tabular-nums text-muted bg-ground rounded-full px-[0.4375rem] py-px group-aria-pressed:text-on-fill group-aria-pressed:bg-[color-mix(in_srgb,var(--on-fill)_16%,transparent)]">
                 {timeframeCounts[t.value]}
               </span>
             </button>
@@ -74,13 +74,13 @@ export default function ControlsBar({
         {favoriteCount > 0 && (
           <button
             type="button"
-            className="group inline-flex flex-none items-center gap-1.5 min-h-10 px-3.5 rounded-[14px] border text-[0.85rem] font-semibold cursor-pointer transition-colors duration-150 aria-pressed:bg-fill aria-pressed:text-on-fill aria-pressed:border-fill bg-surface text-ink border-border-strong hover:bg-surface-2"
+            className="group inline-flex flex-none items-center gap-1.5 min-h-10 px-3.5 rounded-[0.875rem] border text-[1rem] font-semibold cursor-pointer transition-colors duration-150 aria-pressed:bg-fill aria-pressed:text-on-fill aria-pressed:border-fill bg-surface text-ink border-border-strong hover:bg-surface-2"
             aria-pressed={favoritesOnly}
             onClick={() => onFavoritesOnlyChange(!favoritesOnly)}
           >
             <span aria-hidden="true">{favoritesOnly ? "♥" : "♡"}</span>
             Meine Marken
-            <span className="font-mono text-[0.74rem] tabular-nums text-muted bg-ground rounded-full px-[7px] py-px group-aria-pressed:text-on-fill group-aria-pressed:bg-[color-mix(in_srgb,var(--on-fill)_16%,transparent)]">
+            <span className="font-mono text-[1rem] tabular-nums text-muted bg-ground rounded-full px-[0.4375rem] py-px group-aria-pressed:text-on-fill group-aria-pressed:bg-[color-mix(in_srgb,var(--on-fill)_16%,transparent)]">
               {favoriteCount}
             </span>
           </button>
@@ -88,7 +88,7 @@ export default function ControlsBar({
 
         {/* Mobil + Tablet: volle Breite -> FilterBar bricht in eine eigene
             Reihe um (gestapeltes Layout). Erst ab lg teilt sie sich die Reihe. */}
-        <div className="w-full lg:w-auto lg:flex-1 min-w-[260px]">
+        <div className="w-full lg:w-auto lg:flex-1 min-w-[16.25rem]">
           <FilterBar
             market={market}
             brand={brand}

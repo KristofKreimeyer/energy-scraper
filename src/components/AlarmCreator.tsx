@@ -50,11 +50,11 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
     setSet(n);
   };
   const seg = (active: boolean) =>
-    `h-8 px-3 text-[0.78rem] font-semibold rounded-md cursor-pointer border ${
+    `h-8 px-3 text-[1rem] font-semibold rounded-md cursor-pointer border ${
       active ? "bg-fill text-on-fill border-fill" : "bg-surface text-muted border-border-strong hover:text-ink"
     }`;
   const chip = (active: boolean) =>
-    `h-8 px-3 text-[0.78rem] font-semibold rounded-full cursor-pointer border ${
+    `h-8 px-3 text-[1rem] font-semibold rounded-full cursor-pointer border ${
       active ? "bg-fill text-on-fill border-fill" : "bg-surface text-ink border-border-strong hover:border-accent"
     }`;
 
@@ -131,8 +131,8 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
     <Modal onClose={onClose} label="Preis-Alarm einrichten">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-[1.15rem] font-bold text-ink leading-tight">Preis-Alarm einrichten</h2>
-          <p className="text-[0.8rem] text-muted mt-0.5">Wähle Marken – wir melden uns, sobald ein Deal auftaucht.</p>
+          <h2 className="text-[1.75rem] text-ink leading-tight">Preis-Alarm einrichten</h2>
+          <p className="text-[1rem] text-muted mt-0.5">Wähle Marken – wir melden uns, sobald ein Deal auftaucht.</p>
         </div>
         <button
           type="button"
@@ -146,7 +146,7 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
 
       {/* Kanal */}
       <div className="flex flex-col gap-1.5">
-        <span className="text-[0.66rem] font-semibold uppercase tracking-[0.08em] text-muted">Wie benachrichtigen?</span>
+        <span className="text-[1rem] font-semibold uppercase tracking-[0.04em] text-muted">Wie benachrichtigen?</span>
         <div className="flex gap-1.5" role="group" aria-label="Kanal">
           {(["email", "telegram", "push"] as const).map((ch) => (
             <button
@@ -164,7 +164,7 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
 
       {channel === "email" && (
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="creator-email" className="text-[0.66rem] font-semibold uppercase tracking-[0.08em] text-muted">
+          <label htmlFor="creator-email" className="text-[1rem] font-semibold uppercase tracking-[0.04em] text-muted">
             Deine E-Mail-Adresse
           </label>
           <input
@@ -173,12 +173,12 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="du@example.com"
-            className="w-full h-9 px-2.5 text-[0.85rem] bg-surface text-ink border border-border-strong rounded-lg outline-none"
+            className="w-full h-9 px-2.5 text-[1rem] bg-surface text-ink border border-border-strong rounded-lg outline-none"
           />
         </div>
       )}
       {channel === "push" && (
-        <p className="text-[0.74rem] text-muted">
+        <p className="text-[1rem] text-muted">
           Nach dem Speichern fragt dein Browser nach der Erlaubnis. Die Zustellung kann sich je nach Akku-Einstellungen deines Geräts
           verzögern – zuverlässiger sind E-Mail oder Telegram.
         </p>
@@ -186,7 +186,7 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
 
       {/* Marken */}
       <div className="flex flex-col gap-1.5">
-        <span className="text-[0.66rem] font-semibold uppercase tracking-[0.08em] text-muted">Marken</span>
+        <span className="text-[1rem] font-semibold uppercase tracking-[0.04em] text-muted">Marken</span>
         <div className="flex flex-wrap gap-1.5">
           {BRANDS.map((b) => (
             <button
@@ -206,14 +206,14 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
         {favBrands.some((b) => !brands.has(b)) && (
           <button
             type="button"
-            className="self-start text-[0.72rem] font-semibold text-accent-strong hover:text-accent underline underline-offset-2 cursor-pointer"
+            className="self-start text-[1rem] font-semibold text-accent-strong hover:text-accent underline underline-offset-2 cursor-pointer"
             onClick={() => setBrands((prev) => new Set([...prev, ...favBrands]))}
           >
             ♥ Meine Marken übernehmen ({favBrands.length})
           </button>
         )}
         {lockedBrand && (
-          <p className="text-[0.72rem] text-muted">
+          <p className="text-[1rem] text-muted">
             Kostenlos ist <span className="font-semibold text-ink">eine</span> Marke drin – du beobachtest bereits{" "}
             <span className="font-semibold text-ink">{lockedBrand}</span>. Weitere Kanäle dafür sind frei; für weitere Marken gibt es Pro.{" "}
             <button type="button" className="underline underline-offset-2 hover:text-accent-strong cursor-pointer" onClick={clearAlarmMemo}>
@@ -225,7 +225,7 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
 
       {/* Stores */}
       <div className="flex flex-col gap-1.5">
-        <span className="text-[0.66rem] font-semibold uppercase tracking-[0.08em] text-muted">Welche Stores?</span>
+        <span className="text-[1rem] font-semibold uppercase tracking-[0.04em] text-muted">Welche Stores?</span>
         <div className="flex gap-1.5" role="group" aria-label="Store-Filter">
           {(
             [
@@ -266,7 +266,7 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
       {brands.size > 0 && (
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-[0.66rem] font-semibold uppercase tracking-[0.08em] text-muted">Nur wenn unter (optional, Pro)</span>
+            <span className="text-[1rem] font-semibold uppercase tracking-[0.04em] text-muted">Nur wenn unter (optional, Pro)</span>
             <div className="flex gap-1" role="group" aria-label="Zielgröße">
               <button
                 type="button"
@@ -288,7 +288,7 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
           </div>
           {[...brands].map((b) => (
             <div key={b} className="flex items-center gap-2">
-              <span className="flex-none w-24 text-[0.8rem] text-ink truncate">{b}</span>
+              <span className="flex-none w-24 text-[1rem] text-ink truncate">{b}</span>
               <div className="flex items-center gap-1 flex-1 h-8 px-2 bg-surface border border-border-strong rounded-md">
                 <input
                   type="number"
@@ -298,9 +298,9 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
                   value={targets[b] ?? ""}
                   onChange={(e) => setTargets((t) => ({ ...t, [b]: e.target.value }))}
                   placeholder="z. B. 0,89"
-                  className="w-full min-w-0 bg-transparent text-ink text-[0.82rem] outline-none"
+                  className="w-full min-w-0 bg-transparent text-ink text-[1rem] outline-none"
                 />
-                <span className="flex-none text-[0.7rem] text-muted whitespace-nowrap">{unitLabel}</span>
+                <span className="flex-none text-[1rem] text-muted whitespace-nowrap">{unitLabel}</span>
               </div>
             </div>
           ))}
@@ -308,7 +308,7 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
       )}
 
       {msg && (
-        <p className={`text-[0.78rem] ${msg.ok ? "text-good" : "text-warn-ink"}`} role="status">
+        <p className={`text-[1rem] ${msg.ok ? "text-good" : "text-warn-ink"}`} role="status">
           {msg.text}
         </p>
       )}
@@ -321,17 +321,17 @@ export function AlarmCreator({ onClose }: { onClose: () => void }) {
         type="button"
         onClick={save}
         disabled={submitting}
-        className="w-full h-11 text-[0.9rem] font-semibold text-on-fill bg-fill border border-fill rounded-lg cursor-pointer hover:opacity-90 disabled:opacity-60"
+        className="w-full h-11 text-[1rem] font-semibold text-on-fill bg-fill border border-fill rounded-lg cursor-pointer hover:opacity-90 disabled:opacity-60"
       >
         {submitting ? "…" : "Preis-Alarm speichern"}
       </button>
 
       <div className="flex items-center justify-between gap-2">
-        <span className="text-[0.68rem] text-muted">Kostenlos: 1 Marke · Pro: beliebig viele + Wunschpreis.</span>
+        <span className="text-[1rem] text-muted">Kostenlos: 1 Marke · Pro: beliebig viele + Wunschpreis.</span>
         {!showPro && (
           <button
             type="button"
-            className="flex-none text-[0.68rem] font-semibold text-accent-strong hover:text-accent cursor-pointer"
+            className="flex-none text-[1rem] font-semibold text-accent-strong hover:text-accent cursor-pointer"
             onClick={() => setShowPro(true)}
           >
             Pro werden

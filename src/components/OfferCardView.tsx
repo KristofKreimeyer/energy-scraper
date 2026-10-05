@@ -24,7 +24,7 @@ export function OfferCardView({ offer, isBest, rowHasVariant = false, reports, v
   return (
     <li className="flex">
       <article
-        className={`offer-card glass-card group relative flex flex-col h-full w-full rounded-card overflow-hidden shadow-card p-[18px] transition-[transform,border-color] duration-150 hover:-translate-y-[3px] hover:border-border-strong focus-within:border-focus ${
+        className={`offer-card glass-card group relative flex flex-col h-full w-full rounded-card overflow-hidden shadow-card p-[1.125rem] transition-[transform,border-color] duration-150 hover:-translate-y-[3px] hover:border-border-strong focus-within:border-focus ${
           isBest ? "border-[color-mix(in_srgb,var(--good)_45%,var(--border))]" : ""
         }`}
         aria-label={alt}
@@ -35,10 +35,10 @@ export function OfferCardView({ offer, isBest, rowHasVariant = false, reports, v
             <BestTag isBest={isBest} />
             <FavButton offer={offer} />
           </div>
-          <h3 className="text-base leading-[1.25] tracking-[-0.01em]">{offer.title}</h3>
+          <h3 className="text-[1.25rem] leading-[1.25] tracking-[-0.01em]">{offer.title}</h3>
           {extraVariants > 0 && (
             <span
-              className="self-start mt-[5px] text-[0.76rem] text-muted cursor-default"
+              className="self-start mt-[0.3125rem] text-[1rem] text-muted cursor-default"
               title={offer.variantTitles.join(", ")}
               aria-label={`${offer.variantCount} Sorten zum gleichen Preis: ${offer.variantTitles.join(", ")}`}
             >
@@ -49,7 +49,7 @@ export function OfferCardView({ offer, isBest, rowHasVariant = false, reports, v
             // Platzhalter reserviert die Höhe der „X Sorten"-Zeile, wenn
             // irgendein Angebot der Liste eine hat – so fluchten die Preisblöcke
             // reihenweise (2- und 3-Spalter). Erst ab md, mobil (1 Spalte) unnötig.
-            <span className="hidden md:block self-start mt-[5px] text-[0.76rem]" aria-hidden="true">
+            <span className="hidden md:block self-start mt-[0.3125rem] text-[1rem]" aria-hidden="true">
               {" "}
             </span>
           )}
@@ -61,7 +61,7 @@ export function OfferCardView({ offer, isBest, rowHasVariant = false, reports, v
               <span className="font-mono text-[1.1rem] font-semibold tracking-[-0.02em] tabular-nums text-muted whitespace-nowrap">
                 {formatEuro(offer.perUnit)}
               </span>
-              <span className="font-mono text-[0.66rem] tracking-[0.06em] uppercase text-muted whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
+              <span className="font-mono text-[1rem] tracking-[0.04em] uppercase text-muted whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
                 {isMulti ? "je Dose" : offer.unitLabel}
               </span>
             </span>
@@ -69,36 +69,36 @@ export function OfferCardView({ offer, isBest, rowHasVariant = false, reports, v
               {offer.perLiter != null ? (
                 <>
                   <span
-                    className={`font-mono text-[1.7rem] font-bold tracking-[-0.02em] tabular-nums whitespace-nowrap ${
+                    className={`font-display text-[2.75rem] leading-none tabular-nums whitespace-nowrap ${
                       isBest ? "text-good" : "text-accent-strong"
                     }`}
                   >
                     {formatEuro(offer.perLiter)}
                     <span className="text-[1rem] text-muted font-bold">/L</span>
                   </span>
-                  <span className="font-mono text-[0.66rem] tracking-[0.06em] uppercase text-muted whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
-                    Grundpreis · Vergleichswert
+                  <span className="font-mono text-[1rem] tracking-[0.04em] uppercase text-muted whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
+                    Grundpreis
                   </span>
                 </>
               ) : (
                 <>
-                  <span className="font-mono text-[1.7rem] font-bold tabular-nums text-ink" aria-label="unbekannt">
+                  <span className="font-display text-[2.75rem] leading-none text-ink" aria-label="unbekannt">
                     —
                   </span>
-                  <span className="font-mono text-[0.66rem] tracking-[0.06em] uppercase text-muted">Grundpreis</span>
+                  <span className="font-mono text-[1rem] tracking-[0.04em] uppercase text-muted">Grundpreis</span>
                 </>
               )}
             </span>
           </div>
           {isMulti && (
-            <p className="mt-2 font-mono text-[0.74rem] tabular-nums text-muted">
+            <p className="mt-2 font-mono text-[1rem] tabular-nums text-muted">
               {offer.unitLabel} · {formatEuro(offer.price)} gesamt
             </p>
           )}
 
           {offer.requiresApp && offer.appPrice != null && (
-            <p className="flex items-center gap-2 mt-2.5 text-[0.8rem]">
-              <span className="flex-none font-semibold text-accent-strong bg-[color-mix(in_srgb,var(--accent)_12%,transparent)] border border-[color-mix(in_srgb,var(--accent)_30%,transparent)] rounded-[7px] px-2 py-[3px]">
+            <p className="flex items-center gap-2 mt-2.5 text-[1rem]">
+              <span className="flex-none font-semibold text-accent-strong bg-[color-mix(in_srgb,var(--accent)_12%,transparent)] border border-[color-mix(in_srgb,var(--accent)_30%,transparent)] rounded-[0.4375rem] px-2 py-[3px]">
                 <span aria-hidden="true">📱</span> mit App
               </span>
               <span className="text-muted font-mono tabular-nums">
@@ -115,8 +115,8 @@ export function OfferCardView({ offer, isBest, rowHasVariant = false, reports, v
           )}
 
           {saved && (
-            <p className="flex items-center gap-2 mt-2.5 text-[0.8rem]">
-              <span className="flex-none font-mono font-bold tabular-nums text-good bg-good-tint border border-[color-mix(in_srgb,var(--good)_30%,transparent)] rounded-[7px] px-2 py-[3px]">
+            <p className="flex items-center gap-2 mt-2.5 text-[1rem]">
+              <span className="flex-none font-mono font-bold tabular-nums text-good bg-good-tint border border-[color-mix(in_srgb,var(--good)_30%,transparent)] rounded-[0.4375rem] px-2 py-[3px]">
                 <span aria-hidden="true">−{saved.percent}&nbsp;%</span>
                 <span className="visually-hidden">{saved.percent} Prozent gespart</span>
               </span>
@@ -150,7 +150,7 @@ export function OfferCardView({ offer, isBest, rowHasVariant = false, reports, v
           {offer.url && (
             <a
               data-cta=""
-              className="mt-3 pt-3 border-t border-border text-accent-strong text-[0.84rem] font-[650] no-underline inline-flex items-center gap-1.5 after:content-[''] after:absolute after:inset-0 after:rounded-card group-hover:text-accent focus-visible:outline-none"
+              className="mt-3 pt-3 border-t border-border text-accent-strong text-[1rem] font-[650] no-underline inline-flex items-center gap-1.5 after:content-[''] after:absolute after:inset-0 after:rounded-card group-hover:text-accent focus-visible:outline-none"
               href={offer.url}
               target="_blank"
               rel="noopener noreferrer"

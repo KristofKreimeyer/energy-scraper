@@ -58,7 +58,7 @@ export function CardActions({ offer, votes }: { offer: GroupedOffer; votes?: Vot
   // per Hover bekommen sie die Akzentfarbe. Bewusst leichter als der CTA –
   // das senkt das Gewicht (Dichte), ohne die Entdeckbarkeit zu opfern.
   const chip = (active: boolean) =>
-    `inline-flex items-center gap-1 h-7 px-1.5 rounded-md text-[0.74rem] font-medium cursor-pointer transition-colors duration-150 ${
+    `inline-flex items-center gap-1 h-7 px-1.5 rounded-md text-[1rem] font-medium cursor-pointer transition-colors duration-150 ${
       active ? "text-accent-strong" : "text-muted hover:text-ink"
     }`;
 

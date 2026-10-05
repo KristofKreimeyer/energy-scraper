@@ -17,7 +17,7 @@ export default function FilterBar({ market, brand, query, onQueryChange, onOpenF
   const activeFilterCount = (market !== "all" ? 1 : 0) + (brand !== "all" ? 1 : 0);
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <div className="flex items-center gap-2 flex-1 basis-[220px] min-w-[180px] bg-surface border border-border-strong rounded-[14px] px-3 h-11">
+      <div className="flex items-center gap-2 flex-1 basis-[13.75rem] min-w-[11.25rem] bg-surface border border-border-strong rounded-[0.875rem] px-3 h-11">
         <Search size={18} strokeWidth={2.2} aria-hidden className="flex-none text-muted" />
         <input
           id="q"
@@ -43,12 +43,12 @@ export default function FilterBar({ market, brand, query, onQueryChange, onOpenF
         type="button"
         onClick={onOpenFilters}
         aria-haspopup="dialog"
-        className="flex-none h-11 px-3.5 inline-flex items-center gap-1.5 text-[0.85rem] font-semibold rounded-[14px] border bg-surface text-ink border-border-strong hover:bg-surface-2"
+        className="flex-none h-11 px-3.5 inline-flex items-center gap-1.5 text-[1rem] font-semibold rounded-[0.875rem] border bg-surface text-ink border-border-strong hover:bg-surface-2"
       >
         <Filter size={17} strokeWidth={2.2} aria-hidden />
         Filtern & Sortieren
         {activeFilterCount > 0 && (
-          <span className="ml-0.5 text-[0.7rem] font-mono font-bold text-on-fill bg-fill rounded-full min-w-[18px] text-center px-1">
+          <span className="ml-0.5 text-[1rem] font-mono font-bold text-on-fill bg-fill rounded-full min-w-[1.125rem] text-center px-1">
             {activeFilterCount}
           </span>
         )}

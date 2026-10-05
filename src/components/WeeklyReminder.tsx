@@ -42,13 +42,13 @@ export default function WeeklyReminder() {
         <span aria-hidden="true" className="text-[1.4rem]">
           🔔
         </span>
-        <div className="flex-1 min-w-[200px]">
+        <div className="flex-1 min-w-[12.5rem]">
           <h2 id="weekly-title" className="text-[1.6rem] text-ink leading-none">
             Neue Woche, neue Deals?
           </h2>
-          <p className="text-[0.85rem] text-muted">Eine Push pro Woche, sobald die frischen Angebote live sind – ohne Marke, ohne Konto.</p>
+          <p className="text-[1rem] text-muted">Eine Push pro Woche, sobald die frischen Angebote live sind – ohne Marke, ohne Konto.</p>
           {msg && (
-            <p className={`mt-1 text-[0.8rem] ${msg.ok ? "text-good" : "text-warn-ink"}`} role="status">
+            <p className={`mt-1 text-[1rem] ${msg.ok ? "text-good" : "text-warn-ink"}`} role="status">
               {msg.text}
             </p>
           )}
@@ -58,7 +58,7 @@ export default function WeeklyReminder() {
           onClick={toggle}
           disabled={busy}
           aria-pressed={on}
-          className={`flex-none h-10 px-4 rounded-lg text-[0.85rem] font-semibold cursor-pointer transition-colors duration-150 disabled:opacity-60 ${
+          className={`flex-none h-10 px-4 rounded-lg text-[1rem] font-semibold cursor-pointer transition-colors duration-150 disabled:opacity-60 ${
             on ? "bg-surface text-ink border border-border-strong hover:bg-surface-2" : "bg-fill text-on-fill hover:opacity-90"
           }`}
         >

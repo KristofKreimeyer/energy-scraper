@@ -14,12 +14,12 @@ export default function ViewToggle({
   className?: string;
 }) {
   const btn = (active: boolean) =>
-    `h-9 w-9 grid place-items-center rounded-[11px] transition-colors duration-150 ${
+    `h-9 w-9 grid place-items-center rounded-[0.6875rem] transition-colors duration-150 ${
       active ? "bg-fill text-on-fill" : "bg-transparent text-muted hover:text-ink"
     }`;
   return (
     <div
-      className={`flex items-center gap-1 p-1 bg-surface-2 border border-border rounded-[14px] ${className}`}
+      className={`flex items-center gap-1 p-1 bg-surface-2 border border-border rounded-[0.875rem] ${className}`}
       role="group"
       aria-label="Ansicht wählen"
     >

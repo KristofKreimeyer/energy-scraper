@@ -20,15 +20,15 @@ export default function Leaderboard() {
           <h2 id="leaderboard-title" className="text-[1.5rem] leading-none text-accent-strong">
             🏆 Top-Hunter der Woche
           </h2>
-          <span className="text-[0.75rem] text-muted">Punkte: freigegebene Meldung ×3 · Bestätigung ×1</span>
+          <span className="text-[1rem] text-muted">Punkte: freigegebene Meldung ×3 · Bestätigung ×1</span>
         </div>
 
         <ol className="mt-3 flex flex-col divide-y divide-border">
           {board.map((e) => (
-            <li key={e.rank} className="flex items-center gap-3 py-2 text-[0.9rem]">
+            <li key={e.rank} className="flex items-center gap-3 py-2 text-[1rem]">
               <span className="w-6 flex-none text-center font-mono font-bold tabular-nums">{MEDALS[e.rank - 1] ?? e.rank}</span>
               <span className="flex-1 font-semibold text-ink">{e.handle}</span>
-              <span className="text-[0.78rem] text-muted tabular-nums">
+              <span className="text-[1rem] text-muted tabular-nums">
                 {e.approved}&nbsp;Funde · {e.votes}&nbsp;Checks
               </span>
               <span className="font-mono font-bold text-good tabular-nums w-12 text-right">{e.score}</span>
@@ -36,7 +36,7 @@ export default function Leaderboard() {
           ))}
         </ol>
 
-        <p className="mt-4 text-[0.85rem] text-muted">
+        <p className="mt-4 text-[1rem] text-muted">
           Klettere hoch: melde günstigere Preise und bestätige Angebote vor Ort.{" "}
           <button
             type="button"
@@ -52,7 +52,7 @@ export default function Leaderboard() {
             href={COMMUNITY_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 h-9 px-4 rounded-lg bg-fill text-on-fill text-[0.85rem] font-semibold hover:opacity-90"
+            className="inline-flex items-center gap-2 h-9 px-4 rounded-lg bg-fill text-on-fill text-[1rem] font-semibold hover:opacity-90"
           >
             ⚡ Tritt der Jagd bei · {COMMUNITY_LABEL}
           </a>
@@ -60,7 +60,7 @@ export default function Leaderboard() {
             href={DISCORD_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 h-9 px-4 rounded-lg bg-surface text-ink border border-border-strong text-[0.85rem] font-semibold hover:bg-surface-2"
+            className="inline-flex items-center gap-2 h-9 px-4 rounded-lg bg-surface text-ink border border-border-strong text-[1rem] font-semibold hover:bg-surface-2"
           >
             💬 {DISCORD_LABEL}
           </a>

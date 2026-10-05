@@ -12,14 +12,14 @@ export default function Ticker({ offers }: { offers: GroupedOffer[] }) {
 
   const row = items.map((o) => (
     <span key={o.id} className="mx-4">
-      <span className="uppercase tracking-[0.08em]">{o.brand}</span> <b>{formatNumber(o.perLiter!)} €/L</b>{" "}
+      <span className="uppercase tracking-[0.04em]">{o.brand}</span> <b>{formatNumber(o.perLiter!)} €/L</b>{" "}
       <span className="opacity-80">{o.market}</span>
     </span>
   ));
 
   return (
     <div className="app-ticker ticker-band overflow-hidden" aria-hidden="true">
-      <div className="ticker-track py-2 text-[0.95rem] font-mono font-bold">
+      <div className="ticker-track py-2 text-[1rem] font-mono font-bold">
         <span className="mr-2 font-bold">⚡ Live €/L</span>
         {row}
         <span className="mr-2 font-bold">⚡ Live €/L</span>

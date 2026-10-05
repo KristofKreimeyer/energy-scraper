@@ -33,11 +33,11 @@ export function OfferListView({ offer, isBest, reports, votes }: Props) {
               <BestTag isBest={isBest} />
               <FavButton offer={offer} />
             </div>
-            <h3 className="text-[0.95rem] leading-tight truncate mt-0.5">{offer.title}</h3>
+            <h3 className="text-[1rem] leading-tight truncate mt-0.5">{offer.title}</h3>
             <div className="flex items-center gap-2 mt-1 flex-wrap">
               <ValidBadge offer={offer} />
               {saved && (
-                <span className="font-mono font-bold tabular-nums text-good text-[0.72rem] bg-good-tint border border-[color-mix(in_srgb,var(--good)_30%,transparent)] rounded px-1.5 py-px">
+                <span className="font-mono font-bold tabular-nums text-good text-[1rem] bg-good-tint border border-[color-mix(in_srgb,var(--good)_30%,transparent)] rounded px-1.5 py-px">
                   −{saved.percent}&nbsp;%
                 </span>
               )}
@@ -47,10 +47,10 @@ export function OfferListView({ offer, isBest, reports, votes }: Props) {
           <div className="flex-none text-right">
             <div className="font-display text-[1.6rem] tabular-nums text-ink whitespace-nowrap">
               {formatEuro(offer.perUnit)}
-              <span className="text-[0.62rem] font-medium text-muted"> {isMulti ? "/ Dose" : ""}</span>
+              <span className="text-[1rem] font-medium text-muted"> {isMulti ? "/ Dose" : ""}</span>
             </div>
             <div
-              className={`font-mono text-[0.82rem] font-bold tabular-nums whitespace-nowrap ${isBest ? "text-good" : "text-accent-strong"}`}
+              className={`font-mono text-[1rem] font-bold tabular-nums whitespace-nowrap ${isBest ? "text-good" : "text-accent-strong"}`}
             >
               {offer.perLiter != null ? `${formatEuro(offer.perLiter)}/L` : "—"}
             </div>
@@ -59,7 +59,7 @@ export function OfferListView({ offer, isBest, reports, votes }: Props) {
           {offer.url && (
             <a
               data-cta=""
-              className="flex-none inline-flex items-center gap-1 text-accent-strong text-[0.82rem] font-[650] no-underline after:content-[''] after:absolute after:inset-0 after:rounded-card group-hover:text-accent focus-visible:outline-none"
+              className="flex-none inline-flex items-center gap-1 text-accent-strong text-[1rem] font-[650] no-underline after:content-[''] after:absolute after:inset-0 after:rounded-card group-hover:text-accent focus-visible:outline-none"
               href={offer.url}
               target="_blank"
               rel="noopener noreferrer"

@@ -6,7 +6,7 @@ import { Can, StatCard, TopDealBanner } from "./heroParts";
 // Reine Präsentations-Komponente: Zahlen kommen fertig berechnet aus App.
 
 const STAT_VALUE = "font-display text-[3rem] leading-none tabular-nums";
-const STAT_SUB = "text-[0.82rem] text-muted";
+const STAT_SUB = "text-[1rem] text-muted";
 
 export interface HeroStats {
   cheapest: GroupedOffer;
@@ -33,7 +33,7 @@ export default function Hero({ timeframe, deal, dealSaving, stats }: HeroProps) 
   return (
     <section className="relative" aria-labelledby="page-title">
       {/* Bühne: bleibt beim Scrollen stehen, das Kennzahlen-Panel schiebt sich darüber */}
-      <div className="sticky top-[62px] min-h-[min(78vh,640px)] overflow-hidden flex items-center">
+      <div className="sticky top-[3.875rem] min-h-[min(78vh,40rem)] overflow-hidden flex items-center">
         <div className="hero-sun" aria-hidden="true" />
         <div className={`${WRAP} hero-enter relative pb-24`}>
           <p className="font-mono text-[clamp(0.75rem,1.6vw,1.1rem)] tracking-[0.2em] uppercase text-good mb-4">
@@ -50,8 +50,8 @@ export default function Hero({ timeframe, deal, dealSaving, stats }: HeroProps) 
       </div>
 
       {/* Panel: überlappt die Bühne; die Dose ragt über die Oberkante */}
-      <div className="relative z-[5] -mt-[16vh] bg-neon-cyan text-[#0b0626] border-t-[10px] border-neon-yellow pt-16 pb-14">
-        <Can className="absolute right-[5%] -top-[130px] w-[clamp(72px,11vw,140px)] rotate-[8deg] z-[6]" />
+      <div className="relative z-[5] -mt-[16vh] bg-neon-cyan text-[#0b0626] border-t-[0.625rem] border-neon-yellow pt-16 pb-14">
+        <Can className="absolute right-[5%] -top-[8.125rem] w-[clamp(4.5rem,11vw,8.75rem)] rotate-[8deg] z-[6]" />
         <div className={WRAP}>
           <p className="text-[1.15rem] leading-snug font-bold max-w-[40ch]">
             Jede Woche automatisch aus allen Prospekten, verglichen nach Preis pro Liter — das beste €/L steht oben.
@@ -59,7 +59,7 @@ export default function Hero({ timeframe, deal, dealSaving, stats }: HeroProps) 
           {deal && dealSaving && <TopDealBanner deal={deal} dealSaving={dealSaving} timeframe={timeframe} />}
 
           {stats ? (
-            <ul className="list-none mt-8 p-0 grid gap-4 grid-cols-4 max-[780px]:grid-cols-2 max-[430px]:grid-cols-1">
+            <ul className="list-none mt-8 p-0 grid gap-4 grid-cols-4 max-[48.75rem]:grid-cols-2 max-[26.875rem]:grid-cols-1">
               <StatCard
                 className="border-[color-mix(in_srgb,var(--accent)_55%,var(--border))]"
                 label="Günstigste Dose"
@@ -76,7 +76,7 @@ export default function Hero({ timeframe, deal, dealSaving, stats }: HeroProps) 
                   stats.bestLiter ? (
                     <span className={STAT_VALUE}>
                       {formatEuro(stats.bestLiter.perLiter!)}
-                      <span className="text-[0.9rem] text-muted">/L</span>
+                      <span className="text-[1rem] text-muted">/L</span>
                     </span>
                   ) : (
                     noLiter
@@ -96,7 +96,7 @@ export default function Hero({ timeframe, deal, dealSaving, stats }: HeroProps) 
                   stats.literStats ? (
                     <span className="font-display text-[2.4rem] leading-none tabular-nums">
                       {formatNumber(stats.literStats.min)}–{formatNumber(stats.literStats.max)}
-                      <span className="text-[0.9rem] text-muted"> €/L</span>
+                      <span className="text-[1rem] text-muted"> €/L</span>
                     </span>
                   ) : (
                     noLiter
@@ -110,7 +110,7 @@ export default function Hero({ timeframe, deal, dealSaving, stats }: HeroProps) 
                   stats.literStats ? (
                     <span className={STAT_VALUE}>
                       {formatNumber(stats.literStats.median)}
-                      <span className="text-[0.9rem] text-muted"> €/L</span>
+                      <span className="text-[1rem] text-muted"> €/L</span>
                     </span>
                   ) : (
                     noLiter

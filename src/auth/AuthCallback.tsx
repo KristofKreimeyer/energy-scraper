@@ -34,7 +34,7 @@ export default function AuthCallback() {
         <p className="text-ink font-semibold">
           {ok === null ? "Anmeldung wird abgeschlossen …" : ok ? "Angemeldet! Weiter geht’s …" : "Anmeldelink ungültig oder abgelaufen."}
         </p>
-        {ok === false && <p className="text-muted text-[0.85rem] mt-1">Fordere auf der Startseite einen neuen Link an.</p>}
+        {ok === false && <p className="text-muted text-[1rem] mt-1">Fordere auf der Startseite einen neuen Link an.</p>}
       </div>
     </div>
   );

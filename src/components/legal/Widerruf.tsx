@@ -34,7 +34,7 @@ export function Widerruf() {
 
       <H2>Muster-Widerrufsformular</H2>
       <Pp>(Wenn du den Vertrag widerrufen willst, fülle dieses Formular aus und sende es zurück.)</Pp>
-      <div className="rounded-lg border border-border-strong bg-surface-2 p-4 text-[0.88rem] leading-relaxed text-ink/90 space-y-2">
+      <div className="rounded-lg border border-border-strong bg-surface-2 p-4 text-[1rem] leading-relaxed text-ink/90 space-y-2">
         <p>An Kristof Kreimeyer, Bahnhofstr. 4, 59439 Holzwickede, kontakt@kristof-kreimeyer.de:</p>
         <p>Hiermit widerrufe(n) ich/wir (*) den von mir/uns (*) abgeschlossenen Vertrag über den Kauf der folgenden Dienstleistung (*):</p>
         <p>________________________________________________</p>
@@ -42,7 +42,7 @@ export function Widerruf() {
         <p>Name des/der Verbraucher(s): _____________________</p>
         <p>Anschrift des/der Verbraucher(s): _________________</p>
         <p>Datum, Unterschrift (nur bei Mitteilung auf Papier): _______________</p>
-        <p className="text-muted text-[0.8rem]">(*) Unzutreffendes streichen.</p>
+        <p className="text-muted text-[1rem]">(*) Unzutreffendes streichen.</p>
       </div>
     </>
   );

@@ -44,7 +44,7 @@ export function ShareButton({ text, url, className, children, ariaLabel }: Share
   const shareText = `${text} ${url}`;
   const waHref = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
   const tgHref = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
-  const item = "block w-full text-left px-3 py-2 text-[0.82rem] text-ink hover:bg-surface-2 cursor-pointer";
+  const item = "block w-full text-left px-3 py-2 text-[1rem] text-ink hover:bg-surface-2 cursor-pointer";
 
   return (
     <span className="relative z-10 inline-flex self-start" onClick={(e) => e.stopPropagation()}>
@@ -64,7 +64,7 @@ export function ShareButton({ text, url, className, children, ariaLabel }: Share
           <span className="fixed inset-0 z-20" aria-hidden="true" onClick={() => setOpen(false)} />
           <span
             role="menu"
-            className="absolute right-0 top-full mt-1 z-30 min-w-[180px] flex flex-col bg-surface border border-border-strong rounded-lg shadow-card overflow-hidden"
+            className="absolute right-0 top-full mt-1 z-30 min-w-[11.25rem] flex flex-col bg-surface border border-border-strong rounded-lg shadow-card overflow-hidden"
           >
             <a role="menuitem" className={item} href={waHref} target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)}>
               WhatsApp

@@ -45,7 +45,7 @@ export default function OfferResults({
 
   return (
     <div className={WRAP}>
-      <p className="mt-4 mb-1 text-[0.88rem] text-muted font-mono" role="status" aria-live="polite">
+      <p className="mt-4 mb-1 text-[1rem] text-muted font-mono" role="status" aria-live="polite">
         <b className="text-ink">{offers.length}</b> {offers.length === 1 ? "Angebot" : "Angebote"} · sortiert nach {SORT_LABELS[sort]}
         {filtersActive && (
           <>
@@ -96,7 +96,7 @@ export default function OfferResults({
             <button
               type="button"
               onClick={onReset}
-              className="h-9 px-4 inline-flex items-center gap-1.5 text-[0.85rem] font-semibold text-on-fill bg-fill border border-fill rounded-[10px] cursor-pointer hover:opacity-90"
+              className="h-9 px-4 inline-flex items-center gap-1.5 text-[1rem] font-semibold text-on-fill bg-fill border border-fill rounded-[0.625rem] cursor-pointer hover:opacity-90"
             >
               Filter zurücksetzen
             </button>

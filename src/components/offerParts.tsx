@@ -60,7 +60,7 @@ export function Sparkline({ trend, colorClass }: { trend: PriceInsight["trend"];
 /** Kopfzeile „Marke · Markt". */
 export function BrandLine({ offer }: { offer: GroupedOffer }) {
   return (
-    <span className="font-mono text-[0.68rem] tracking-[0.14em] uppercase text-accent-strong font-bold">
+    <span className="font-mono text-[1rem] tracking-[0.04em] uppercase text-accent-strong font-bold">
       {offer.brand} · {offer.market}
     </span>
   );
@@ -69,7 +69,7 @@ export function BrandLine({ offer }: { offer: GroupedOffer }) {
 /** Dezente „bestes €/L"-Auszeichnung – null, wenn nicht bester Grundpreis. */
 export function BestTag({ isBest }: { isBest: boolean }) {
   if (!isBest) return null;
-  return <span className="self-start text-[0.64rem] tracking-[0.1em] uppercase text-good font-semibold">◈ bestes €/L</span>;
+  return <span className="self-start text-[1rem] tracking-[0.04em] uppercase text-good font-semibold">◈ bestes €/L</span>;
 }
 
 /** Marke merken (Favorit). Liegt über dem ganzflächigen Karten-Link. */
@@ -103,12 +103,12 @@ export function InsightBlock({ offer, className = "" }: { offer: GroupedOffer; c
   if (!insight) return null;
   return (
     <div
-      className={`flex flex-col gap-[5px] text-[0.76rem] ${className}`}
+      className={`flex flex-col gap-[0.3125rem] text-[1rem] ${className}`}
       aria-label={`Preisniveau: ${INSIGHT_COPY[insight.level].label}. Typischer Grundpreis ${formatEuro(insight.median)} pro Liter über ${insight.dayCount} erfasste Tage.`}
     >
       <div className="flex items-center gap-2">
         <span
-          className={`flex-none inline-flex items-center gap-[5px] font-bold rounded-[7px] px-2 py-[3px] border ${INSIGHT_BADGE[insight.level]}`}
+          className={`flex-none inline-flex items-center gap-[0.3125rem] font-bold rounded-[0.4375rem] px-2 py-[3px] border ${INSIGHT_BADGE[insight.level]}`}
         >
           {INSIGHT_COPY[insight.level].icon === "bolt" ? (
             <Zap size={12} fill="currentColor" stroke="none" aria-hidden />
@@ -132,7 +132,7 @@ export function ValidBadge({ offer }: { offer: GroupedOffer }) {
   const variant = ending ? VALID_VARIANT.ending : upcoming ? VALID_VARIANT.upcoming : VALID_VARIANT.base;
   return (
     <span
-      className={`inline-flex items-center gap-1.5 self-start text-[0.76rem] font-semibold rounded-[7px] px-[9px] py-1 border ${variant}`}
+      className={`inline-flex items-center gap-1.5 self-start text-[1rem] font-semibold rounded-[0.4375rem] px-[0.5625rem] py-1 border ${variant}`}
     >
       <Clock size={13} strokeWidth={2.2} aria-hidden />
       {label}
@@ -144,7 +144,7 @@ export function ValidBadge({ offer }: { offer: GroupedOffer }) {
 export function CommunityBlock({ reports, className = "" }: { reports?: CommunityReport[]; className?: string }) {
   if (!reports || reports.length === 0) return null;
   return (
-    <div className={`flex flex-col gap-1 text-[0.75rem] ${className}`} aria-label="Von der Community gemeldete Preise">
+    <div className={`flex flex-col gap-1 text-[1rem] ${className}`} aria-label="Von der Community gemeldete Preise">
       {reports.slice(0, 2).map((r, i) => (
         <span key={i} className="inline-flex items-center gap-1.5 text-muted">
           <span aria-hidden="true">💬</span>

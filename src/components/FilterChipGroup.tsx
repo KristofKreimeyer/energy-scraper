@@ -3,16 +3,16 @@ import type { ReactNode } from "react";
 // Eine beschriftete Filter-Chip-Gruppe (Markt / Zucker / Marke im FilterOverlay).
 // Jeder Chip zeigt Text + Zähler; deaktiviert, wenn 0 Treffer und nicht gewählt.
 
-const LABEL = "font-mono text-[0.68rem] tracking-[0.1em] uppercase text-muted";
+const LABEL = "font-mono text-[1rem] tracking-[0.04em] uppercase text-muted";
 
 const chip =
-  "group inline-flex items-center gap-[7px] min-h-[38px] px-3.5 bg-surface text-ink border border-border-strong " +
-  "rounded-full text-[0.85rem] font-semibold cursor-pointer transition-colors duration-150 enabled:aria-[pressed=false]:hover:bg-surface-2 " +
+  "group inline-flex items-center gap-[0.4375rem] min-h-[2.375rem] px-3.5 bg-surface text-ink border border-border-strong " +
+  "rounded-full text-[1rem] font-semibold cursor-pointer transition-colors duration-150 enabled:aria-[pressed=false]:hover:bg-surface-2 " +
   "aria-pressed:bg-fill aria-pressed:text-on-fill aria-pressed:border-fill " +
   "aria-pressed:hover:opacity-90 " +
   "disabled:opacity-40 disabled:cursor-not-allowed";
 
-const chipCount = "font-mono text-[0.62rem] opacity-75 tabular-nums group-aria-pressed:opacity-90";
+const chipCount = "font-mono text-[1rem] opacity-75 tabular-nums group-aria-pressed:opacity-90";
 
 export interface ChipOption {
   value: string;

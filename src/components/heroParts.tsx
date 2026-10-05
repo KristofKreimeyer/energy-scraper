@@ -10,10 +10,10 @@ const LABEL = "font-mono text-[1rem] tracking-[0.04em] uppercase text-muted";
 export function Can({ className = "" }: { className?: string }) {
   return (
     <svg viewBox="0 0 200 420" className={className} aria-hidden="true">
-      <rect x="14" y="6" width="172" height="408" rx="26" fill="var(--surface)" stroke="var(--border-strong)" strokeWidth="8" />
-      <rect x="14" y="6" width="172" height="46" rx="22" fill="var(--border-strong)" />
-      <rect x="14" y="368" width="172" height="46" rx="22" fill="var(--border-strong)" />
-      <polygon points="24,160 176,136 176,236 24,260" fill="var(--accent)" stroke="var(--border-strong)" strokeWidth="6" />
+      <rect x="14" y="6" width="172" height="408" rx="26" fill="#ff38d0" stroke="#000000" strokeWidth="8" />
+      <rect x="14" y="6" width="172" height="46" rx="22" fill="#000000" />
+      <rect x="14" y="368" width="172" height="46" rx="22" fill="#000000" />
+      <polygon points="24,160 176,136 176,236 24,260" fill="#ffffff" stroke="#000000" strokeWidth="6" />
       <text
         x="100"
         y="206"
@@ -21,7 +21,7 @@ export function Can({ className = "" }: { className?: string }) {
         fontFamily="Barlow Condensed, sans-serif"
         fontWeight="600"
         fontSize="52"
-        fill="#0b0626"
+        fill="#000000"
         transform="rotate(-7 100 206)"
       >
         €/L

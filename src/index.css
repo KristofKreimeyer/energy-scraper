@@ -25,27 +25,28 @@
    dark:-Variante, die den „System-Default, bis manuell umgeschaltet“-Fall
    nicht sauber abbildet. */
 :root {
-  --ground: #fff7e6;
+  --ground: #ffffff;
   --surface: #ffffff;
-  --surface-2: #ffefcc;
-  --ink: #0b0626;
-  --muted: #4b4580;
-  --border: #d9cff0;
-  --border-strong: #0b0626;
-  --accent: #ff2e93; /* Neon-Pink: Fläche mit Ink-Text */
-  --accent-strong: #c20a63; /* Text/Links auf hellem Grund */
-  --accent-tint: #ffefcc;
-  --fill: #ff2e93; /* gefüllte Akzentfläche, AA mit --on-fill */
-  --on-fill: #0b0626;
-  --good: #c20a63;
-  --good-tint: #ffefcc;
-  --warn-ink: #0b0626;
-  --warn-tint: #ffefcc;
-  --focus: #3b1fd1;
+  --surface-2: #f4f4f4;
+  --ink: #000000;
+  --muted: #555555;
+  --border: #e2e2e2;
+  --border-strong: #000000;
+  --accent: #ff38d0; /* Magenta: Fläche mit schwarzem Text */
+  --accent-strong: #c4009a; /* Text/Links auf hellem Grund (AA) */
+  --accent-tint: #f4f4f4;
+  --fill: #ff38d0; /* gefüllte Akzentfläche, AA mit --on-fill */
+  --on-fill: #000000;
+  --blue: #38c6ff; /* Himmelblau: Fläche mit schwarzem Text */
+  --good: #0b6e99; /* Blau als Text auf hellem Grund (AA) */
+  --good-tint: #e3f4fb;
+  --warn-ink: #000000;
+  --warn-tint: #f4f4f4;
+  --focus: #0b6e99;
 
   --radius: 0.375rem;
   --radius-sm: 0.25rem;
-  --shadow: 0.375rem 0.375rem 0 #0b0626;
+  --shadow: 0.375rem 0.375rem 0 #000000;
   --maxw: 72.5rem;
 
   color-scheme: light dark;
@@ -53,42 +54,41 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --ground: #0b0626;
-    --surface: #17104a;
-    --surface-2: #1f1660;
-    --ink: #fff7e6;
-    --muted: #b9b3e0;
-    --border: #3a2d8f;
-    --border-strong: #fff7e6;
-    --accent: #ff2e93;
-    --accent-strong: #ff5cad;
-    --accent-tint: #1f1660;
-    --fill: #ff2e93;
-    --on-fill: #0b0626;
-    --good: #ff5cad;
-    --good-tint: #1f1660;
-    --warn-ink: #fff7e6;
-    --warn-tint: #1f1660;
-    --focus: #fff7e6;
-    --shadow: 0.375rem 0.375rem 0 #000000;
-   
+    --ground: #000000;
+    --surface: #111111;
+    --surface-2: #1c1c1c;
+    --ink: #ffffff;
+    --muted: #b8b8b8;
+    --border: #333333;
+    --border-strong: #ffffff;
+    --accent: #ff38d0;
+    --accent-strong: #ff5ad8;
+    --accent-tint: #1c1c1c;
+    --fill: #ff38d0;
+    --on-fill: #000000;
+    --good: #38c6ff;
+    --good-tint: #0a2a38;
+    --warn-ink: #ffffff;
+    --warn-tint: #1c1c1c;
+    --focus: #38c6ff;
+    --shadow: 0.375rem 0.375rem 0 #ff38d0;
   }
 }
 
 /* Explizite Theme-Umschaltung überschreibt die Systemvorgabe in beide Richtungen */
 :root[data-theme='light'] {
-  --ground: #fff7e6; --surface: #ffffff; --surface-2: #ffefcc;
-  --ink: #0b0626; --muted: #4b4580; --border: #d9cff0; --border-strong: #0b0626;
-  --accent: #ff2e93; --accent-strong: #c20a63; --accent-tint: #ffefcc; --fill: #ff2e93; --on-fill: #0b0626;
-  --good: #c20a63; --good-tint: #ffefcc; --warn-ink: #0b0626; --warn-tint: #ffefcc;
-  --focus: #3b1fd1; --shadow: 0.375rem 0.375rem 0 #0b0626;
+  --ground: #ffffff; --surface: #ffffff; --surface-2: #f4f4f4;
+  --ink: #000000; --muted: #555555; --border: #e2e2e2; --border-strong: #000000;
+  --accent: #ff38d0; --accent-strong: #c4009a; --accent-tint: #f4f4f4; --fill: #ff38d0; --on-fill: #000000;
+  --good: #0b6e99; --good-tint: #e3f4fb; --warn-ink: #000000; --warn-tint: #f4f4f4;
+  --focus: #0b6e99; --shadow: 0.375rem 0.375rem 0 #000000;
 }
 :root[data-theme='dark'] {
-  --ground: #0b0626; --surface: #17104a; --surface-2: #1f1660;
-  --ink: #fff7e6; --muted: #b9b3e0; --border: #3a2d8f; --border-strong: #fff7e6;
-  --accent: #ff2e93; --accent-strong: #ff5cad; --accent-tint: #1f1660; --fill: #ff2e93; --on-fill: #0b0626;
-  --good: #ff5cad; --good-tint: #1f1660; --warn-ink: #fff7e6; --warn-tint: #1f1660;
-  --focus: #fff7e6; --shadow: 0.375rem 0.375rem 0 #000000;
+  --ground: #000000; --surface: #111111; --surface-2: #1c1c1c;
+  --ink: #ffffff; --muted: #b8b8b8; --border: #333333; --border-strong: #ffffff;
+  --accent: #ff38d0; --accent-strong: #ff5ad8; --accent-tint: #1c1c1c; --fill: #ff38d0; --on-fill: #000000;
+  --good: #38c6ff; --good-tint: #0a2a38; --warn-ink: #ffffff; --warn-tint: #1c1c1c;
+  --focus: #38c6ff; --shadow: 0.375rem 0.375rem 0 #ff38d0;
 }
 
 /* ---- Tokens für Tailwind-Utilities verfügbar machen --------------------- */
@@ -141,6 +141,7 @@ h3 {
   --color-border: var(--border);
   --color-border-strong: var(--border-strong);
   --color-accent: var(--accent);
+  --color-blue: var(--blue);
   --color-accent-strong: var(--accent-strong);
   --color-accent-tint: var(--accent-tint);
   --color-fill: var(--fill);
@@ -275,9 +276,9 @@ h3 {
   overflow-wrap: anywhere;
 }
 
-/* Ticker: neutrales Band, Akzent nur auf den Zahlen */
+/* Ticker: Magenta-Band mit schwarzem Text */
 .ticker-band {
-  background: var(--surface-2);
-  color: var(--ink);
+  background: var(--accent);
+  color: #000000;
   border-block: 0.125rem solid var(--border-strong);
 }

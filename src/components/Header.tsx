@@ -23,6 +23,7 @@ export default function Header({ onOpenCreator }: { onOpenCreator: () => void })
         <button
           className="flex-none ml-auto h-10 px-4 sm:px-4 bg-fill text-on-fill border border-fill rounded-[0.625rem] text-[1rem] font-semibold cursor-pointer inline-flex items-center gap-2 hover:opacity-90"
           type="button"
+          aria-label="Preis-Alarm"
           onClick={onOpenCreator}
         >
           <span aria-hidden="true">⏰</span>

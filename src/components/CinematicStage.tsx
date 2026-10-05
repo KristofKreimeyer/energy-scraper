@@ -48,7 +48,7 @@ export default function CinematicStage({ timeframe }: { timeframe: Timeframe }) 
   useCinematicScroll(ref);
 
   return (
-    <div ref={ref} className="cine" aria-labelledby="page-title">
+    <div ref={ref} className="cine">
       <div className="cine-stage">
         {/* Hintergrund-Blitze mit Parallaxe (unterschiedliche Geschwindigkeiten) */}
         <BoltShape

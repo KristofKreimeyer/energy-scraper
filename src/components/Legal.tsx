@@ -33,15 +33,10 @@ export function LegalPage({ route }: { route: LegalRoute }) {
   return (
     <main id="main" className="py-8">
       <div className={WRAP}>
-        <a
-          href="#"
-          className="inline-flex items-center gap-1.5 text-[0.85rem] font-semibold text-accent-strong hover:text-accent mb-4"
-        >
+        <a href="#" className="inline-flex items-center gap-1.5 text-[0.85rem] font-semibold text-accent-strong hover:text-accent mb-4">
           <span aria-hidden="true">←</span> Zurück zur Übersicht
         </a>
-        <h1 className="text-[1.7rem] font-bold text-ink tracking-[-0.02em] mb-1">
-          {LEGAL_ROUTES[route]}
-        </h1>
+        <h1 className="text-[1.7rem] font-bold text-ink tracking-[-0.02em] mb-1">{LEGAL_ROUTES[route]}</h1>
         <Body />
       </div>
     </main>

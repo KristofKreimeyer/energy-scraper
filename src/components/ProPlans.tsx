@@ -28,16 +28,12 @@ export default function ProPlans({
 
       {channel === "telegram" ? (
         <p className="text-[0.74rem] text-muted">
-          Im Telegram-Bot freischalten: sende{" "}
-          <span className="text-ink font-semibold">/redeem DEIN-CODE</span> an den
-          Bot.
+          Im Telegram-Bot freischalten: sende <span className="text-ink font-semibold">/redeem DEIN-CODE</span> an den Bot.
         </p>
       ) : channel === "push" ? (
         <>
           <RedeemCodeForm code={code} onCodeChange={onCodeChange} onRedeem={onRedeem} />
-          <span className="text-[0.68rem] text-muted">
-            Pro wird an dieses Gerät gebunden.
-          </span>
+          <span className="text-[0.68rem] text-muted">Pro wird an dieses Gerät gebunden.</span>
         </>
       ) : (
         <>
@@ -51,10 +47,7 @@ export default function ProPlans({
               }`}
             >
               <span className="text-[0.9rem] font-bold text-ink">
-                {p.price}{" "}
-                <span className="text-[0.72rem] font-medium text-muted">
-                  {p.period}
-                </span>
+                {p.price} <span className="text-[0.72rem] font-medium text-muted">{p.period}</span>
               </span>
               <span className="flex items-center gap-1.5">
                 {"badge" in p && p.badge && (
@@ -75,9 +68,7 @@ export default function ProPlans({
           >
             Schon Supporter? Code einlösen
           </button>
-          {codeOpen && (
-            <RedeemCodeForm code={code} onCodeChange={onCodeChange} onRedeem={onRedeem} />
-          )}
+          {codeOpen && <RedeemCodeForm code={code} onCodeChange={onCodeChange} onRedeem={onRedeem} />}
         </>
       )}
     </div>

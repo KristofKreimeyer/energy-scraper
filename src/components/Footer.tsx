@@ -10,7 +10,7 @@ export default function Footer() {
   });
 
   return (
-    <footer className="border-t-4 border-border-strong mt-16 pt-8 pb-16 text-muted text-[1rem]">
+    <footer className="border-t-4 border-border-strong pt-8 pb-16 text-muted text-[1rem]">
       <div className={`${WRAP} flex flex-wrap gap-x-6 gap-y-4 items-center`}>
         <span className="font-display text-[1.4rem] leading-none text-ink inline-flex items-center gap-2">
           <span aria-hidden="true">⚡</span>EnergyHunt

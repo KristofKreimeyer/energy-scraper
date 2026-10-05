@@ -43,7 +43,7 @@ export default function ControlsBar({
   onViewChange,
 }: ControlsBarProps) {
   return (
-    <div className="md:sticky md:top-[3.875rem] z-[15] bg-[color-mix(in_srgb,var(--ground)_92%,transparent)] backdrop-blur-[0.375rem] py-4 mt-8 border-b-4 border-border-strong">
+    <div className="md:sticky md:top-[3.875rem] z-[15] bg-surface py-4 border-y-4 border-border-strong">
       <div className={`${WRAP} flex flex-wrap items-center gap-4`}>
         <div
           className="inline-flex flex-none gap-2 p-2 bg-surface-2 border border-border rounded-[0.875rem]"

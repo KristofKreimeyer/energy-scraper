@@ -45,14 +45,14 @@ export default function OfferResults({
 
   return (
     <div className={WRAP}>
-      <p className="mt-4 mb-2 text-[1rem] text-muted font-mono" role="status" aria-live="polite">
-        <b className="text-ink">{offers.length}</b> {offers.length === 1 ? "Angebot" : "Angebote"} · sortiert nach {SORT_LABELS[sort]}
+      <p className="mt-8 mb-2 text-[1rem] text-black font-mono" role="status" aria-live="polite">
+        <b>{offers.length}</b> {offers.length === 1 ? "Angebot" : "Angebote"} · sortiert nach {SORT_LABELS[sort]}
         {filtersActive && (
           <>
             {" · "}
             <button
               type="button"
-              className="font-[inherit] text-accent-strong border-0 px-2 py-0 -mx-2 cursor-pointer underline underline-offset-2 hover:text-accent"
+              className="font-[inherit] font-bold text-black border-0 px-2 py-0 -mx-2 cursor-pointer underline underline-offset-2 hover:opacity-70"
               onClick={onReset}
             >
               Filter zurücksetzen
@@ -90,7 +90,7 @@ export default function OfferResults({
           )}
         </ul>
       ) : (
-        <div className="mt-2 px-6 py-12 flex flex-col items-start gap-4 text-muted border border-dashed border-border-strong rounded-card">
+        <div className="mt-2 px-6 py-12 flex flex-col items-start gap-4 text-black border-2 border-dashed border-black rounded-card">
           <p>Keine Angebote gefunden. Filter oder Suche anpassen.</p>
           {filtersActive && (
             <button

@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-05T12:00:36.886Z",
+  "updatedAt": "2026-10-12T12:38:39.218Z",
   "products": {
     "aldi nord|rockstar|energydrink original|0,5-l-dose": {
       "market": "Aldi Nord",
@@ -121,6 +121,12 @@
         },
         {
           "date": "2026-07-21",
+          "price": 1.29,
+          "perUnit": 1.29,
+          "perLiter": 2.58
+        },
+        {
+          "date": "2026-10-12",
           "price": 1.29,
           "perUnit": 1.29,
           "perLiter": 2.58
@@ -308,6 +314,12 @@
           "price": 4.99,
           "perUnit": 0.83,
           "perLiter": 3.33
+        },
+        {
+          "date": "2026-10-12",
+          "price": 4.99,
+          "perUnit": 0.83,
+          "perLiter": 3.33
         }
       ]
     },
@@ -355,6 +367,12 @@
         },
         {
           "date": "2026-10-05",
+          "price": 0.75,
+          "perUnit": 0.75,
+          "perLiter": 1.5
+        },
+        {
+          "date": "2026-10-12",
           "price": 0.75,
           "perUnit": 0.75,
           "perLiter": 1.5
@@ -818,6 +836,12 @@
           "price": 0.99,
           "perUnit": 0.99,
           "perLiter": 1.98
+        },
+        {
+          "date": "2026-10-12",
+          "price": 0.99,
+          "perUnit": 0.99,
+          "perLiter": 1.98
         }
       ]
     },
@@ -970,6 +994,48 @@
           "price": 0.89,
           "perUnit": 0.89,
           "perLiter": 3.56
+        }
+      ]
+    },
+    "lidl|red bull|energy drink|24x0.25l": {
+      "market": "Lidl",
+      "brand": "Red Bull",
+      "title": "Energy Drink",
+      "unitLabel": "24x0.25l",
+      "points": [
+        {
+          "date": "2026-10-12",
+          "price": 20.99,
+          "perUnit": 0.87,
+          "perLiter": 3.5
+        }
+      ]
+    },
+    "netto|red bull|energy drink|250 ml": {
+      "market": "Netto",
+      "brand": "Red Bull",
+      "title": "Energy Drink",
+      "unitLabel": "250 ml",
+      "points": [
+        {
+          "date": "2026-10-12",
+          "price": 0.99,
+          "perUnit": 0.99,
+          "perLiter": 3.96
+        }
+      ]
+    },
+    "penny|rockstar|energy-drink*|4 x 0,5 l": {
+      "market": "Penny",
+      "brand": "Rockstar",
+      "title": "Energy-Drink*",
+      "unitLabel": "4 x 0,5 l",
+      "points": [
+        {
+          "date": "2026-10-12",
+          "price": 2.78,
+          "perUnit": 0.7,
+          "perLiter": 1.39
         }
       ]
     }

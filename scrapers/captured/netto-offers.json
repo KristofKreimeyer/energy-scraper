@@ -1,36 +1,19 @@
 [
   {
-    "brand": "Red Bull",
+    "brand": "Rockstar",
     "supermarket": "Netto Marken-Discount",
     "title": "Energy Drink",
-    "description": "taurin- & koffeinhaltig, versch. Sorten, auch ZERO ZUCKER 250 ml zzgl. 0.25 Pfand",
-    "productBrand": "Red Bull",
-    "price": "0,99 €",
-    "priceNumber": 0.99,
+    "description": "taurin- & koffeinhaltig, versch. Sorten 0,5 Liter zzgl. Pfand 0.25",
+    "productBrand": "Rockstar",
+    "price": "0,79 €",
+    "priceNumber": 0.79,
     "oldPrice": "1,49 €",
-    "pricePerBaseUnit": "(3.96 / l)",
-    "validFrom": "2026-10-11T22:00:00.000+0000",
-    "validTo": "2026-10-17T18:00:00.000+0000",
-    "imageUrl": "https://content-media.bonial.biz/69729cad-d104-47b8-85f7-886ee5c93820/4afea804-74a7-47a7-8151-0b5817e6c222.jpg?impolicy=SEO-offer-normal",
-    "sourcePage": 2,
+    "pricePerBaseUnit": "(1.58 / l)",
+    "validFrom": "2026-10-18T22:00:00.000+0000",
+    "validTo": "2026-10-24T18:00:00.000+0000",
+    "imageUrl": "https://content-media.bonial.biz/e179d3d0-e018-4e52-9da5-8a62517f6f25/09dacae6-aa31-4e0b-95f9-9caa7afd037f.jpg?impolicy=SEO-offer-normal",
+    "sourcePage": 31,
     "sourceUrl": "https://www.kaufda.de/Netto-Marken-Discount/Sortiment/Energydrink",
-    "scrapedAt": "2026-10-12T12:37:53.827Z"
-  },
-  {
-    "brand": "Red Bull",
-    "supermarket": "Netto Marken-Discount",
-    "title": "Energy Drink",
-    "description": "taurin- & koffeinhaltig, versch. Sorten 250 ml zzgl. 0.25 Pfand",
-    "productBrand": "Red Bull",
-    "price": "0,99 €",
-    "priceNumber": 0.99,
-    "oldPrice": "1,49 €",
-    "pricePerBaseUnit": "(3.96 / l)",
-    "validFrom": "2026-10-11T22:00:00.000+0000",
-    "validTo": "2026-10-17T18:00:00.000+0000",
-    "imageUrl": "https://content-media.bonial.biz/9180e867-379f-4779-ac28-dce5b34c7828/1538d9d8-da4b-40bd-aa4a-f6cdb93a4c20.jpg?impolicy=SEO-offer-normal",
-    "sourcePage": 1,
-    "sourceUrl": "https://www.kaufda.de/Netto-Marken-Discount/Sortiment/Energydrink",
-    "scrapedAt": "2026-10-12T12:37:53.827Z"
+    "scrapedAt": "2026-10-19T10:24:00.171Z"
   }
 ]

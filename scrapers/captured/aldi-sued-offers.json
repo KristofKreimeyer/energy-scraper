@@ -1,1 +1,19 @@
-[]
+[
+  {
+    "brand": "Red Bull",
+    "supermarket": "Aldi Süd",
+    "title": "Energy-Drink-Adventskalender",
+    "description": "Koffein- und taurinhaltig; 24 x 0,25 l = 6-l-Packung",
+    "price": "29,99 €",
+    "priceNumber": 29.99,
+    "productBrand": "RED BULL",
+    "productType": "Funktionsgetränke/Eistee - Sport-/Energy Drinks",
+    "salesUnit": "je Packung",
+    "validFrom": "19.10.",
+    "webshopIdentifier": "706009_kw43",
+    "imageUrl": "https://aldi-assets.publitas.com/feed-images/2026/43/706009_001_Energy-Drink-Adventskalender-Red-Bull-Adventskalender_Produkt_001.png",
+    "sourcePage": "11-12",
+    "sourceUrl": "https://prospekt.aldi-sued.de/kw43-26-op-mp/page/11-12",
+    "scrapedAt": "2026-10-19T10:22:43.598Z"
+  }
+]

@@ -1,23 +1,5 @@
 [
   {
-    "brand": "Red Bull",
-    "supermarket": "Lidl",
-    "title": "Energy Drink",
-    "productBrand": "Red Bull",
-    "description": "HINWEIS: MIT LIDL PLUS APP 19.99 € 24x0.25l +6.00 Pfand, Standardpackung 0.25l",
-    "price": "20,99 €",
-    "priceNumber": 20.99,
-    "referencePrice": 3.5,
-    "unit": "Liter",
-    "quantity": 24,
-    "validFrom": "2026-10-18T22:00:00Z",
-    "validTo": "2026-10-24T21:59:00Z",
-    "imageUrl": "https://cdn.marktguru.de/api/v1/offers/25301402/images/default/0/medium.webp",
-    "offerId": 25301402,
-    "sourceUrl": "https://www.marktguru.de/offers/25301402",
-    "scrapedAt": "2026-10-19T10:23:56.894Z"
-  },
-  {
     "brand": "Rockstar",
     "supermarket": "Lidl",
     "title": "Energy-Drink",
@@ -33,6 +15,24 @@
     "imageUrl": "https://cdn.marktguru.de/api/v1/offers/25398647/images/default/0/medium.webp",
     "offerId": 25398647,
     "sourceUrl": "https://www.marktguru.de/offers/25398647",
-    "scrapedAt": "2026-10-19T10:23:56.895Z"
+    "scrapedAt": "2026-10-26T10:38:31.316Z"
+  },
+  {
+    "brand": "Red Bull",
+    "supermarket": "Lidl",
+    "title": "Energy Drink",
+    "productBrand": "Red Bull",
+    "description": "6x0.25l + 1.50 Pfand",
+    "price": "4,99 €",
+    "priceNumber": 4.99,
+    "referencePrice": 3.33,
+    "unit": "Liter",
+    "quantity": 6,
+    "validFrom": "2026-11-05T23:00:00Z",
+    "validTo": "2026-11-07T22:59:00Z",
+    "imageUrl": "https://cdn.marktguru.de/api/v1/offers/25482317/images/default/0/medium.webp",
+    "offerId": 25482317,
+    "sourceUrl": "https://www.marktguru.de/offers/25482317",
+    "scrapedAt": "2026-10-26T10:38:31.316Z"
   }
 ]

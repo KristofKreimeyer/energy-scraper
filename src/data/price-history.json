@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-19T10:24:45.798Z",
+  "updatedAt": "2026-10-26T10:39:19.074Z",
   "products": {
     "aldi nord|rockstar|energydrink original|0,5-l-dose": {
       "market": "Aldi Nord",
@@ -81,6 +81,12 @@
         },
         {
           "date": "2026-09-28",
+          "price": 0.89,
+          "perUnit": 0.89,
+          "perLiter": 3.56
+        },
+        {
+          "date": "2026-10-26",
           "price": 0.89,
           "perUnit": 0.89,
           "perLiter": 3.56
@@ -460,6 +466,12 @@
           "price": 0.89,
           "perUnit": 0.89,
           "perLiter": 3.56
+        },
+        {
+          "date": "2026-10-26",
+          "price": 0.89,
+          "perUnit": 0.89,
+          "perLiter": 3.56
         }
       ]
     },
@@ -486,6 +498,12 @@
           "price": 0.89,
           "perUnit": 0.89,
           "perLiter": 3.56
+        },
+        {
+          "date": "2026-10-26",
+          "price": 0.89,
+          "perUnit": 0.89,
+          "perLiter": 3.56
         }
       ]
     },
@@ -509,6 +527,12 @@
         },
         {
           "date": "2026-09-28",
+          "price": 0.89,
+          "perUnit": 0.89,
+          "perLiter": 3.56
+        },
+        {
+          "date": "2026-10-26",
           "price": 0.89,
           "perUnit": 0.89,
           "perLiter": 3.56
@@ -549,6 +573,12 @@
         },
         {
           "date": "2026-09-28",
+          "price": 0.89,
+          "perUnit": 0.89,
+          "perLiter": 3.56
+        },
+        {
+          "date": "2026-10-26",
           "price": 0.89,
           "perUnit": 0.89,
           "perLiter": 3.56
@@ -593,6 +623,12 @@
         },
         {
           "date": "2026-10-19",
+          "price": 0.88,
+          "perUnit": 0.88,
+          "perLiter": 1.76
+        },
+        {
+          "date": "2026-10-26",
           "price": 0.88,
           "perUnit": 0.88,
           "perLiter": 1.76
@@ -664,6 +700,12 @@
           "price": 0.79,
           "perUnit": 0.79,
           "perLiter": 3.16
+        },
+        {
+          "date": "2026-10-26",
+          "price": 0.88,
+          "perUnit": 0.88,
+          "perLiter": 3.52
         }
       ]
     },
@@ -800,6 +842,12 @@
           "price": 0.85,
           "perUnit": 0.85,
           "perLiter": 3.4
+        },
+        {
+          "date": "2026-10-26",
+          "price": 0.89,
+          "perUnit": 0.89,
+          "perLiter": 3.56
         }
       ]
     },
@@ -1012,6 +1060,12 @@
           "price": 0.89,
           "perUnit": 0.89,
           "perLiter": 3.56
+        },
+        {
+          "date": "2026-10-26",
+          "price": 0.89,
+          "perUnit": 0.89,
+          "perLiter": 3.56
         }
       ]
     },
@@ -1088,6 +1142,34 @@
           "price": 0.99,
           "perUnit": 0.99,
           "perLiter": 1.98
+        }
+      ]
+    },
+    "lidl|red bull|energy drink|6x0.25l": {
+      "market": "Lidl",
+      "brand": "Red Bull",
+      "title": "Energy Drink",
+      "unitLabel": "6x0.25l",
+      "points": [
+        {
+          "date": "2026-10-26",
+          "price": 4.99,
+          "perUnit": 0.83,
+          "perLiter": 3.33
+        }
+      ]
+    },
+    "netto|monster|monster energy drink|0,5 liter": {
+      "market": "Netto",
+      "brand": "Monster",
+      "title": "Monster Energy Drink",
+      "unitLabel": "0,5 Liter",
+      "points": [
+        {
+          "date": "2026-10-26",
+          "price": 0.88,
+          "perUnit": 0.88,
+          "perLiter": 1.76
         }
       ]
     }

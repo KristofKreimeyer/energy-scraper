@@ -1,1 +1,20 @@
-[]
+[
+  {
+    "brand": "Red Bull",
+    "supermarket": "Kaufland",
+    "title": "Energy Drink",
+    "productBrand": "Red Bull",
+    "description": "oder Erfrischungsgetränk versch. Sorten, z. T. taurin- und koffeinhaltig (+ 0.25 Pfand) je 0,25 - 0,33-l-Dose. Auch zero zucker",
+    "price": "0,88 €",
+    "priceNumber": 0.88,
+    "referencePrice": 3.52,
+    "unit": "Liter",
+    "quantity": 1,
+    "validFrom": "2026-10-25T23:00:00Z",
+    "validTo": "2026-10-31T18:00:00Z",
+    "imageUrl": "https://cdn.marktguru.de/api/v1/offers/25496742/images/default/0/medium.webp",
+    "offerId": 25496742,
+    "sourceUrl": "https://www.marktguru.de/offers/25496742",
+    "scrapedAt": "2026-10-26T10:38:03.171Z"
+  }
+]

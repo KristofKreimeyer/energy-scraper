@@ -1,19 +1,18 @@
 [
   {
-    "brand": "Rockstar",
+    "brand": "Monster",
     "supermarket": "Netto Marken-Discount",
-    "title": "Energy Drink",
+    "title": "Monster Energy Drink",
     "description": "taurin- & koffeinhaltig, versch. Sorten 0,5 Liter zzgl. Pfand 0.25",
-    "productBrand": "Rockstar",
-    "price": "0,79 €",
-    "priceNumber": 0.79,
-    "oldPrice": "1,49 €",
-    "pricePerBaseUnit": "(1.58 / l)",
-    "validFrom": "2026-10-18T22:00:00.000+0000",
-    "validTo": "2026-10-24T18:00:00.000+0000",
-    "imageUrl": "https://content-media.bonial.biz/e179d3d0-e018-4e52-9da5-8a62517f6f25/09dacae6-aa31-4e0b-95f9-9caa7afd037f.jpg?impolicy=SEO-offer-normal",
-    "sourcePage": 31,
+    "price": "0,88 €",
+    "priceNumber": 0.88,
+    "oldPrice": "1,59 €",
+    "pricePerBaseUnit": "(1.76 / l)",
+    "validFrom": "2026-10-25T23:00:00.000+0000",
+    "validTo": "2026-10-31T19:00:00.000+0000",
+    "imageUrl": "https://content-media.bonial.biz/b61f03c3-0c13-46e7-b79a-bb774a8fd26d/67d64e2f-57b7-478b-8677-f83fbfa3dbcd.jpg?impolicy=SEO-offer-normal",
+    "sourcePage": 43,
     "sourceUrl": "https://www.kaufda.de/Netto-Marken-Discount/Sortiment/Energydrink",
-    "scrapedAt": "2026-10-19T10:24:00.171Z"
+    "scrapedAt": "2026-10-26T10:38:33.453Z"
   }
 ]

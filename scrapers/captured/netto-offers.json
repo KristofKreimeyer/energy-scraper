@@ -1,18 +1,36 @@
 [
   {
+    "brand": "Red Bull",
+    "supermarket": "Netto Marken-Discount",
+    "title": "Energy Drink",
+    "description": "taurin- & koffeinhaltig, versch. Sorten 0,355 Liter zzgl. 0.25 Pfand",
+    "productBrand": "Red Bull",
+    "price": "1,49 €",
+    "priceNumber": 1.49,
+    "oldPrice": "1,99 €",
+    "pricePerBaseUnit": "(4.20 / l)",
+    "validFrom": "2026-11-01T23:00:00.000+0000",
+    "validTo": "2026-11-07T19:00:00.000+0000",
+    "imageUrl": "https://content-media.bonial.biz/ca32ac3f-a463-4700-bfec-842f16a84291/d9977ef9-a134-4b37-9acf-7162d267a578.jpg?impolicy=SEO-offer-normal",
+    "sourcePage": 48,
+    "sourceUrl": "https://www.kaufda.de/Netto-Marken-Discount/Sortiment/Energydrink",
+    "scrapedAt": "2026-11-02T12:57:42.242Z"
+  },
+  {
     "brand": "Monster",
     "supermarket": "Netto Marken-Discount",
-    "title": "Monster Energy Drink",
-    "description": "taurin- & koffeinhaltig, versch. Sorten 0,5 Liter zzgl. Pfand 0.25",
+    "title": "Energy Drink",
+    "description": "taurin- & koffeinhaltig, versch. Sorten, 0,5 Liter, zzgl. Pfand 0.25",
+    "productBrand": "Monster",
     "price": "0,88 €",
     "priceNumber": 0.88,
     "oldPrice": "1,59 €",
     "pricePerBaseUnit": "(1.76 / l)",
-    "validFrom": "2026-10-25T23:00:00.000+0000",
-    "validTo": "2026-10-31T19:00:00.000+0000",
-    "imageUrl": "https://content-media.bonial.biz/b61f03c3-0c13-46e7-b79a-bb774a8fd26d/67d64e2f-57b7-478b-8677-f83fbfa3dbcd.jpg?impolicy=SEO-offer-normal",
-    "sourcePage": 43,
+    "validFrom": "2026-11-01T23:00:00.000+0000",
+    "validTo": "2026-11-07T19:00:00.000+0000",
+    "imageUrl": "https://content-media.bonial.biz/ee01a90f-edab-454c-b985-6dc1b533d4b9/f9999bf9-dac9-4081-af9f-24a72925a069.jpg?impolicy=SEO-offer-normal",
+    "sourcePage": 3,
     "sourceUrl": "https://www.kaufda.de/Netto-Marken-Discount/Sortiment/Energydrink",
-    "scrapedAt": "2026-10-26T10:38:33.453Z"
+    "scrapedAt": "2026-11-02T12:57:42.242Z"
   }
 ]

@@ -4,24 +4,6 @@
     "supermarket": "Lidl",
     "title": "Energy Drink",
     "productBrand": "Red Bull",
-    "description": "6x0.25l + 1.50 Pfand",
-    "price": "4,99 €",
-    "priceNumber": 4.99,
-    "referencePrice": 3.33,
-    "unit": "Liter",
-    "quantity": 6,
-    "validFrom": "2026-11-05T23:00:00Z",
-    "validTo": "2026-11-07T22:59:00Z",
-    "imageUrl": "https://cdn.marktguru.de/api/v1/offers/25482317/images/default/0/medium.webp",
-    "offerId": 25482317,
-    "sourceUrl": "https://www.marktguru.de/offers/25482317",
-    "scrapedAt": "2026-11-02T12:57:39.713Z"
-  },
-  {
-    "brand": "Red Bull",
-    "supermarket": "Lidl",
-    "title": "Energy Drink",
-    "productBrand": "Red Bull",
     "description": "Versch. Sorten. Taurin- und koffeinhaltig. Je 250 ml zzgl. 0.25 Pfand",
     "price": "0,99 €",
     "priceNumber": 0.99,
@@ -33,6 +15,24 @@
     "imageUrl": "https://cdn.marktguru.de/api/v1/offers/25588052/images/default/0/medium.webp",
     "offerId": 25588052,
     "sourceUrl": "https://www.marktguru.de/offers/25588052",
-    "scrapedAt": "2026-11-02T12:57:39.713Z"
+    "scrapedAt": "2026-11-09T13:29:05.893Z"
+  },
+  {
+    "brand": "Monster",
+    "supermarket": "Lidl",
+    "title": "Energy Drink",
+    "productBrand": "Monster Energy",
+    "description": "Versch. Sorten. Je Gebinde 10x 0,5 l zzgl. 2.50 Pfand. Standardpackung: 0,5 l",
+    "price": "8,88 €",
+    "priceNumber": 8.88,
+    "referencePrice": 1.78,
+    "unit": "Liter",
+    "quantity": 10,
+    "validFrom": "2026-11-15T23:00:00Z",
+    "validTo": "2026-11-21T22:59:59Z",
+    "imageUrl": "https://cdn.marktguru.de/api/v1/offers/25682987/images/default/0/medium.webp",
+    "offerId": 25682987,
+    "sourceUrl": "https://www.marktguru.de/offers/25682987",
+    "scrapedAt": "2026-11-09T13:29:05.894Z"
   }
 ]

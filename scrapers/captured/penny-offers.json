@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "supermarket": "Penny",
+    "brand": "Red Bull",
+    "productBrand": "Red Bull",
+    "title": "Energy-Drink*",
+    "description": "je 250 ml",
+    "salesUnit": "je 250 ml",
+    "price": "0,99 €",
+    "priceNumber": 0.99,
+    "oldPrice": "1,49 €",
+    "pricePerLiter": 3.96,
+    "appPriceNumber": 0.89,
+    "appPerLiter": 3.56,
+    "validFrom": "2026-11-08T23:00:00.000Z",
+    "validTo": "2026-11-14T22:59:00.000Z",
+    "imageUrl": "https://cdn.penny.de/dam/jcr:2edc7b53-56d9-4ca7-97f1-72825ed4566d/57702313.png?impolicy=penny&imwidth=200",
+    "sourceUrl": "https://www.penny.de/angebote/getraenke/red-bull-energy-drink",
+    "offerId": "113172e8-4d26-4db4-9dd0-c108ced14234",
+    "scrapedAt": "2026-11-09T13:29:07.426Z"
+  }
+]

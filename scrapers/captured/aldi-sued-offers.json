@@ -1,1 +1,19 @@
-[]
+[
+  {
+    "brand": "Red Bull",
+    "supermarket": "Aldi Süd",
+    "title": "Energy Drink",
+    "description": "Versch. Sorten; taurin- und koffeinhaltig; je 6 x 0,25 l = 1,5-l-Packung",
+    "price": "5,29 €",
+    "priceNumber": 5.29,
+    "productBrand": "RED BULL",
+    "productType": "Funktionsgetränke/Eistee - Sport-/Energy Drinks",
+    "salesUnit": "je Packung",
+    "validFrom": "13.11.",
+    "webshopIdentifier": "474872_kw46",
+    "imageUrl": "https://aldi-assets.publitas.com/feed-images/2026/46/474872_001_Red-Bull-250-ml-x-6-Red-Bull-250-ml-x-6_Produkt_001.png",
+    "sourcePage": "23-24",
+    "sourceUrl": "https://prospekt.aldi-sued.de/kw46-26-op-mp/page/23-24",
+    "scrapedAt": "2026-11-09T13:27:55.045Z"
+  }
+]

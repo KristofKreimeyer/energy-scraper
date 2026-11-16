@@ -1,38 +1,38 @@
 [
   {
-    "brand": "Monster",
+    "brand": "Rockstar",
     "supermarket": "Aldi Nord",
-    "title": "Energydrink",
-    "price": "0,89 €",
-    "priceNumber": 0.89,
+    "title": "Energydrink Zero Sugar Peach",
+    "price": "0,79 €",
+    "priceNumber": 0.79,
     "salesUnit": "0,5-L-Dose",
-    "imageUrl": "https://s7g10.scene7.com/is/image/aldinord/3932_08_2026_monsterenergy_20_on_comp_201026_164816?bfc=on&wid=1440&fmt=webp-alpha",
-    "productUrl": "https://www.aldi-nord.de/produkt/energydrink-3932.html",
+    "imageUrl": "https://s7g10.scene7.com/is/image/aldinord/1038356_47_2026_rockstar_zero_sugar_peach_05l_dose_1_on?bfc=on&wid=1440&fmt=webp-alpha",
+    "productUrl": "https://www.aldi-nord.de/produkt/energydrink-zero-sugar-peach-1038356.html",
     "sourceUrl": "https://www.aldi-nord.de/angebote.html",
-    "scrapedAt": "2026-11-09T13:27:48.495Z"
+    "scrapedAt": "2026-11-16T13:13:15.607Z"
   },
   {
-    "brand": "Monster",
+    "brand": "Rockstar",
     "supermarket": "Aldi Nord",
-    "title": "Energy Drink Original",
-    "price": "0,89 €",
-    "priceNumber": 0.89,
+    "title": "Energydrink Tropical Guava",
+    "price": "0,79 €",
+    "priceNumber": 0.79,
     "salesUnit": "0,5-L-Dose",
-    "imageUrl": "https://s7g10.scene7.com/is/image/aldinord/1024623_50_2023_monsterenergy05l_01_on?bfc=on&wid=1440&fmt=webp-alpha",
-    "productUrl": "https://www.aldi-nord.de/produkt/energy-drink-original-10246230003.html",
+    "imageUrl": "https://s7g10.scene7.com/is/image/aldinord/1016626_47_2026_rockstar_tropical_guava_05l_dose_1_on?bfc=on&wid=1440&fmt=webp-alpha",
+    "productUrl": "https://www.aldi-nord.de/produkt/energydrink-tropical-guava-1016626.html",
     "sourceUrl": "https://www.aldi-nord.de/angebote.html",
-    "scrapedAt": "2026-11-09T13:27:48.495Z"
+    "scrapedAt": "2026-11-16T13:13:15.608Z"
   },
   {
-    "brand": "Monster",
+    "brand": "Rockstar",
     "supermarket": "Aldi Nord",
-    "title": "Energydrink",
-    "price": "0,89 €",
-    "priceNumber": 0.89,
+    "title": "Energydrink Blueberry-Pomegranate-Açai",
+    "price": "0,79 €",
+    "priceNumber": 0.79,
     "salesUnit": "0,5-L-Dose",
-    "imageUrl": "https://s7g10.scene7.com/is/image/aldinord/1024624_50_2023_monsterenergy05lmixtray_02_on_comp?bfc=on&wid=1440&fmt=webp-alpha",
-    "productUrl": "https://www.aldi-nord.de/produkt/energydrink-10246240003.html",
+    "imageUrl": "https://s7g10.scene7.com/is/image/aldinord/1014193_47_2026_energy_rockstar_blueberry_on?bfc=on&wid=1440&fmt=webp-alpha",
+    "productUrl": "https://www.aldi-nord.de/produkt/energydrink-blueberry-pomegranate-acai-1014193.html",
     "sourceUrl": "https://www.aldi-nord.de/angebote.html",
-    "scrapedAt": "2026-11-09T13:27:48.495Z"
+    "scrapedAt": "2026-11-16T13:13:15.608Z"
   }
 ]

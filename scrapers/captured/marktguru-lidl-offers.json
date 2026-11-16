@@ -1,23 +1,5 @@
 [
   {
-    "brand": "Red Bull",
-    "supermarket": "Lidl",
-    "title": "Energy Drink",
-    "productBrand": "Red Bull",
-    "description": "Versch. Sorten. Taurin- und koffeinhaltig. Je 250 ml zzgl. 0.25 Pfand",
-    "price": "0,99 €",
-    "priceNumber": 0.99,
-    "referencePrice": 3.96,
-    "unit": "Liter",
-    "quantity": 1,
-    "validFrom": "2026-11-08T23:00:00Z",
-    "validTo": "2026-11-14T22:59:59Z",
-    "imageUrl": "https://cdn.marktguru.de/api/v1/offers/25588052/images/default/0/medium.webp",
-    "offerId": 25588052,
-    "sourceUrl": "https://www.marktguru.de/offers/25588052",
-    "scrapedAt": "2026-11-09T13:29:05.893Z"
-  },
-  {
     "brand": "Monster",
     "supermarket": "Lidl",
     "title": "Energy Drink",
@@ -33,6 +15,24 @@
     "imageUrl": "https://cdn.marktguru.de/api/v1/offers/25682987/images/default/0/medium.webp",
     "offerId": 25682987,
     "sourceUrl": "https://www.marktguru.de/offers/25682987",
-    "scrapedAt": "2026-11-09T13:29:05.894Z"
+    "scrapedAt": "2026-11-16T13:14:59.792Z"
+  },
+  {
+    "brand": "Rockstar",
+    "supermarket": "Lidl",
+    "title": "Energy-Drink",
+    "productBrand": "Rockstar",
+    "description": "HINWEIS: MIT LIDL PLUS APP Versch. Sorten. Taurin- und koffeinhaltig. Je 4x 0,5 l zzgl. 1.- Pfand Entspricht -.50/Stk. Kauf von 4 Stk. Einzelpreis: -.99 zzgl. 0.25 Pfand",
+    "price": "2,00 €",
+    "priceNumber": 2,
+    "referencePrice": 1,
+    "unit": "Liter",
+    "quantity": 4,
+    "validFrom": "2026-11-22T23:00:00Z",
+    "validTo": "2026-11-28T22:59:59Z",
+    "imageUrl": "https://cdn.marktguru.de/api/v1/offers/25774492/images/default/0/medium.webp",
+    "offerId": 25774492,
+    "sourceUrl": "https://www.marktguru.de/offers/25774492",
+    "scrapedAt": "2026-11-16T13:14:59.792Z"
   }
 ]

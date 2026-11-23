@@ -1,22 +1,22 @@
 [
   {
     "supermarket": "Penny",
-    "brand": "Monster",
-    "productBrand": "Monster",
+    "brand": "Red Bull",
+    "productBrand": "Red Bull",
     "title": "Energy-Drink*",
-    "description": "je 0,5 I",
-    "salesUnit": "je 0,5 I",
+    "description": "je 250 ml",
+    "salesUnit": "je 250 ml",
     "price": "0,99 €",
     "priceNumber": 0.99,
-    "oldPrice": "1,59 €",
-    "pricePerLiter": 1.98,
+    "oldPrice": "1,49 €",
+    "pricePerLiter": 3.96,
     "appPriceNumber": 0.89,
-    "appPerLiter": 1.78,
-    "validFrom": "2026-11-15T23:00:00.000Z",
-    "validTo": "2026-11-21T22:59:00.000Z",
-    "imageUrl": "https://cdn.penny.de/dam/jcr:a4dbfeca-1fd4-46c7-8c92-fad3327acf29/24972656.png?impolicy=penny&imwidth=200",
-    "sourceUrl": "https://www.penny.de/angebote/getraenke/monster-energy-drink",
-    "offerId": "1dcc1fd8-f908-4965-9bb4-41a45c9ebd94",
-    "scrapedAt": "2026-11-16T13:15:01.077Z"
+    "appPerLiter": 3.56,
+    "validFrom": "2026-11-22T23:00:00.000Z",
+    "validTo": "2026-11-28T22:59:00.000Z",
+    "imageUrl": "https://cdn.penny.de/dam/jcr:468451e8-440c-48d6-8807-a430bf4976ef/53676715.png?impolicy=penny&imwidth=200",
+    "sourceUrl": "https://www.penny.de/angebote/top-angebote/red-bull-energy-drink",
+    "offerId": "4307a269-82a0-4825-ac31-840e846d9975",
+    "scrapedAt": "2026-11-23T15:31:33.385Z"
   }
 ]
